@@ -1,0 +1,1418 @@
+{
+  "updatedAt": "2026-02-21T19:10:01.615Z",
+  "createdAt": "2026-02-21T07:49:23.465Z",
+  "id": "MSegAouawkKzdaUF",
+  "name": "My workflow 12",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1872,
+        416
+      ],
+      "id": "6536f599-e447-4a25-980d-14da44079b58",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1632,
+        528
+      ],
+      "id": "65a98f5d-7548-4efc-98dc-a56de6b01a18",
+      "name": "Get a file",
+      "webhookId": "0e4cb516-7116-43cc-9632-c80c02c72bf1",
+      "credentials": {
+        "telegramApi": {
+          "id": "puWFBaP6cvSY4W9C",
+          "name": "Helper Doc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1312,
+        528
+      ],
+      "id": "62334c00-7012-4bd2-a3fe-7bd521efa02f",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45b5b690-0356-452e-a4a7-98042823f89d",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        400
+      ],
+      "id": "c002f913-8cd3-4d5c-80c2-461d3712a56d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b498bbcb-54a3-411b-ab0f-2715d19d78cd",
+              "name": "query",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8d2f65a5-63d0-4b99-ad25-d31ec84e4079",
+              "name": "max_results",
+              "value": 5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        400
+      ],
+      "id": "7fa4c4cd-7437-4116-b428-9c97ba8f3f87",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_id",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -480,
+        400
+      ],
+      "id": "3d60c229-0763-408f-8685-c7833ab23125",
+      "name": "Узнаем обращался ли клиент ранее?",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-profile-complete",
+              "leftValue": "={{ $json.profile_complete }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        400
+      ],
+      "id": "5c032f95-4a67-42b3-8d16-9668c1f9a1fa",
+      "name": "Профиль заполнен?"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ 'astro_' + $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        736
+      ],
+      "id": "261709f1-b725-4aee-8da0-00f6bf260caf",
+      "name": "Memory Onboarding"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        736
+      ],
+      "id": "33e2376e-039c-4dd5-9f61-07289d7895d1",
+      "name": "OpenAI Onboarding Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — дружелюбный помощник астрологического бота. Твоя задача — собрать данные нового пользователя для составления персональных прогнозов.\n\nТЕКУЩИЙ ШАГ ОНБОРДИНГА:\nПроанализируй историю диалога и определи, что уже собрано, а что ещё нет.\n\nДанные для сбора (по очереди, ОДНО за раз):\n1. Имя\n2. Дата рождения (формат ДД.ММ.ГГГГ)\n3. Место рождения\n4. Удобное время для ежедневного прогноза (формат ЧЧ:ММ, например 09:00, по московскому времени)\n\nПРАВИЛА:\n- Задавай ТОЛЬКО ОДИН вопрос за раз\n- Будь тёплым, называй пользователя по имени как только узнаешь его\n- Если пользователь ввёл данные не в том формате — мягко попроси исправить\n- Для пункта 4: после получения города — автоматически определи timezone в формате IANA:\n  Примеры: Москва→Europe/Moscow, Санкт-Петербург→Europe/Moscow, Новосибирск→Asia/Novosibirsk,\n  Екатеринбург→Asia/Yekaterinburg, Красноярск→Asia/Krasnoyarsk, Владивосток→Asia/Vladivostok,\n  Калининград→Europe/Kaliningrad, Алматы→Asia/Almaty, Минск→Europe/Minsk, Киев→Europe/Kiev,\n  Ташкент→Asia/Tashkent, Баку→Asia/Baku, Тбилиси→Asia/Tbilisi, Лондон→Europe/London,\n  Берлин→Europe/Berlin, Париж→Europe/Paris, Дубай→Asia/Dubai, Нью-Йорк→America/New_York.\n  Если город неизвестен — используй Europe/Moscow по умолчанию.\n- Если все пять пунктов уже есть в истории диалога — ответь СТРОГО JSON и ничего больше:\n{\"onboarding_complete\":true,\"first_name\":\"Имя\",\"last_name\":\"Фамилия\",\"birth_date\":\"ДД.ММ.ГГГГ\",\"city\":\"Город\",\"preferred_time\":\"ЧЧ:ММ\",\"timezone\":\"IANA/Timezone\"}\n\nЕсли данные ещё не собраны — начни с приветствия и попроси имя:\n«Привет! 🌟 Я астрологический помощник. Чтобы составлять для тебя персональные прогнозы, мне нужно немного узнать о тебе. Как тебя зовут?»"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        528
+      ],
+      "id": "2939628e-2725-4967-aa91-44e3b2a799bb",
+      "name": "Onboarding Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.item.json.output || '';\n\n// Попытаемся найти JSON в ответе\nconst jsonMatch = output.match(/\\{[\\s\\S]*\\\"onboarding_complete\\\"[\\s\\S]*\\}/);\n\nif (jsonMatch) {\n  try {\n    const parsed = JSON.parse(jsonMatch[0]);\n    if (parsed.onboarding_complete === true) {\n      const preferredTime = parsed.preferred_time || '09:00';\n      return [{\n        json: {\n          is_onboarding_done: true,\n          first_name: parsed.first_name || '',\n          birth_date: parsed.birth_date || '',\n          city: parsed.city || '',\n          preferred_time: preferredTime,\n          timezone: parsed.timezone || 'Europe/Moscow',\n          message: `Отлично, ${parsed.first_name}! 🌟\\n\\nТвой профиль создан:\\n👤 ${parsed.first_name}\\n🎂 Дата рождения: ${parsed.birth_date}\\n🌍 Город: ${parsed.city}\\n⏰ Ежедневный прогноз: ${preferredTime}\\n\\nКаждый день в ${preferredTime} я буду отправлять тебе персональный астрологический прогноз! ✨\\n\\nА прямо сейчас можешь запросить прогноз на день, неделю или месяц — просто напиши мне 🔮`\n        }\n      }];\n    }\n  } catch (e) {\n    // не JSON — продолжаем диалог\n  }\n}\n\nreturn [{\n  json: {\n    is_onboarding_done: false,\n    message: output\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        528
+      ],
+      "id": "8427c917-a614-45b9-98dc-2cfccf8a4186",
+      "name": "Parse Onboarding Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-done",
+              "leftValue": "={{ $json.is_onboarding_done }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        528
+      ],
+      "id": "42169c3a-ff75-4342-89f8-cae01e4c2530",
+      "name": "Онбординг завершён?"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "username": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+            "first_name": "={{ $json.first_name }}",
+            "birth_date": "={{ $json.birth_date }}",
+            "city": "={{ $json.city }}",
+            "preferred_time": "={{ $json.preferred_time }}",
+            "timezone": "={{ $json.timezone }}",
+            "profile_complete": "YES",
+            "first_time_ask": "={{ $now.toISO() }}",
+            "last_time_ask": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        432
+      ],
+      "id": "3bbd707d-890e-490e-8265-0029eb56d571",
+      "name": "Сохранить профиль в Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Parse Onboarding Response').item.json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        432
+      ],
+      "id": "f7ee78e9-3646-4162-af5f-3c90e633a6b4",
+      "name": "Отправить приветствие",
+      "webhookId": "0b610eb1-2f96-46ec-a514-ef62bd2ef2f8",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        640
+      ],
+      "id": "c60f7f86-c51a-40cf-a3ca-88256496960b",
+      "name": "Отправить вопрос онбординга",
+      "webhookId": "5901e0a2-2558-4339-8b22-747396c4d773",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ 'main_' + $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        208
+      ],
+      "id": "97275d65-7bdc-4def-a2b7-c500114a5c05",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        208
+      ],
+      "id": "1dae7702-117a-4de1-8110-763e23be1eb5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог с глубокими знаниями западной и ведической астрологии. Твоя задача — составлять персонализированные астрологические прогнозы на основе натальных данных пользователя.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ (из базы):\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\nДата рождения: {{ $('Узнаем обращался ли клиент ранее?').item.json.birth_date || 'не указана' }}\nГород: {{ $('Узнаем обращался ли клиент ранее?').item.json.city || 'не указан' }}\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nШАГ 1 — АВТОМАТИЧЕСКИ ОПРЕДЕЛИ ЗНАК ЗОДИАКА:\nПо дате рождения из базы вычисли знак зодиака пользователя:\n- Овен: 21.03 – 19.04\n- Телец: 20.04 – 20.05\n- Близнецы: 21.05 – 20.06\n- Рак: 21.06 – 22.07\n- Лев: 23.07 – 22.08\n- Дева: 23.08 – 22.09\n- Весы: 23.09 – 22.10\n- Скорпион: 23.10 – 21.11\n- Стрелец: 22.11 – 21.12\n- Козерог: 22.12 – 19.01\n- Водолей: 20.01 – 18.02\n- Рыбы: 19.02 – 20.03\n\nШАГ 2 — ПРОВЕРЬ, ЗАПРАШИВАЛ ЛИ ПОЛЬЗОВАТЕЛЬ ЭТОТ ПЕРИОД РАНЕЕ:\nПроанализируй историю диалога выше. Найди, был ли уже прогноз на этот же период (дату, неделю или месяц).\n\nЕСЛИ ПЕРИОД УЖЕ БЫЛ В ИСТОРИИ:\n- Сохрани тот же общий смысл, выводы и астрологическую суть прогноза\n- Полностью перепиши текст другими словами — новые метафоры, другой порядок мыслей, свежие формулировки\n- Добавь 1-2 новых детали или акцента, которых не было в прошлый раз\n- Не упоминай, что это повтор — просто дай свежую версию прогноза\n- Аффирмацию составь новую, но по смыслу близкую к предыдущей\n\nЕСЛИ ПЕРИОД НОВЫЙ — составляй прогноз с нуля как обычно.\n\nШАГ 4 — СОСТАВЬ ПЕРСОНАЛЬНЫЙ ПРОГНОЗ:\nИспользуй все вычисленные данные для создания уникального прогноза. Каждый прогноз должен опираться на:\n- Знак Солнца и его текущие транзиты\n- Положение Луны на прогнозируемую дату (убывающая /\n- Числовой код судьбы\n- Ограничь персональный прогноз до 2-4 предложений на каждый подпункт.\n\nПРАВИЛА ОПРЕДЕЛЕНИЯ ПЕРИОДА:\n- Если пользователь говорит «на сегодня» → прогноз на {{ $now.toFormat('dd.MM.yyyy') }}\n- Если пользователь говорит «на завтра» → прогноз на {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\n- Если пользователь говорит «на эту неделю» → период с {{ $now.startOf('week').toFormat('dd.MM.yyyy') }} по {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\n- Если пользователь говорит «на следующую неделю» → период с {{ $now.plus({weeks: 1}).startOf('week').toFormat('dd.MM.yyyy') }} по {{ $now.plus({weeks: 1}).endOf('week').toFormat('dd.MM.yyyy') }}\n- Если пользователь говорит «на этот месяц» → {{ $now.toFormat('MMMM yyyy') }}\n- Если пользователь говорит «на следующий месяц» → {{ $now.plus({months: 1}).toFormat('MMMM yyyy') }}\n- Если период НЕ указан — составляй прогноз на сегодня ({{ $now.toFormat('dd.MM.yyyy') }}) по умолчанию, без лишних уточнений\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n- Ты - близкая подружка/друг. Стиль общения неформальный, тёплый, но авторитетный в астрологии. Без вольностей и панибратства.\n- Обращайся к пользователю по имени\n- В начале прогноза всегда указывай знак зодиака и точную дату или период прогноза\n- Используй астрологическую терминологию (транзиты, аспекты, дома, ретроградность), но объясняй её доступно\n- Избегай категоричных негативных предсказаний — предлагай, как использовать энергию момента\n- Никогда не спрашивай знак зодиака — ты определяешь его сам из даты рождения\n- Сообщения не очень длинные, иногда сопровождаются эмодзи из списка : ✨🥺💫💞🔮🌠🎑💗🥹\n- В обращениях не используй полное имя! Обращается на ты.\n\nСТРУКТУРА ПРОГНОЗА:\n1. 🌟 Общая энергия периода\n2. 💕 Любовь и отношения\n3. 💼 Карьера и финансы\n4. 🌿 Здоровье и энергетика\n5. 🔮 Совет на период\n6. ✨ Аффирмация дня: [уникальная фраза, составленная под знак и текущую дату]\n\nВАЖНЫЕ ПРАВИЛА:\n- СТРУКТУРЫ НЕ ПРИДЕРЖИВАЕМСЯ. Ты сам может уточнить у юзера что его интересует.\n- В один и тот же день, период не может быть взаимоисключающих прогнозов на разные темы. Если пользователь уже получал прогноз на конкретную тему, то вежливо напоминаем о том что прогноз на этот день уже есть и слегка дополняем. Максимальное количество дополнений - 2\n- Привязывай прогноз к реальным астрологическим событиям текущего периода (фаза Луны, сезон, планетарные транзиты)\n- Не делай медицинских, юридических или финансовых рекомендаций в буквальном смысле\n- Если дата рождения в базе не указана — вежливо попроси пользователя её уточнить, сообщив что без неё невозможно составить персональный прогноз\n- Ограничь персональный прогноз до 2-4 предложений на каждый подпункт."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "95ba70b9-fc0f-4c60-a9bc-7fdd9a7c2bcf",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "49f70298-712c-47e4-a99c-348ba9333326",
+      "name": "Text from bot",
+      "webhookId": "67cb4cf7-0364-49b5-9bb6-3e4c13706065",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        0
+      ],
+      "id": "81243807-b565-4b07-9381-a9cc9d36ba50",
+      "name": "Обновить last_time_ask",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2160,
+        416
+      ],
+      "id": "f0dc41d4-73d0-43ff-87d0-a68825aa83e1",
+      "name": "Telegram Trigger",
+      "webhookId": "4e2bf9a5-a199-45dd-a9b0-ffe40f8db1e0",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/15 * * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2176,
+        1008
+      ],
+      "id": "3542db12-1448-494c-8d8a-83080bfff05d",
+      "name": "Триггер каждые 15 минут"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "profile_complete",
+              "lookupValue": "YES"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1936,
+        1008
+      ],
+      "id": "98dc4f70-bd54-4f7d-92f2-4e4edf725961",
+      "name": "Получить всех клиентов из Sheets",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Фильтруем пользователей, которым сейчас нужно отправить прогноз\n// Логика: текущее время в timezone пользователя совпадает с preferred_time\n// и сегодня прогноз ещё не отправлялся\n\nconst users = $input.all();\nconst nowUTC = new Date();\n\nconst usersToNotify = [];\n\nfor (const user of users) {\n  const tz = user.json.timezone || 'Europe/Moscow';\n  const preferredTime = user.json.preferred_time || '09:00';\n  const lastSent = user.json.last_daily_sent || '';\n\n  // Получаем текущее время в timezone пользователя\n  const userTimeStr = nowUTC.toLocaleTimeString('ru-RU', {\n    timeZone: tz,\n    hour: '2-digit',\n    minute: '2-digit',\n    hour12: false\n  });\n\n  // Получаем текущую дату в timezone пользователя\n  const userDateStr = nowUTC.toLocaleDateString('ru-RU', {\n    timeZone: tz,\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit'\n  });\n\n  // Парсим время\n  const [curH, curM] = userTimeStr.split(':').map(Number);\n  const [prefH, prefM] = preferredTime.split(':').map(Number);\n\n  // Разница в минутах (проверяем попадание в 15-минутное окно)\n  const curTotalMin = curH * 60 + curM;\n  const prefTotalMin = prefH * 60 + prefM;\n  const diffMinutes = Math.abs(curTotalMin - prefTotalMin);\n\n  // Проверяем что сегодня ещё не отправляли\n  // last_daily_sent хранится в ISO формате, преобразуем к дате пользователя\n  let alreadySentToday = false;\n  if (lastSent) {\n    const lastSentDate = new Date(lastSent).toLocaleDateString('ru-RU', {\n      timeZone: tz,\n      year: 'numeric',\n      month: '2-digit',\n      day: '2-digit'\n    });\n    alreadySentToday = lastSentDate === userDateStr;\n  }\n\n  if (diffMinutes <= 14 && !alreadySentToday) {\n    usersToNotify.push({\n      json: {\n        telegram_id: user.json.telegram_id,\n        first_name: user.json.first_name,\n        last_name: user.json.last_name,\n        birth_date: user.json.birth_date,\n        city: user.json.city,\n        timezone: tz,\n        preferred_time: preferredTime,\n        user_current_time: userTimeStr,\n        user_current_date: userDateStr\n      }\n    });\n  }\n}\n\nif (usersToNotify.length === 0) {\n  // Никому не нужно отправлять — возвращаем пустой массив\n  // n8n остановит выполнение дальше если нет данных\n  return [];\n}\n\nreturn usersToNotify;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1696,
+        1008
+      ],
+      "id": "0c206f5e-f9a3-403e-a249-e97e49e9326c",
+      "name": "Фильтр: кому сейчас отправлять"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "==Составь утреннее пожелание на сегодня {{ $json.user_current_date }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "==Ты — астролог, который каждое утро отправляет короткое персональное пожелание на день.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ:\nИмя: {{ $json.first_name || 'не указано' }}\nДата рождения: {{ $json.birth_date || 'не указана' }}\nСегодня: {{ $json.user_current_date }}\n\nТВОЯ ЗАДАЧА:\nПо дате рождения автоматически определи знак зодиака и составь одно короткое пожелание на сегодняшний день.\n\nЗнаки зодиака:\n- Овен: 21.03–19.04 | Телец: 20.04–20.05 | Близнецы: 21.05–20.06\n- Рак: 21.06–22.07 | Лев: 23.07–22.08 | Дева: 23.08–22.09\n- Весы: 23.09–22.10 | Скорпион: 23.10–21.11 | Стрелец: 22.11–21.12\n- Козерог: 22.12–19.01 | Водолей: 20.01–18.02 | Рыбы: 19.02–20.03\n\nФОРМАТ ОТВЕТА — строго одна строка, ничего больше:\n✨[Пожелание на день]✨\n\nПРАВИЛА:\n- Пожелание короткое — одно предложение, максимум 15 слов\n- Тёплый, чуть ироничный тон — как от мудрого друга\n- Каждый день новое, непохожее на предыдущее\n- Никаких приветствий, подписей, объяснений — только сама строка с ✨\n- Опирайся на энергию дня, фазу Луны и знак пользователя\n\nПРИМЕРЫ ПРАВИЛЬНОГО ФОРМАТА:\n✨Сегодня день лучше всего посвятить себе, собственно, как и всю жизнь✨\n✨Звёзды советуют улыбнуться первым — это всегда работает✨\n✨Сегодня Луна на твоей стороне, главное — не мешай ей✨"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        1008
+      ],
+      "id": "191698a2-9a15-4796-b86b-c0782e4743a2",
+      "name": "AI Agent — Ежедневный прогноз",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1440,
+        1200
+      ],
+      "id": "37e0b7c2-00c9-45d7-90bf-c60781668e25",
+      "name": "OpenAI Daily Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Фильтр: кому сейчас отправлять').item.json.telegram_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1008,
+        1008
+      ],
+      "id": "607887c2-2a87-4d2e-ae17-090431ddbbed",
+      "name": "Отправить прогноз в Telegram",
+      "webhookId": "97f6d7b9-10d3-4f5d-a09f-1669f1cab396",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Фильтр: кому сейчас отправлять').item.json.telegram_id }}",
+            "last_daily_sent": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -752,
+        1008
+      ],
+      "id": "d46b46a5-9aa3-4fb8-9e5c-d01712b692a0",
+      "name": "Обновить last_daily_sent",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Узнаем обращался ли клиент ранее?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Узнаем обращался ли клиент ранее?": {
+      "main": [
+        [
+          {
+            "node": "Профиль заполнен?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Профиль заполнен?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Onboarding": {
+      "ai_memory": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Onboarding Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Onboarding Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Onboarding Response": {
+      "main": [
+        [
+          {
+            "node": "Онбординг завершён?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Онбординг завершён?": {
+      "main": [
+        [
+          {
+            "node": "Сохранить профиль в Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отправить вопрос онбординга",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить профиль в Sheets": {
+      "main": [
+        [
+          {
+            "node": "Отправить приветствие",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Text from bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_time_ask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Триггер каждые 15 минут": {
+      "main": [
+        [
+          {
+            "node": "Получить всех клиентов из Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить всех клиентов из Sheets": {
+      "main": [
+        [
+          {
+            "node": "Фильтр: кому сейчас отправлять",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фильтр: кому сейчас отправлять": {
+      "main": [
+        [
+          {
+            "node": "AI Agent — Ежедневный прогноз",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — Ежедневный прогноз": {
+      "main": [
+        [
+          {
+            "node": "Отправить прогноз в Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Daily Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — Ежедневный прогноз",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отправить прогноз в Telegram": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_daily_sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Триггер каждые 15 минут": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "442b1801-e7bc-442f-b91e-6f10b3a304a6",
+  "activeVersionId": null,
+  "versionCounter": 8,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T07:49:23.465Z",
+      "createdAt": "2026-02-21T07:49:23.465Z",
+      "role": "workflow:owner",
+      "workflowId": "MSegAouawkKzdaUF",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
