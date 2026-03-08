@@ -1,0 +1,779 @@
+{
+  "updatedAt": "2026-02-23T18:16:51.347Z",
+  "createdAt": "2026-02-20T11:53:14.262Z",
+  "id": "DTHkJtI9vuEi3wo7",
+  "name": "🗓️ Логопед v3 — AI Agent + Кнопки",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "v3-n01",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        304
+      ],
+      "webhookId": "logoped-v3-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst msg = $input.first().json;\nconst isCallback = !!msg.callback_query;\nconst chat_id = String(isCallback\n  ? msg.callback_query.message.chat.id\n  : msg.message?.chat?.id || '');\nconst user_id = String(isCallback\n  ? msg.callback_query.from?.id\n  : msg.message?.from?.id || chat_id);\nconst text = isCallback\n  ? (msg.callback_query.data || '')\n  : (msg.message?.text || '');\nconst first_name = isCallback\n  ? (msg.callback_query.from?.first_name || '')\n  : (msg.message?.from?.first_name || '');\nconst callback_id = isCallback ? msg.callback_query.id : null;\nreturn [{ json: { chat_id, user_id, text, first_name, isCallback, callback_id } }];\n"
+      },
+      "id": "v3-n02",
+      "name": "Разобрать входящее",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "returnAll": true,
+        "options": {
+          "orderBy": "startTime"
+        }
+      },
+      "id": "v3-n03",
+      "name": "Получить события Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -1360,
+        512
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $('Разобрать входящее').first().json;\nconst chat_id = inp.chat_id;\nconst user_id = inp.user_id;\nconst text = inp.text;\nconst first_name = inp.first_name;\nconst isCallback = inp.isCallback;\nconst callback_id = inp.callback_id;\n\nconst busyEvents = $input.all().map(i => i.json);\nconst busySlots = busyEvents.map(e => ({\n  start: new Date(e.start?.dateTime || e.start?.date + 'T00:00:00+03:00'),\n  end:   new Date(e.end?.dateTime   || e.end?.date   + 'T23:59:59+03:00')\n})).filter(e => !isNaN(e.start.getTime()));\n\nconst WORK_START = 10, WORK_END = 17;\nconst freeByDate = {};\nconst now = new Date();\n\nfor (let offset = 1; offset <= 7; offset++) {\n  const day = new Date(now);\n  day.setDate(day.getDate() + offset);\n  const dow = day.getDay();\n  if (dow === 0) continue;\n\n  const dateStr = day.toISOString().slice(0,10);\n  const [y,m,dd] = dateStr.split('-');\n  const dayNames = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];\n  const label = dayNames[dow] + ' ' + dd + '.' + m;\n\n  const slots = [];\n  for (let h = WORK_START; h < WORK_END; h++) {\n    const sStart = new Date(dateStr + 'T' + String(h).padStart(2,'0') + ':00:00+03:00');\n    const sEnd   = new Date(sStart.getTime() + 3600000);\n    const busy = busySlots.some(e => sStart < e.end && sEnd > e.start);\n    if (!busy) slots.push(String(h).padStart(2,'0') + ':00');\n  }\n  if (slots.length > 0) {\n    freeByDate[dateStr] = { label: label, slots: slots, count: slots.length };\n  }\n}\n\nconst slotsLines = Object.entries(freeByDate)\n  .map(function(e) { return e[1].label + ' (' + e[0] + '): ' + e[1].slots.join(', '); })\n  .join('\\n');\n\nreturn [{ json: {\n  chat_id: chat_id, user_id: user_id, text: text, first_name: first_name,\n  isCallback: isCallback, callback_id: callback_id,\n  freeByDate: freeByDate,\n  freeDates: Object.keys(freeByDate),\n  slotsText: slotsLines || 'Нет свободных слотов на ближайшую неделю',\n  isCallbackStr: isCallback ? 'yes' : 'no'\n}}];\n"
+      },
+      "id": "v3-n04",
+      "name": "Вычислить слоты",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        304
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "is-cb",
+                    "leftValue": "={{ $json.isCallbackStr }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "v3-n05",
+      "name": "Callback или текст?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -848,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $input.first().json;\nconst data = ctx.text;\nconst freeByDate = ctx.freeByDate;\n\nlet action = null, date = null, time = null, replyText = null, replyMarkup = null;\n\nif (data.startsWith('date_')) {\n  date = data.slice(5);\n  const info = freeByDate[date];\n  const slots = info ? info.slots : [];\n  const label = info ? info.label : date;\n  action = 'show_times';\n  replyText = '\\uD83D\\uDCC5 *' + label + '* \\u2014 выберите время:';\n  const timeRows = slots.map(function(t) { return [{ text: '\\uD83D\\uDD50 ' + t, callback_data: 'time_' + date + '_' + t }]; });\n  timeRows.push([{ text: '\\u2B05\\uFE0F Другая дата', callback_data: 'back_dates' }]);\n  replyMarkup = { inline_keyboard: timeRows };\n} else if (data.startsWith('time_')) {\n  const parts = data.slice(5).split('_');\n  date = parts[0]; time = parts[1];\n  const label = freeByDate[date] ? freeByDate[date].label : date;\n  action = 'confirm';\n  replyText = 'Подтвердите запись:\\n\\n\\uD83D\\uDCC5 *' + label + ' в ' + time + '*\\n\\u23F1 60 минут';\n  replyMarkup = {\n    inline_keyboard: [\n      [{ text: '\\u2705 Записаться!', callback_data: 'confirm_' + date + '_' + time }],\n      [{ text: '\\u2B05\\uFE0F Другое время', callback_data: 'date_' + date }]\n    ]\n  };\n} else if (data.startsWith('confirm_')) {\n  const parts = data.slice(8).split('_');\n  date = parts[0]; time = parts[1];\n  action = 'book';\n} else if (data === 'back_dates') {\n  action = 'show_dates';\n  const freeDates = Object.keys(freeByDate);\n  replyText = 'Выберите удобную дату:';\n  replyMarkup = {\n    inline_keyboard: freeDates.map(function(d) {\n      const info = freeByDate[d];\n      const cnt = info.count;\n      const word = cnt === 1 ? 'слот' : (cnt < 5 ? 'слота' : 'слотов');\n      return [{ text: '\\uD83D\\uDCC5 ' + info.label + ' \\u2014 ' + cnt + ' ' + word, callback_data: 'date_' + d }];\n    })\n  };\n}\n\nreturn [{ json: Object.assign({}, ctx, { action: action, date: date, time: time, replyText: replyText, replyMarkup: replyMarkup }) }];\n"
+      },
+      "id": "v3-n06",
+      "name": "Разобрать callback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "book",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "book",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "v3-n07",
+      "name": "Роутер callback",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "start": "={{ $json.date + 'T' + $json.time + ':00+03:00' }}",
+        "end": "={{ $json.date + 'T' + String(parseInt($json.time.split(':')[0])+1).padStart(2,'0') + ':00:00+03:00' }}",
+        "additionalFields": {
+          "description": "={{ 'Telegram user_id: ' + $json.user_id }}",
+          "summary": "={{ '📚 Логопед: ' + $json.first_name }}"
+        }
+      },
+      "id": "v3-n08",
+      "name": "Создать событие",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        0
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1uIJugsf5bsJ5CcAn7f6tzBWPEEY7fvNmmSkhKbczp64",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "appointment_id": "={{ 'B' + Date.now() }}",
+            "user_id": "={{ $('Разобрать callback').first().json.user_id }}",
+            "child_name": "={{ $('Разобрать callback').first().json.first_name }}",
+            "phone": "",
+            "datetime": "={{ $('Разобрать callback').first().json.date + ' ' + $('Разобрать callback').first().json.time }}",
+            "status": "active",
+            "feedback_sent": ""
+          },
+          "schema": [
+            {
+              "id": "appointment_id",
+              "displayName": "appointment_id",
+              "required": false,
+              "defaultMatch": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "child_name",
+              "displayName": "child_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datetime",
+              "displayName": "datetime",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feedback_sent",
+              "displayName": "feedback_sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "v3-n09",
+      "name": "Записать бронь",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        208,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst cb = $('Разобрать callback').first().json;\nconst fbd = cb.freeByDate || {};\nconst label = fbd[cb.date]?.label || cb.date;\nreturn [{ json: {\n  ...cb,\n  replyText: `🎉 *${cb.first_name || 'Вы'}*, запись подтверждена!\\n\\n📅 ${label} в ${cb.time}\\n⏱ 60 минут\\n\\nЗа день пришлю напоминание. До встречи! 📚`,\n  replyMarkup: null,\n  action: 'booked'\n}}];\n"
+      },
+      "id": "v3-n10",
+      "name": "Ответ о бронировании",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "136356612",
+        "text": "={{ '🆕 Новая запись!\\n\\n👤 ' + $('Разобрать callback').first().json.first_name + '\\n📅 ' + $('Разобрать callback').first().json.date + ' в ' + $('Разобрать callback').first().json.time + '\\nChat ID: ' + $('Разобрать callback').first().json.chat_id }}",
+        "additionalFields": {}
+      },
+      "id": "v3-n11",
+      "name": "Уведомить администратора",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        192
+      ],
+      "webhookId": "e227b3b2-57fd-49fd-b6d8-5ac084076a97",
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $input.first().json;\nreturn [{ json: {\n  chat_id: ctx.chat_id,\n  user_id: ctx.user_id,\n  isCallback: ctx.isCallback,\n  callback_id: ctx.callback_id,\n  replyText: ctx.output || '',\n  replyMarkup: ctx.replyMarkup || null\n}}];\n"
+      },
+      "id": "v3-n15",
+      "name": "Подготовить ответ агента",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn [{ json: $input.first().json }];\n"
+      },
+      "id": "v3-n16",
+      "name": "Объединить ветки",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Разобрать входящее').first().json.callback_id }}",
+        "additionalFields": {}
+      },
+      "id": "v3-n17",
+      "name": "Ответить на callback",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        144
+      ],
+      "webhookId": "09a0fd54-7c15-4afa-b76e-f4557256488c",
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.replyText || '...' }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": "={{ $json.replyMarkup ? JSON.stringify($json.replyMarkup) : '' }}"
+        }
+      },
+      "id": "v3-n18",
+      "name": "Отправить ответ",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        304
+      ],
+      "webhookId": "26d37e3b-18d7-4eec-8446-34cc210a9624",
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "s1",
+                    "leftValue": "={{ $json._isCallback }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "s2",
+                    "leftValue": "={{ $json._isCallback }}",
+                    "rightValue": "no",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "v3-n05b",
+      "name": "Роутер входящего",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -608,
+        304
+      ]
+    },
+    {
+      "id": "n-deepseek-direct",
+      "name": "DeepSeek Direct",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        700
+      ],
+      "parameters": {
+        "jsCode": "const ctx = $input.first().json;\nconst userId = ctx.user_id;\nconst userText = ctx.text;\nconst slotsText = ctx.slotsText || '';\nconst firstName = ctx.first_name || '';\nconst freeByDate = ctx.freeByDate || {};\nconst freeDates = Object.keys(freeByDate);\n\nfunction dateBtns() {\n  return freeDates.map(function(d) {\n    const info = freeByDate[d];\n    const cnt = info.count;\n    const word = cnt === 1 ? 'слот' : (cnt < 5 ? 'слота' : 'слотов');\n    return [{ text: '📅 ' + info.label + ' — ' + cnt + ' ' + word, callback_data: 'date_' + d }];\n  });\n}\n\n// /start — welcome + date buttons\nif (userText === '/start') {\n  const greet = firstName ? ('Hello' + firstName + '! 👋\\n\\n') : '';\n  const markup = freeDates.length > 0 ? { inline_keyboard: dateBtns() } : null;\n  return [{ json: Object.assign({}, ctx, {\n    output: greet + 'Я помогаю записаться к логопеду.\\n\\nВыберите удобную дату:',\n    replyMarkup: markup\n  })}];\n}\n\n// Conversation history\nconst sd = $getWorkflowStaticData('global');\nconst histKey = 'h_' + userId;\nlet history = sd[histKey] || [];\n\nconst systemMsg = 'Ты — Алиса, помощник по записи к логопеду. '\n  + 'Правила:\\n'\n  + '1. При первом сообщении — поздоровайся и предложи выбрать дату.\\n'\n  + '2. Когда хочет записаться — скажи \"выберите дату из кнопок ниже\".\\n'\n  + '3. Отвечай кратко (1-3 предложения), по-русски.\\n'\n  + '4. Не придумывай даты — только из [Свободных слотов].\\n'\n  + '5. Занятие 60 мин, отмена за 24ч.\\n\\n'\n  + '[Свободные слоты]:\\n' + slotsText;\n\nconst messages = [{ role: 'system', content: systemMsg }]\n  .concat(history.slice(-8))\n  .concat([{ role: 'user', content: userText }]);\n\nlet reply = '';\ntry {\n  const resp = await $helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.deepseek.com/chat/completions',\n    headers: {\n      'Authorization': 'Bearer sk-7f37cfdf82d54d60a3970e4f20e3622e',\n      'Content-Type': 'application/json'\n    },\n    body: { model: 'deepseek-chat', messages: messages, max_tokens: 500, temperature: 0.7 },\n    json: true\n  });\n  reply = resp.choices[0].message.content;\n  history = history.concat([\n    { role: 'user', content: userText },\n    { role: 'assistant', content: reply }\n  ]);\n  if (history.length > 20) history = history.slice(-20);\n  sd[histKey] = history;\n} catch(e) {\n  reply = 'Прошу прощения, сервис временно недоступен. Повторите запрос через минуту.';\n}\n\n// Show date buttons when booking intent detected\nconst wantsBook = /запис|слот|дату|выбер|хочу|когда|время|приём|доступн/i.test(userText + reply);\nconst replyMarkup = (wantsBook && freeDates.length > 0)\n  ? { inline_keyboard: dateBtns() }\n  : null;\n\nreturn [{ json: Object.assign({}, ctx, { output: reply, replyMarkup: replyMarkup }) }];\n"
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Разобрать входящее",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать входящее": {
+      "main": [
+        [
+          {
+            "node": "Получить события Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить события Calendar": {
+      "main": [
+        [
+          {
+            "node": "Вычислить слоты",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Вычислить слоты": {
+      "main": [
+        [
+          {
+            "node": "Callback или текст?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback или текст?": {
+      "main": [
+        [
+          {
+            "node": "Разобрать callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DeepSeek Direct",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать callback": {
+      "main": [
+        [
+          {
+            "node": "Роутер callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Роутер callback": {
+      "main": [
+        [
+          {
+            "node": "Создать событие",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Объединить ветки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать событие": {
+      "main": [
+        [
+          {
+            "node": "Записать бронь",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записать бронь": {
+      "main": [
+        [
+          {
+            "node": "Ответ о бронировании",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Уведомить администратора",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ о бронировании": {
+      "main": [
+        [
+          {
+            "node": "Объединить ветки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Уведомить администратора": {
+      "main": [
+        []
+      ]
+    },
+    "Подготовить ответ агента": {
+      "main": [
+        [
+          {
+            "node": "Объединить ветки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Объединить ветки": {
+      "main": [
+        [
+          {
+            "node": "Отправить ответ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ответить на callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответить на callback": {
+      "main": [
+        []
+      ]
+    },
+    "Роутер входящего": {
+      "main": [
+        [
+          {
+            "node": "Разобрать callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DeepSeek Direct",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Direct": {
+      "main": [
+        [
+          {
+            "node": "Подготовить ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b6befe5e-eaf6-4e99-a92a-1899bc858b9c",
+  "activeVersionId": null,
+  "versionCounter": 109,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-20T11:53:14.262Z",
+      "createdAt": "2026-02-20T11:53:14.262Z",
+      "role": "workflow:owner",
+      "workflowId": "DTHkJtI9vuEi3wo7",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
