@@ -1,0 +1,1362 @@
+{
+  "updatedAt": "2026-02-20T12:37:38.579Z",
+  "createdAt": "2026-02-20T12:37:38.579Z",
+  "id": "k3XI9MVcCQcHSeX4",
+  "name": "🗓️ Логопед Бот — Запись copy",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {},
+        "path": "4dc1bb92-0d4a-4242-82a4-62b746cd029e"
+      },
+      "id": "4bd46add-4023-478d-b96d-b8ba585e43ad",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        304
+      ],
+      "webhookId": "4dc1bb92-0d4a-4242-82a4-62b746cd029e",
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first().json;\nconst chat_id = msg?.message?.chat?.id || msg?.callback_query?.message?.chat?.id || '';\nconst text = msg?.message?.text || msg?.callback_query?.data || '';\nconst first_name = msg?.message?.from?.first_name || msg?.callback_query?.from?.first_name || 'Клиент';\nconst username = msg?.message?.from?.username || '';\nreturn [{ json: { chat_id: String(chat_id), text: text.trim(), first_name, username, raw: msg } }];"
+      },
+      "id": "91cdb34c-7e62-4d64-8272-66e5a3a8073b",
+      "name": "Извлечь данные сообщения",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Сессии",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "49427b90-64a9-4a8a-8236-2834c2f0f0fa",
+      "name": "Читать Сессии",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -768,
+        208
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Записи",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "1e200077-cd38-44b7-8759-25140e5c9b01",
+      "name": "Читать Записи",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -768,
+        384
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "returnAll": true,
+        "options": {
+          "orderBy": "startTime"
+        }
+      },
+      "id": "1f89d43d-52bc-4356-8d19-938d78e41024",
+      "name": "Получить события Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -768,
+        560
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Собираем все входные данные\nconst msgData = $('Извлечь данные сообщения').first().json;\nconst chat_id = msgData.chat_id;\nconst userText = msgData.text;\nconst first_name = msgData.first_name;\n\n// Найти сессию для этого chat_id\nconst allSessions = $('Читать Сессии').all().map(i => i.json);\nconst session = allSessions.find(s => String(s.Chat_ID) === String(chat_id));\nconst history = session ? JSON.parse(session.История || '[]') : [];\nconst rowNumber = allSessions.findIndex(s => String(s.Chat_ID) === String(chat_id)) + 2; // +2 for header\n\n// Найти активные записи для этого chat_id\nconst allBookings = $('Читать Записи').all().map(i => i.json);\nconst myBookings = allBookings.filter(b => String(b.Chat_ID) === String(chat_id) && b.Статус === 'активна');\nconst bookingsText = myBookings.length > 0\n  ? myBookings.map(b => `- ${b.Дата} в ${b.Время} (ID: ${b.ID})`).join('\\n')\n  : 'нет активных записей';\n\n// Вычислить свободные слоты\nconst calData = $input.first().json;\nconst busyEvents = calData.calendarEvents || [];\nconst busySlots = busyEvents.map(e => ({\n  start: new Date(e.start?.dateTime || e.start?.date),\n  end: new Date(e.end?.dateTime || e.end?.date)\n})).filter(e => !isNaN(e.start));\n\nconst freeSlots = [];\nconst now = new Date();\nconst moscowOffset = 3 * 60; // UTC+3\nconst workStart = 9; // 9:00\nconst workEnd = 18; // 18:00\nconst slotDuration = 60; // minutes\n\nfor (let dayOffset = 0; dayOffset <= 13; dayOffset++) {\n  const day = new Date(now);\n  day.setDate(day.getDate() + dayOffset);\n  const dayOfWeek = day.getUTCDay(); // 0=Sun, 6=Sat\n  if (dayOfWeek === 0) continue; // Пропускаем воскресенье\n\n  const dateStr = day.toISOString().slice(0, 10);\n\n  for (let hour = workStart; hour < workEnd; hour++) {\n    const slotStart = new Date(`${dateStr}T${String(hour).padStart(2,'0')}:00:00+03:00`);\n    const slotEnd = new Date(slotStart.getTime() + slotDuration * 60000);\n\n    if (slotStart <= now) continue; // Не предлагаем прошедшее время\n\n    const isBusy = busySlots.some(e => slotStart < e.end && slotEnd > e.start);\n    if (!isBusy) {\n      const weekDays = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];\n      freeSlots.push({\n        date: dateStr,\n        time: `${String(hour).padStart(2,'0')}:00`,\n        label: `${weekDays[dayOfWeek]} ${dateStr} в ${String(hour).padStart(2,'0')}:00`\n      });\n    }\n  }\n  if (freeSlots.length >= 20) break; // Показываем до 20 слотов\n}\n\nconst slotsText = freeSlots.slice(0, 15).map(s => s.label).join('\\n');\n\n// Текущая дата/время\nconst nowMoscow = new Date(Date.now() + moscowOffset * 60000);\nconst currentDateTime = nowMoscow.toISOString().replace('T', ' ').slice(0, 16) + ' (Москва)';\n\n// Собрать промпт для DeepSeek\nconst systemPrompt = `Ты — вежливый помощник по записи к логопеду. Тебя зовут Алиса.\nТекущая дата и время: ${currentDateTime}\n\nТвои задачи:\n1. Приветствовать клиента и выяснить его имя (если не знаешь)\n2. Помочь выбрать удобный слот из ДОСТУПНЫХ\n3. Подтвердить запись\n4. Помочь перенести или отменить запись\n\nДОСТУПНЫЕ СЛОТЫ (только из этого списка!):\n${slotsText || 'Нет свободных слотов на ближайшие 2 недели'}\n\nСУЩЕСТВУЮЩИЕ ЗАПИСИ КЛИЕНТА:\n${bookingsText}\n\nПравила:\n- Занятие длится 60 минут\n- Предлагай только из ДОСТУПНЫХ слотов выше\n- Собери имя клиента и выбранный слот для оформления записи\n- Для переноса: уточни старый слот и новый желаемый\n- Отвечай на русском, дружелюбно и коротко\n- Если хочешь перечислить слоты — перечисляй не более 5 самых ближайших\n\nОТВЕЧАЙ ТОЛЬКО ВАЛИДНЫМ JSON БЕЗ MARKDOWN:\n{\n  \"message\": \"текст ответа клиенту\",\n  \"action\": \"reply_only | book | reschedule | cancel\",\n  \"booking\": { \"name\": \"имя\", \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM\" },\n  \"reschedule\": { \"old_date\": \"YYYY-MM-DD\", \"old_time\": \"HH:MM\", \"new_date\": \"YYYY-MM-DD\", \"new_time\": \"HH:MM\" },\n  \"cancel\": { \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM\" }\n}\nПоля booking/reschedule/cancel — null если не применяется.`;\n\n// Добавляем текущее сообщение в историю\nconst updatedHistory = [...history, { role: 'user', content: userText }];\n// Ограничиваем историю последними 10 сообщениями\nconst trimmedHistory = updatedHistory.slice(-10);\n\nconst messages = [\n  { role: 'system', content: systemPrompt },\n  ...trimmedHistory\n];\n\nreturn [{ json: {\n  chat_id,\n  first_name,\n  userText,\n  messages,\n  trimmedHistory,\n  freeSlots,\n  myBookings,\n  allBookings,\n  sessionRowNumber: session ? rowNumber : -1,\n  hasSession: !!session\n}}];"
+      },
+      "id": "fb1331b5-de7f-450d-bb70-9e361e2cc58c",
+      "name": "Подготовить промпт",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-357bc6bce80e405ba66c211ab8c33740"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-chat', messages: $json.messages, max_tokens: 600, temperature: 0.4, response_format: { type: 'json_object' } }) }}",
+        "options": {}
+      },
+      "id": "6cf3a251-4400-4079-abca-2140f7ba0c72",
+      "name": "DeepSeek Агент",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst raw = input.choices?.[0]?.message?.content || '{}';\nlet parsed;\ntry {\n  const cleaned = raw.replace(/```json|```/g, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch(e) {\n  parsed = { message: 'Извините, произошла ошибка. Попробуйте ещё раз.', action: 'reply_only', booking: null, reschedule: null, cancel: null };\n}\n\nconst prev = $('Подготовить промпт').first().json;\n\nreturn [{ json: {\n  ...prev,\n  reply_message: parsed.message || 'Произошла ошибка, попробуйте снова.',\n  action: parsed.action || 'reply_only',\n  booking: parsed.booking || null,\n  reschedule: parsed.reschedule || null,\n  cancel: parsed.cancel || null,\n  fullResponse: parsed\n}}];"
+      },
+      "id": "395bd341-2dca-4aa7-879c-e906c2c24126",
+      "name": "Разобрать ответ DeepSeek",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "book",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "reschedule",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "541cfda2-3da3-48bb-9631-5b6efa6577e9",
+      "name": "Роутер действий",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        224,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "start": "={{ $json.booking.date + 'T' + $json.booking.time + ':00' }}",
+        "end": "={{ $json.booking.date + 'T' + String(parseInt($json.booking.time.split(':')[0]) + 1).padStart(2,'00') + ':00:00' }}",
+        "additionalFields": {
+          "description": "={{ 'Клиент: ' + ($json.booking.name || '') + '\\nTelegram: ' + $json.chat_id }}",
+          "summary": "={{ '📚 Занятие: ' + ($json.booking.name || 'Клиент') }}"
+        }
+      },
+      "id": "08010360-7465-4878-95a8-cfa0aa057ec9",
+      "name": "Создать событие Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        112
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const calEvent = $input.first().json;\nconst prev = $('Разобрать ответ DeepSeek').first().json;\n\n// Генерируем уникальный ID\nconst booking_id = 'B' + Date.now();\n\nreturn [{ json: {\n  ...prev,\n  calendar_event_id: calEvent.id || '',\n  booking_id,\n  rowToAppend: {\n    ID: booking_id,\n    Имя: prev.booking?.name || '',\n    Телефон: prev.booking?.phone || '',\n    Chat_ID: prev.chat_id,\n    Дата: prev.booking?.date || '',\n    Время: prev.booking?.time || '',\n    Статус: 'активна',\n    Calendar_Event_ID: calEvent.id || '',\n    Создано: new Date().toISOString()\n  }\n}}];"
+      },
+      "id": "06db4e42-cf90-427e-9d18-c42ba7881a65",
+      "name": "Подготовить строку записи",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Записи",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.rowToAppend.ID }}",
+            "Имя": "={{ $json.rowToAppend.Имя }}",
+            "Телефон": "={{ $json.rowToAppend.Телефон }}",
+            "Chat_ID": "={{ $json.rowToAppend.Chat_ID }}",
+            "Дата": "={{ $json.rowToAppend.Дата }}",
+            "Время": "={{ $json.rowToAppend.Время }}",
+            "Статус": "активна",
+            "Calendar_Event_ID": "={{ $json.rowToAppend.Calendar_Event_ID }}",
+            "Создано": "={{ $json.rowToAppend.Создано }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Имя",
+              "displayName": "Имя",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Время",
+              "displayName": "Время",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Calendar_Event_ID",
+              "displayName": "Calendar_Event_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Создано",
+              "displayName": "Создано",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Отзыв_запрошен",
+              "displayName": "Отзыв_запрошен",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "469caee0-d3a3-441c-9757-77583ae7752f",
+      "name": "Записать в Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        944,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "136356612",
+        "text": "={{ '🆕 Новая запись!\\n\\n👤 ' + $json.rowToAppend.Имя + '\\n📅 ' + $json.rowToAppend.Дата + ' в ' + $json.rowToAppend.Время + '\\n💬 Chat ID: ' + $json.rowToAppend.Chat_ID + '\\n📞 ' + ($json.rowToAppend.Телефон || 'не указан') }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        },
+        "path": "01c33f26-7d2c-46f8-8e89-081c05b17e9f"
+      },
+      "id": "91c1c02b-2957-4504-bc38-2717a1fdb62f",
+      "name": "Уведомить администратора",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        112
+      ],
+      "webhookId": "01c33f26-7d2c-46f8-8e89-081c05b17e9f",
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst allBookings = input.allBookings || [];\nconst r = input.reschedule;\n\n// Ищем запись по дате и времени и chat_id\nconst booking = allBookings.find(b =>\n  String(b.Chat_ID) === String(input.chat_id) &&\n  b.Дата === r?.old_date &&\n  b.Время === r?.old_time &&\n  b.Статус === 'активна'\n);\n\nif (!booking) {\n  return [{ json: { ...input, error: 'booking_not_found', errorMsg: 'Запись не найдена. Проверьте дату и время.' } }];\n}\n\nreturn [{ json: { ...input, foundBooking: booking } }];"
+      },
+      "id": "ac443006-a4f0-465b-9e43-d5fc027b8abf",
+      "name": "Найти запись для переноса",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "eventId": "={{ $json.foundBooking.Calendar_Event_ID }}",
+        "updateFields": {
+          "end": "={{ $json.reschedule.new_date + 'T' + String(parseInt($json.reschedule.new_time.split(':')[0]) + 1).padStart(2,'00') + ':00:00' }}",
+          "start": "={{ $json.reschedule.new_date + 'T' + $json.reschedule.new_time + ':00' }}"
+        }
+      },
+      "id": "d3d0d460-21d0-4326-a1ba-f9853b15ddd6",
+      "name": "Обновить событие Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        384
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Записи",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата": "={{ $json.reschedule.new_date }}",
+            "Время": "={{ $json.reschedule.new_time }}",
+            "Статус": "активна",
+            "row_number": 0,
+            "ID": "={{ $json.foundBooking.ID }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Имя",
+              "displayName": "Имя",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Время",
+              "displayName": "Время",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Calendar_Event_ID",
+              "displayName": "Calendar_Event_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Создано",
+              "displayName": "Создано",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Отзыв_запрошен",
+              "displayName": "Отзыв_запрошен",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f8c49743-0ed3-4fff-9286-8c9d78e17d43",
+      "name": "Обновить строку переноса",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        944,
+        384
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst allBookings = input.allBookings || [];\nconst c = input.cancel;\n\nconst booking = allBookings.find(b =>\n  String(b.Chat_ID) === String(input.chat_id) &&\n  b.Дата === c?.date &&\n  b.Время === c?.time &&\n  b.Статус === 'активна'\n);\n\nif (!booking) {\n  return [{ json: { ...input, error: 'booking_not_found', errorMsg: 'Запись не найдена.' } }];\n}\n\nreturn [{ json: { ...input, foundBooking: booking } }];"
+      },
+      "id": "ed67fb23-8b8b-4c18-bee0-6c69774b9b64",
+      "name": "Найти запись для отмены",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "eremeevdaniil137@mail.ru",
+          "mode": "list",
+          "cachedResultName": "eremeevdaniil137@mail.ru"
+        },
+        "eventId": "={{ $json.foundBooking.Calendar_Event_ID }}",
+        "options": {}
+      },
+      "id": "d453c5f6-f7d8-4a00-b98b-b5bc27d2d692",
+      "name": "Удалить событие Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        640
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "llgActQeqUVxEewb",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Записи",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Статус": "отменена",
+            "ID": "={{ $json.foundBooking.ID }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b2debca-ba40-41c8-8546-d5f6e125828f",
+      "name": "Обновить статус отмены",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        944,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.reply_message || $json.errorMsg || 'Произошла ошибка, попробуйте снова.' }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        },
+        "path": "99568469-ce2f-4820-ae8e-c894360be863"
+      },
+      "id": "e5c1080a-1039-460c-8bd0-76935aab371f",
+      "name": "Отправить ответ клиенту",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        384
+      ],
+      "webhookId": "99568469-ce2f-4820-ae8e-c894360be863",
+      "credentials": {
+        "telegramApi": {
+          "id": "vreHOidWlmOz9B1Y",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Разобрать ответ DeepSeek').first().json;\nconst chat_id = input.chat_id;\nconst userText = input.userText;\nconst reply_message = input.reply_message;\nconst trimmedHistory = input.trimmedHistory || [];\nconst sessionRowNumber = input.sessionRowNumber;\nconst hasSession = input.hasSession;\n\n// Обновляем историю\nconst newHistory = [...trimmedHistory, { role: 'assistant', content: reply_message }].slice(-10);\n\nreturn [{ json: {\n  chat_id,\n  hasSession,\n  sessionRowNumber,\n  rowData: {\n    Chat_ID: chat_id,\n    История: JSON.stringify(newHistory),\n    Последнее_обновление: new Date().toISOString()\n  }\n}}];"
+      },
+      "id": "7cb318f1-8879-4f78-a500-4fe8c558fa65",
+      "name": "Подготовить обновление сессии",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.hasSession }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b66f4d8-ed69-42a4-9ef3-e9398310fccf",
+      "name": "Сессия существует?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Сессии",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "История": "={{ $json.rowData.История }}",
+            "Последнее_обновление": "={{ $json.rowData.Последнее_обновление }}",
+            "row_number": 0,
+            "Chat_ID": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [
+            "Chat_ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "История",
+              "displayName": "История",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Последнее_обновление",
+              "displayName": "Последнее_обновление",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "ce9f66f4-4c21-4a48-94c4-3f78b82a8a34",
+      "name": "Обновить сессию",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2128,
+        272
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Сессии",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat_ID": "={{ $json.chat_id }}",
+            "История": "={{ $json.rowData.История }}",
+            "Последнее_обновление": "={{ $json.rowData.Последнее_обновление }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "История",
+              "displayName": "История",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Последнее_обновление",
+              "displayName": "Последнее_обновление",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7e3acc08-cbad-472a-a46e-d4bd87384eff",
+      "name": "Создать сессию",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2128,
+        512
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Всегда передаём данные дальше, даже если Calendar пустой\nlet calEvents = [];\ntry {\n  calEvents = $('Получить события Calendar').all().map(i => i.json);\n} catch(e) {\n  calEvents = [];\n}\nreturn [{ json: { calendarEvents: calEvents } }];"
+      },
+      "id": "684d89bf-094c-4880-b0f5-89cf372f4564",
+      "name": "Передать данные",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        784
+      ],
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Извлечь данные сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Извлечь данные сообщения": {
+      "main": [
+        [
+          {
+            "node": "Читать Сессии",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Читать Записи",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Получить события Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Читать Сессии": {
+      "main": [
+        []
+      ]
+    },
+    "Читать Записи": {
+      "main": [
+        []
+      ]
+    },
+    "Получить события Calendar": {
+      "main": [
+        [
+          {
+            "node": "Передать данные",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить промпт": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek Агент",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Агент": {
+      "main": [
+        [
+          {
+            "node": "Разобрать ответ DeepSeek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать ответ DeepSeek": {
+      "main": [
+        [
+          {
+            "node": "Роутер действий",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Роутер действий": {
+      "main": [
+        [
+          {
+            "node": "Создать событие Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Найти запись для переноса",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Найти запись для отмены",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отправить ответ клиенту",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать событие Calendar": {
+      "main": [
+        [
+          {
+            "node": "Подготовить строку записи",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить строку записи": {
+      "main": [
+        [
+          {
+            "node": "Записать в Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записать в Sheets": {
+      "main": [
+        [
+          {
+            "node": "Уведомить администратора",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Уведомить администратора": {
+      "main": [
+        [
+          {
+            "node": "Отправить ответ клиенту",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти запись для переноса": {
+      "main": [
+        [
+          {
+            "node": "Обновить событие Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обновить событие Calendar": {
+      "main": [
+        [
+          {
+            "node": "Обновить строку переноса",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обновить строку переноса": {
+      "main": [
+        [
+          {
+            "node": "Отправить ответ клиенту",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти запись для отмены": {
+      "main": [
+        [
+          {
+            "node": "Удалить событие Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Удалить событие Calendar": {
+      "main": [
+        [
+          {
+            "node": "Обновить статус отмены",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обновить статус отмены": {
+      "main": [
+        [
+          {
+            "node": "Отправить ответ клиенту",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отправить ответ клиенту": {
+      "main": [
+        [
+          {
+            "node": "Подготовить обновление сессии",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить обновление сессии": {
+      "main": [
+        [
+          {
+            "node": "Сессия существует?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сессия существует?": {
+      "main": [
+        [
+          {
+            "node": "Обновить сессию",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Создать сессию",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Передать данные": {
+      "main": [
+        [
+          {
+            "node": "Подготовить промпт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "dfd52441-b01e-467b-803d-5469ac0b7723",
+  "activeVersionId": null,
+  "versionCounter": 25,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-20T12:37:38.579Z",
+      "createdAt": "2026-02-20T12:37:38.579Z",
+      "role": "workflow:owner",
+      "workflowId": "k3XI9MVcCQcHSeX4",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
