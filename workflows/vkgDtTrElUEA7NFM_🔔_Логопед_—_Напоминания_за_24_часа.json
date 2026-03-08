@@ -1,0 +1,201 @@
+{
+  "updatedAt": "2026-02-20T10:26:35.540Z",
+  "createdAt": "2026-02-20T10:26:35.540Z",
+  "id": "vkgDtTrElUEA7NFM",
+  "name": "🔔 Логопед — Напоминания за 24 часа",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "b1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Каждый час",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1LcQ4kR6Y3NqefcSrF6NtVEP126Q-iuMbkI5KkfsODxQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Записи",
+          "mode": "name"
+        },
+        "filtersUI": {},
+        "options": {}
+      },
+      "id": "b1b2c3d4-0002-0002-0002-000000000002",
+      "name": "Читать все записи",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -560,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allRows = $input.all().map(i => i.json);\n\n// Найти записи на завтра (за 24 часа +/- 30 минут)\nconst now = new Date();\nconst target = new Date(now.getTime() + 24 * 60 * 60 * 1000);\nconst targetDate = target.toISOString().slice(0, 10);\n\nconst toRemind = allRows.filter(row => {\n  if (row.Статус !== 'активна') return false;\n  if (row.Дата !== targetDate) return false;\n  if (!row.Chat_ID) return false;\n\n  // Проверяем что занятие через 23-25 часов\n  const sessionTime = new Date(`${row.Дата}T${row.Время}:00+03:00`);\n  const diffHours = (sessionTime - now) / (1000 * 60 * 60);\n  return diffHours >= 23 && diffHours <= 25;\n});\n\nreturn toRemind.map(row => ({ json: row }));"
+      },
+      "id": "b1b2c3d4-0003-0003-0003-000000000003",
+      "name": "Найти записи на завтра",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.Chat_ID }}",
+        "text": "={{ '👋 Добрый день, ' + ($json.Имя || '') + '!\\n\\nНапоминаем о вашем занятии с логопедом:\\n📅 Завтра, ' + $json.Дата + ' в ' + $json.Время + '\\n\\nЕсли вы хотите перенести или отменить занятие — просто напишите нам.' }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b1b2c3d4-0004-0004-0004-000000000004",
+      "name": "Отправить напоминание",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "gMFEBtNRIGgmfwOA",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Каждый час": {
+      "main": [
+        [
+          {
+            "node": "Читать все записи",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Читать все записи": {
+      "main": [
+        [
+          {
+            "node": "Найти записи на завтра",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти записи на завтра": {
+      "main": [
+        [
+          {
+            "node": "Отправить напоминание",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Каждый час": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": null,
+  "versionId": "43304562-9746-4359-b675-90d4584d5ed7",
+  "activeVersionId": null,
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-20T10:26:35.540Z",
+      "createdAt": "2026-02-20T10:26:35.540Z",
+      "role": "workflow:owner",
+      "workflowId": "vkgDtTrElUEA7NFM",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
