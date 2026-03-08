@@ -1,0 +1,3614 @@
+{
+  "updatedAt": "2026-02-26T19:37:24.146Z",
+  "createdAt": "2026-02-26T19:37:24.146Z",
+  "id": "gjrUQG3J8pEGBbHL",
+  "name": "Бот под Макс - ФИНАЛ",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "bot_started",
+          "message_chat_created",
+          "message_created",
+          "message_callback"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.maxTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        1568
+      ],
+      "id": "4c6265aa-8c10-46d8-926f-4e027ddee892",
+      "name": "Max Trigger",
+      "webhookId": "4e2bf9a5-a199-45dd-a9b0-ffe40f8db1e0",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Разбираем апдейт от Max Trigger\nconst update = $input.item.json;\n\nconst updateType = update.update_type || '';\n\nconst isCallback = updateType === 'message_callback';\nconst isMessage  = updateType === 'message_created';\nconst isBotStart = updateType === 'bot_started' || updateType === 'message_chat_created';\n\nlet chatId, userId, text, callbackData, username, firstName;\n\nif (isCallback) {\n  const cb = update.callback || {};\n  userId       = (cb.user && cb.user.user_id)  || '';\n  username     = (cb.user && cb.user.username) || '';\n  firstName    = (cb.user && cb.user.name)     || '';\n  // chat_id может быть в message.recipient.chat_id или cb.message.recipient.chat_id\n  chatId       = (cb.message && cb.message.recipient && cb.message.recipient.chat_id) ||\n                 (cb.user && cb.user.user_id) || '';\n  callbackData = cb.payload || '';\n  text         = '';\n\n} else if (isMessage) {\n  const msg = update.message || {};\n  userId    = (msg.sender && msg.sender.user_id) || '';\n  username  = (msg.sender && msg.sender.username) || '';\n  firstName = (msg.sender && msg.sender.name) || '';\n  chatId    = (msg.recipient && msg.recipient.chat_id) || userId || '';\n  text      = (msg.body && msg.body.text) || '';\n  callbackData = '';\n\n} else if (isBotStart) {\n  userId    = (update.user && update.user.user_id) || '';\n  username  = (update.user && update.user.username) || '';\n  firstName = (update.user && update.user.name) || '';\n  chatId    = update.chat_id || userId || '';\n  text      = '';\n  callbackData = '';\n\n} else {\n  chatId = userId = username = firstName = text = callbackData = '';\n}\n\nconst isStart  = text === '/start' || isBotStart;\n\n// Проверяем голосовое (аудио-аттачмент в Max)\nconst attachments = (update.message && update.message.body && update.message.body.attachments) || [];\nconst isVoice = attachments.some(a => a.type === 'audio');\n\n// Сохраняем оригинальный update для дальнейшего использования\nreturn [{\n  json: {\n    chatId,\n    userId,\n    username,\n    firstName,\n    text,\n    callbackData,\n    isCallback,\n    isMessage,\n    isStart,\n    isVoice,\n    updateType,\n    _rawUpdate: update\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2480,
+        1568
+      ],
+      "id": "443e15fc-24fb-48cc-9a9d-80c28696f1c5",
+      "name": "Разбираем апдейт"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isStart }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "cond-start"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isCallback }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "cond-callback"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Callback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isVoice }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "cond-voice"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isMessage }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "cond-text"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2304,
+        1536
+      ],
+      "id": "5150655a-2e41-4e7f-a50b-b8051d9a6a9a",
+      "name": "Switch по типу"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Добро пожаловать, {{ $('Разбираем апдейт').item.json.firstName }}✨\\n\\nЯ помогу тебе лучше понять особенности своего характера🌄\\nПодскажу, как строить гармоничные отношения💞\\nРаскрою твои сильные и слабые стороны🔮\\n\\nС чего начнём?\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Гороскоп\", \"payload\": \"mode_horoscope\"},\n            {\"type\": \"callback\", \"text\": \"Совместимость\", \"payload\": \"mode_compatibility\"},\n            {\"type\": \"callback\", \"text\": \"Натальная карта\", \"payload\": \"mode_natal\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2096,
+        1312
+      ],
+      "id": "f07eb69b-dd02-4089-840e-c7eb13401594",
+      "name": "Отправить приветствие с кнопками",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Отвечаем на callback и сохраняем mode\nconst callbackData = $input.item.json.callbackData;\nconst userId = $input.item.json.userId;\nconst chatId = $input.item.json.chatId;\n\nlet mode = '';\nlet modeLabel = '';\nlet natalTarget = '';\n\nif (callbackData === 'mode_horoscope') {\n  mode = 'horoscope';\n  modeLabel = 'гороскоп';\n} else if (callbackData === 'mode_compatibility') {\n  mode = 'compatibility';\n  modeLabel = 'совместимость';\n} else if (callbackData === 'mode_natal') {\n  mode = 'natal';\n  modeLabel = 'натальная карта';\n} else if (callbackData === 'natal_self') {\n  mode = 'natal_self';\n  modeLabel = 'натальная карта (для себя)';\n  natalTarget = 'self';\n} else if (callbackData === 'natal_other') {\n  mode = 'natal_other';\n  modeLabel = 'натальная карта (другой)';\n  natalTarget = 'other';\n}\n\nreturn [{\n  json: {\n    ...$input.item.json,\n    mode,\n    modeLabel,\n    natalTarget\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2096,
+        1552
+      ],
+      "id": "b3ad1b3b-260e-4324-bb52-e4a5ecdf5431",
+      "name": "Парсим callback"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://platform-api.max.ru/answers",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"callback_id\": \"{{ $('Max Trigger').item.json.callback.callback_id }}\",\n  \"notification\": \"\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1920,
+        1552
+      ],
+      "id": "f98af51e-71d7-4a20-a16d-5e0cb040baae",
+      "name": "Ответ на callback (убрать часики)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_id",
+              "lookupValue": "={{ $('Парсим callback').item.json.userId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1760,
+        1552
+      ],
+      "id": "9b6a7f5e-89e5-46a8-b121-ded0a1781d1b",
+      "name": "Проверяем юзера (callback)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Парсим callback').item.json.userId }}",
+            "username": "={{ $('Парсим callback').item.json.username }}",
+            "current_mode": "={{ $('Парсим callback').item.json.callbackData === 'check_subscription' ? $('Проверяем юзера (callback)').item.json.current_mode : $('Парсим callback').item.json.mode }}",
+            "last_time_ask": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_mode",
+              "displayName": "current_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "zodiac",
+              "displayName": "zodiac",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1552,
+        1552
+      ],
+      "id": "4c601bca-21c3-4999-860c-2ea5b71259b6",
+      "name": "Сохраняем mode в Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Если пользователь нажал \"Я подписался\", берём current_mode из Sheets\n// Иначе используем mode из callback\n\nconst callbackData = $('Парсим callback').item.json.callbackData;\nconst parsedMode = $('Парсим callback').item.json.mode;\nconst sheetsData = $('Проверяем юзера (callback)').item.json;\n\nlet resolvedMode = parsedMode;\n\nif (callbackData === 'check_subscription') {\n  resolvedMode = sheetsData.current_mode || '';\n}\n\nreturn [{\n  json: {\n    ...$('Парсим callback').item.json,\n    mode: resolvedMode,\n    resolvedFromSheets: callbackData === 'check_subscription'\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1552
+      ],
+      "id": "85d1e5f3-320b-4cd1-bbf9-2ca72acb5096",
+      "name": "Определяем финальный mode"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-profile-callback",
+              "leftValue": "={{ $('Проверяем юзера (callback)').item.json.profile_complete }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1184,
+        1552
+      ],
+      "id": "ad03e857-cbe7-4cd4-9dda-bce8bb4219c8",
+      "name": "Профиль заполнен? (callback)"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "horoscope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-horoscope"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Гороскоп"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "compatibility",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-compat"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Совместимость"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "НатальнаяКарта"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal_other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal-other"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "НатальнаяКарта (другой)"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal_self",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal-self"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "НатальнаяКарта (для себя)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -304,
+        368
+      ],
+      "id": "e68bc9b0-ed10-45c5-97e1-71b07d731c2f",
+      "name": "Роутер по режиму (профиль заполнен)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Отлично! 🔮 Ты выбрал гороскоп. \\nВыбери период или напиши его сам:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [{\"type\": \"message\", \"text\": \"На сегодня\", \"payload\": \"На сегодня\"}],\n          [{\"type\": \"message\", \"text\": \"На завтра\", \"payload\": \"На завтра\"}],\n          [{\"type\": \"message\", \"text\": \"На неделю\", \"payload\": \"На неделю\"}],\n          [{\"type\": \"message\", \"text\": \"На месяц\", \"payload\": \"На месяц\"}]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d3dd74d2-5dde-47f2-adda-621ba3a75440",
+      "name": "Предложить запросить гороскоп",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"💞 Хочешь проверить совместимость — отлично!\\n\\nРасскажи мне о втором человеке: имя, дата рождения и город.\\n\\nНапример: Маша, 14.05.1990, Москва\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        176
+      ],
+      "id": "7eb0a0bf-13e8-47b2-aefb-530decb931e1",
+      "name": "Предложить ввести партнёра",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "horoscope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-horoscope-new"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ОнбордингГороскоп"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "compatibility",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-compat-new"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ОнбордингСовместимость"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal-new"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ОнбордингНатальная"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal_other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal-other-new"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ОнбордингНатальная (другой)"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Определяем финальный mode').item.json.mode }}",
+                    "rightValue": "natal_self",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-mode-natal-self-new"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ОнбордингНатальная (для себя)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -288,
+        1120
+      ],
+      "id": "7f61d1bc-8eb2-4580-a465-06927b0efce1",
+      "name": "Роутер по режиму (нет профиля)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Отлично! 🔮 Ты выбрал персональный гороскоп.\\n\\nЧтобы составить точный прогноз, мне нужно узнать тебя немного лучше.\\n\\nКак тебя зовут? 😊\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        880
+      ],
+      "id": "9075cb11-926f-42a0-955a-e23959898db7",
+      "name": "Начало онбординга (гороскоп)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Прекрасно! 💞 Ты хочешь проверить совместимость с другим человеком.\\n\\nДля начала мне нужны твои данные.\\n\\nКак тебя зовут? 😊\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        1056
+      ],
+      "id": "89e95774-d5bb-43d0-a0fb-0e33cb2d27f2",
+      "name": "Начало онбординга (совместимость)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Чудесно! 🌟 Ты хочешь рассчитать натальную карту — это карта твоей судьбы!\\n\\nМне нужны твои данные для точного расчёта.\\n\\nКак тебя зовут? 😊\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        1232
+      ],
+      "id": "1f7f1f83-34a7-49af-b1b2-ef5a1ac116cd",
+      "name": "Начало онбординга (натальная)"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Max Trigger').item.json.message.body.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $('Разбираем апдейт').item.json.isVoice }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2096,
+        1856
+      ],
+      "id": "f348cb3e-3cc2-42e8-b4aa-54f8d3a12458",
+      "name": "Switch (текст/голос)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Скачиваем аудио-файл из Max\n// В Max аудио приходит как аттачмент типа 'audio' с полем url или token\nconst update = $('Max Trigger').item.json;\nconst attachments = (update.message && update.message.body && update.message.body.attachments) || [];\nconst audioAtt = attachments.find(a => a.type === 'audio');\n\nif (!audioAtt || !audioAtt.payload) {\n  throw new Error('Аудио аттачмент не найден');\n}\n\n// Возвращаем url для скачивания\nreturn [{\n  json: {\n    ...update,\n    audioUrl: audioAtt.payload.url || '',\n    audioToken: audioAtt.payload.token || ''\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1856,
+        1968
+      ],
+      "id": "909ccb23-3a1d-4b1b-85ca-784bd2501dc2",
+      "name": "Get audio URL (Max)"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        1968
+      ],
+      "id": "f3f87435-0526-4e5c-9195-23110f51529b",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45b5b690-0356-452e-a4a7-98042823f89d",
+              "name": "text",
+              "value": "={{ $json.text || $('Max Trigger').item.json.message.body.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1216,
+        1840
+      ],
+      "id": "eb8be1d8-28d5-4021-bd0a-69da18aa0584",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b498bbcb-54a3-411b-ab0f-2715d19d78cd",
+              "name": "query",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8d2f65a5-63d0-4b99-ad25-d31ec84e4079",
+              "name": "max_results",
+              "value": 5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        1840
+      ],
+      "id": "2f7c46f1-58a0-4458-824b-fec3e588b8e6",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_id",
+              "lookupValue": "={{ $('Разбираем апдейт').item.json.userId }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -752,
+        1840
+      ],
+      "id": "a7fd1c0e-0a1a-4cd8-9ac0-da7b0359d855",
+      "name": "Узнаем обращался ли клиент ранее?",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-profile-complete",
+              "leftValue": "={{ $json.profile_complete }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        1840
+      ],
+      "id": "2a995cb2-094c-4d33-8c88-b6c00f39306d",
+      "name": "Профиль заполнен? (текст)"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Узнаем обращался ли клиент ранее?').item.json.current_mode }}",
+                    "rightValue": "horoscope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "mode-route-horoscope"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Гороскоп"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Узнаем обращался ли клиент ранее?').item.json.current_mode }}",
+                    "rightValue": "compatibility",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "mode-route-compat"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Совместимость"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Узнаем обращался ли клиент ранее?').item.json.current_mode }}",
+                    "rightValue": "natal_self",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "mode-route-natal"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "НатальнаяКарта"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Узнаем обращался ли клиент ранее?').item.json.current_mode }}",
+                    "rightValue": "natal_other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "mode-route-natal-other"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "НатальнаяКарта (другой)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        960,
+        1024
+      ],
+      "id": "6bb39952-2eaa-411e-b419-9957744ce28d",
+      "name": "Роутер по режиму (текстовое сообщение)"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ 'astro_' + $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        2176
+      ],
+      "id": "74fbb80c-3df3-4217-b98a-f957b1f8443a",
+      "name": "Memory Onboarding"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        2160
+      ],
+      "id": "57decca9-14ac-4f5a-bf43-f3df7bfa8e60",
+      "name": "OpenAI Onboarding Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — тёплый и ненавязчивый помощник астрологического бота. Твоя задача — собрать данные нового пользователя для составления персональных прогнозов.\n\nТЕКУЩИЙ ШАГ ОНБОРДИНГА:\nПроанализируй историю диалога и определи, что уже собрано, а что ещё нет.\n\nДанные для сбора (по очереди, строго ОДНО за раз):\n1. Имя\n2. Дата рождения — принимай в любом виде (14 мая 1990, 14.05.1990, 14/05/90 и т.д.), переводи в формат ДД.ММ.ГГГГ самостоятельно\n3. Место рождения (город)\n4. Удобное время для ежедневного прогноза (формат ЧЧ:ММ, по московскому времени)\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nПРАВИЛА:\n- Задавай ТОЛЬКО ОДИН вопрос за раз — никогда не объединяй несколько вопросов в одно сообщение\n- Называй пользователя по имени, как только узнаешь его\n- Если пользователь ввёл дату в нестандартном формате — прими её и переведи сам, не проси переформатировать\n- Не используй канцелярские фразы («На данном этапе», «Теперь подробнее», «Отлично, переходим к следующему шагу»)\n- Отвечай живо, по-человечески, без шаблонных переходов\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n— Стиль тёплый, неформальный, на «ты». Обращайся по имени.\n— Используй астрологическую терминологию, объясняй её доступно.\n— Не используй шаблонные переходы («Теперь подробнее по остальным пунктам» и подобные).\n— Пиши связно, как живой человек, а не как бот, перечисляющий пункты.\n— Эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹\n\n\nКак спрашивать:\n- Имя: первый вопрос, коротко и по-человечески\n- Дату рождения: после имени, упомяни имя пользователя, спроси просто\n- Город: после даты, короткий вопрос\n- Время прогноза: последний вопрос, объясни зачем (в какое время удобно получать прогноз на день)\n\nКогда все 4 пункта собраны — ответь СТРОГО JSON, без каких-либо слов до или после:\n{\"onboarding_complete\":true,\"first_name\":\"Имя\",\"birth_date\":\"ДД.ММ.ГГГГ\",\"city\":\"Город\",\"preferred_time\":\"ЧЧ:ММ\",\"timezone\":\"Europe/Moscow\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        1952
+      ],
+      "id": "ceef1ac1-9704-470a-bada-e6772173e2b6",
+      "name": "Onboarding Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.item.json.output || '';\n\n// Попытаемся найти JSON в ответе\nconst jsonMatch = output.match(/\\{[\\s\\S]*\\\"onboarding_complete\\\"[\\s\\S]*\\}/);\n\nif (jsonMatch) {\n  try {\n    const parsed = JSON.parse(jsonMatch[0]);\n    if (parsed.onboarding_complete === true) {\n      const preferredTime = parsed.preferred_time || '09:00';\n      return [{\n        json: {\n          is_onboarding_done: true,\n          first_name: parsed.first_name || '',\n          birth_date: parsed.birth_date || '',\n          city: parsed.city || '',\n          preferred_time: preferredTime,\n          timezone: parsed.timezone || 'Europe/Moscow',\n          message: `${parsed.first_name}, всё готово 🌟\\n\\nКаждый день в ${preferredTime} буду присылать тебе персональный прогноз. Можешь прямо сейчас написать, что тебя интересует — прогноз на сегодня, неделю или месяц 🔮`\n        }\n      }];\n    }\n  } catch (e) {\n    // не JSON — продолжаем диалог\n  }\n}\n\nreturn [{\n  json: {\n    is_onboarding_done: false,\n    message: output\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        1936
+      ],
+      "id": "7ff75484-e1c4-4b14-948d-47b142309372",
+      "name": "Parse Onboarding Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-done",
+              "leftValue": "={{ $json.is_onboarding_done }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        1936
+      ],
+      "id": "d12f5bb2-9f2b-4f5f-a98a-43e5c0fd1b52",
+      "name": "Онбординг завершён?"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Разбираем апдейт').item.json.userId }}",
+            "username": "={{ $('Разбираем апдейт').item.json.username }}",
+            "first_name": "={{ $json.first_name }}",
+            "birth_date": "={{ $json.birth_date }}",
+            "city": "={{ $json.city }}",
+            "preferred_time": "={{ $json.preferred_time }}",
+            "timezone": "={{ $json.timezone }}",
+            "profile_complete": "YES",
+            "first_time_ask": "={{ $now.toISO() }}",
+            "last_time_ask": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_mode",
+              "displayName": "current_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "zodiac",
+              "displayName": "zodiac",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        1920
+      ],
+      "id": "28265278-fe78-4d22-9c01-c2d56be5bcc3",
+      "name": "Сохранить профиль в Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $('Parse Onboarding Response').item.json.message }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1984,
+        1760
+      ],
+      "id": "cddea288-711d-4cbe-942d-065c1948bae6",
+      "name": "Отправить приветствие (онбординг завершён)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.message }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1088,
+        2064
+      ],
+      "id": "c868dea1-a9a9-4709-ba12-d0d90903d5e6",
+      "name": "Отправить вопрос онбординга"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ 'main_' + $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1424,
+        432
+      ],
+      "id": "a8322e74-5a59-48f0-b928-cbf1612a778a",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1280,
+        432
+      ],
+      "id": "a85ad5d7-4ff2-4dcf-b434-aa44a71edf62",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог с глубокими знаниями западной и ведической астрологии. Твоя задача — составлять персонализированные астрологические прогнозы на основе натальных данных пользователя.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ (из базы):\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\nДата рождения: {{ $('Узнаем обращался ли клиент ранее?').item.json.birth_date || 'не указана' }}\nГород: {{ $('Узнаем обращался ли клиент ранее?').item.json.city || 'не указан' }}\n- Знак зодиака: {{ $('Узнаем обращался ли клиент ранее?').item.json.zodiac }}\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\n════════════════════════════════════════\nШАГ 1 — ОПРЕДЕЛЕНИЕ ЗНАКА ЗОДИАКА\n════════════════════════════════════════\n\nПравила:\n— Знак зодиака определяй в соответствии с: {{ $('Узнаем обращался ли клиент ранее?').item.json.zodiac }}, а не с текущим днём!\n— Все границы включительно. Пример: 19.01 → Козерог, 20.01 → Водолей.\n— Козерог охватывает два диапазона: 22.12–31.12 и 01.01–19.01.\n— Прежде чем писать прогноз, зафиксируй для себя: «ДД.ММ: [значение] → знак: [знак]» — и только потом продолжай, НО ПИСАТЬ ЭТО В СООБЩЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ НЕ НАДО.\n— Если дата рождения не указана — вежливо попроси её уточнить, объяснив, что без неё персональный прогноз составить невозможно.\n- НЕ НУЖНО ТАК ПИСАТЬ: \"ДД.ММ: 19.01 → знак: Козерог\".\n\n════════════════════════════════════════\nШАГ 2 — ОПРЕДЕЛЕНИЕ ПЕРИОДА ПРОГНОЗА\n════════════════════════════════════════\n\n«на сегодня»         → {{ $now.toFormat('dd.MM.yyyy') }}\n«на завтра»          → {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\n«на эту неделю»      → с {{ $now.startOf('week').toFormat('dd.MM.yyyy') }} по {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\n«на следующую неделю»→ с {{ $now.plus({weeks: 1}).startOf('week').toFormat('dd.MM.yyyy') }} по {{ $now.plus({weeks: 1}).endOf('week').toFormat('dd.MM.yyyy') }}\n«на этот месяц»      → {{ $now.toFormat('MMMM yyyy') }}\n«на следующий месяц» → {{ $now.plus({months: 1}).toFormat('MMMM yyyy') }}\nпериод не указан     → прогноз на сегодня (по умолчанию)\n\n════════════════════════════════════════\nШАГ 3 — СОСТАВЛЕНИЕ ПРОГНОЗА\n════════════════════════════════════════\n\nСТРУКТУРА (2–4 предложения на каждый пункт):\n1. 🌟 Общая энергия периода\n2. 💕 Любовь и отношения\n3. 💼 Карьера и финансы\n4. 🌿 Здоровье и энергетика\n5. 🔮 Совет на период\n6. ✨ Аффирмация дня\n\n════════════════════════════════════════\nСТИЛЬ ОБЩЕНИЯ\n════════════════════════════════════════\n\n— НЕ здоровайся с пользователем.\n— Обращайся по имени, на «ты», тон тёплый и неформальный.\n— Используй астрологическую терминологию, но объясняй её доступно.\n— Избегай категоричных негативных предсказаний.\n— Сопровождай сообщения эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹\n\n════════════════════════════════════════\nВАЖНЫЕ ОГРАНИЧЕНИЯ\n════════════════════════════════════════\n- НЕ НУЖНО ТАК ПИСАТЬ: \"ДД.ММ: 19.01 → знак: Козерог\" в начале составленного текста.\n— Привязывай прогноз к реальным астрологическим событиям периода (фаза Луны, сезон, планетарные транзиты).\n— Не давай медицинских, юридических или финансовых рекомендаций буквально.\n— Если пользователь уже получал прогноз на этот период — напомни об этом и слегка дополни. Максимум дополнений на один период: 2.\n— В один и тот же период не может быть взаимоисключающих прогнозов по одной теме.\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        192
+      ],
+      "id": "583998e3-2861-4870-bf22-6c946a254729",
+      "name": "AI Agent (Гороскоп)",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог. Рассчитываешь совместимость двух людей на основе их астрологических данных.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ:\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\nДата рождения: {{ $('Узнаем обращался ли клиент ранее?').item.json.birth_date || 'не указана' }}\nГород: {{ $('Узнаем обращался ли клиент ранее?').item.json.city || 'не указан' }}\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nОПРЕДЕЛЕНИЕ ЗНАКА ЗОДИАКА ДРУГОГО ЧЕЛОВЕКА:\nИспользуй только день и месяц из даты рождения. Год не нужен.\n\n  Овен:       21.03 – 19.04\n  Телец:      20.04 – 20.05\n  Близнецы:   21.05 – 20.06\n  Рак:        21.06 – 22.07\n  Лев:        23.07 – 22.08\n  Дева:       23.08 – 22.09\n  Весы:       23.09 – 22.10\n  Скорпион:   23.10 – 21.11\n  Стрелец:    22.11 – 21.12\n  Козерог:    22.12 – 31.12  и  01.01 – 19.01  ← два диапазона\n  Водолей:    20.01 – 18.02\n  Рыбы:       19.02 – 20.03\n\n\nВАЖНО: \n- Знак зодиака от юзера, от которого запрос берем из: {{ $('Узнаем обращался ли клиент ранее?').item.json.zodiac }}\n- Формат может быть любым (ДД.ММ.ГГГГ, словами и т.д.) — извлеки ДД и ММ.\n— Определяй знаки внутренне, не выводи их явно в формате «ДД.ММ → знак: ...».\n— Если данные второго человека не указаны — вежливо попроси ввести имя, дату и город рождения.\n— Принимай данные в любом формате — не требуй строгого формата от пользователя.\n\nВ сообщении пользователя содержатся данные второго человека. Проанализируй совместимость и составь отчёт.\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n— Не здоровайся с пользователем.\n— Стиль тёплый, неформальный, на «ты». Обращайся по имени.\n— Не используй шаблонные переходы между разделами («Теперь подробнее...» и подобные).\n— Пиши как живой человек — связно, без шаблонных вставок.\n— Используй астрологическую терминологию, но объясняй доступно.\n— Эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹\n\nСТРУКТУРА ОТВЕТА (2–4 предложения на каждый раздел):\n💞 Общая совместимость (процент и краткое описание)\n❤️ Эмоциональная совместимость\n🧠 Интеллектуальная совместимость\n💼 Совместимость в делах и целях\n⚡ Напряжения и трудности\n🌟 Совет для гармоничных отношений\n\nВАЖНО:\n— Если пользователь вводит одни и те же данные — совместимость должна быть идентичной по сути и цифрам.\n— Не выводи процесс вычисления знаков зодиака явно.\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        656
+      ],
+      "id": "5188d116-cd69-45fb-b3e2-5cfa825cae5a",
+      "name": "AI Agent (Совместимость)",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог. Составляешь натальную карту пользователя и подробно её интерпретируешь.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ:\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\nДата рождения: {{ $('Узнаем обращался ли клиент ранее?').item.json.birth_date || 'не указана' }}\nГород рождения: {{ $('Узнаем обращался ли клиент ранее?').item.json.city || 'не указан' }}\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n— Не здоровайся с пользователем.\n— Стиль тёплый, неформальный, на «ты». Обращайся по имени.\n— Используй астрологическую терминологию, объясняй её доступно.\n— Не используй шаблонные переходы («Теперь подробнее по остальным пунктам» и подобные).\n— Пиши связно, как живой человек, а не как бот, перечисляющий пункты.\n— Эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nСТРУКТУРА ОТВЕТА (2–4 предложения на каждый раздел):\n☀️ Солнечный знак — ядро личности\n🌙 Лунный знак — эмоциональный мир\n⬆️ Асцендент — как тебя видят другие (если точное время рождения не указано — дай обобщённое описание без уточнений об этом)\n💫 Доминирующие планеты и их влияние\n🔥 Сильные стороны\n🌊 Зоны роста и вызовы\n💼 Профессиональные склонности\n💞 В любви и отношениях\n🌟 Главная жизненная задача\n✨ Аффирмация\n\nСтиль: тёплый, вдохновляющий. Эмодзи: ✨🌟💫🔮🌙☀️💞\n\nВАЖНЫЕ ПРАВИЛА:\n— Натальная карта составляется про самого пользователя — все формулировки от второго лица: «ты», «твой», «тебе».\n— Привязывай интерпретацию к реальным астрологическим событиям текущего периода.\n— Не делай медицинских, юридических или финансовых рекомендаций.\n— Не используй '---' для разделения — только разрыв строки.\n— Если пользователь уже получал натальную карту, напомни об этом и слегка дополни. Максимум дополнений: 2.\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        1008
+      ],
+      "id": "caf85442-4e61-4021-9c6d-a867db825f5b",
+      "name": "AI Agent (Натальная карта)",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ 'compat_' + $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        832
+      ],
+      "id": "cc59ad56-1ef0-4514-bd9d-a5c52ffb0d23",
+      "name": "Memory Совместимость"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1264,
+        832
+      ],
+      "id": "536d8b5c-d4dd-4862-9edd-94dfc2389c6f",
+      "name": "OpenAI Совместимость",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        1216
+      ],
+      "id": "c506f793-f59f-4d2a-bf09-0e2c4cd9c7ed",
+      "name": "Memory Натальная"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        1216
+      ],
+      "id": "9800aa70-503d-4d98-8f3d-bf49b103d1cc",
+      "name": "OpenAI Натальная",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.output }}\\n\\n✨ Хочешь узнать что-то ещё? Выбери режим:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Гороскоп\", \"payload\": \"mode_horoscope\"},\n            {\"type\": \"callback\", \"text\": \"Совместимость\", \"payload\": \"mode_compatibility\"},\n            {\"type\": \"callback\", \"text\": \"Натальная карта\", \"payload\": \"mode_natal\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1648,
+        176
+      ],
+      "id": "d69d0ec3-be83-45b7-bc62-349a18b1a8fa",
+      "name": "Text from bot (Гороскоп)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.output }}\\n\\n✨ Хочешь узнать что-то ещё? Выбери режим:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Гороскоп\", \"payload\": \"mode_horoscope\"},\n            {\"type\": \"callback\", \"text\": \"Совместимость\", \"payload\": \"mode_compatibility\"},\n            {\"type\": \"callback\", \"text\": \"Натальная карта\", \"payload\": \"mode_natal\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        640
+      ],
+      "id": "fce6c982-256e-4f6d-87fb-bfe6cfd657a5",
+      "name": "Text from bot (Совместимость)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.output }}\\n\\n✨ Хочешь узнать что-то ещё? Выбери режим:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Гороскоп\", \"payload\": \"mode_horoscope\"},\n            {\"type\": \"callback\", \"text\": \"Совместимость\", \"payload\": \"mode_compatibility\"},\n            {\"type\": \"callback\", \"text\": \"Натальная карта\", \"payload\": \"mode_natal\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1664,
+        992
+      ],
+      "id": "074e98d1-a1b1-44ec-a6a1-3ee3eb9c8150",
+      "name": "Text from bot (Натальная)"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Разбираем апдейт').item.json.userId }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_mode",
+              "displayName": "current_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "zodiac",
+              "displayName": "zodiac",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1936,
+        640
+      ],
+      "id": "f2207cff-b994-4560-9f15-439b655bc47b",
+      "name": "Обновить last_time_ask",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/15 * * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2144,
+        2336
+      ],
+      "id": "72ec5c2f-ea9c-4b59-8c47-709f0afacaf0",
+      "name": "Триггер каждые 15 минут"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "profile_complete",
+              "lookupValue": "YES"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1904,
+        2336
+      ],
+      "id": "eaa789dd-92f8-4294-a3b1-6c82f0f36848",
+      "name": "Получить всех клиентов из Sheets",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Фильтруем пользователей, которым сейчас нужно отправить прогноз\nconst users = $input.all();\nconst nowUTC = new Date();\n\nconst usersToNotify = [];\n\nfor (const user of users) {\n  const tz = user.json.timezone || 'Europe/Moscow';\n  const preferredTime = user.json.preferred_time || '09:00';\n  const lastSent = user.json.last_daily_sent || '';\n\n  const userTimeStr = nowUTC.toLocaleTimeString('ru-RU', {\n    timeZone: tz,\n    hour: '2-digit',\n    minute: '2-digit',\n    hour12: false\n  });\n\n  const userDateStr = nowUTC.toLocaleDateString('ru-RU', {\n    timeZone: tz,\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit'\n  });\n\n  const [curH, curM] = userTimeStr.split(':').map(Number);\n  const [prefH, prefM] = preferredTime.split(':').map(Number);\n\n  const curTotalMin = curH * 60 + curM;\n  const prefTotalMin = prefH * 60 + prefM;\n  const diffMinutes = Math.abs(curTotalMin - prefTotalMin);\n\n  let alreadySentToday = false;\n  if (lastSent) {\n    const lastSentDate = new Date(lastSent).toLocaleDateString('ru-RU', {\n      timeZone: tz,\n      year: 'numeric',\n      month: '2-digit',\n      day: '2-digit'\n    });\n    alreadySentToday = lastSentDate === userDateStr;\n  }\n\n  if (diffMinutes <= 14 && !alreadySentToday) {\n    usersToNotify.push({\n      json: {\n        telegram_id: user.json.telegram_id,\n        first_name: user.json.first_name,\n        last_name: user.json.last_name,\n        birth_date: user.json.birth_date,\n        city: user.json.city,\n        timezone: tz,\n        preferred_time: preferredTime,\n        user_current_time: userTimeStr,\n        user_current_date: userDateStr\n      }\n    });\n  }\n}\n\nif (usersToNotify.length === 0) {\n  return [];\n}\n\nreturn usersToNotify;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1664,
+        2336
+      ],
+      "id": "fbc773ca-992a-428d-9f11-0580723bbe0a",
+      "name": "Фильтр: кому сейчас отправлять"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "==Составь утреннее пожелание на сегодня в соответствии со знаком зодиака: {{ $json.user_current_date }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "==Ты — астролог, который каждое утро отправляет короткое персональное пожелание на день.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ:\nИмя: {{ $json.first_name || 'не указано' }}\nДата рождения: {{ $json.birth_date || 'не указана' }}\nСегодня: {{ $json.user_current_date }}\n\nТВОЯ ЗАДАЧА:\nПо дате рождения определи знак зодиака и составь одно короткое пожелание на день.\n\nОПРЕДЕЛЕНИЕ ЗНАКА ЗОДИАКА:\nИспользуй только день и месяц из даты рождения. Год не нужен.\n\n  Овен:       21.03 – 19.04\n  Телец:      20.04 – 20.05\n  Близнецы:   21.05 – 20.06\n  Рак:        21.06 – 22.07\n  Лев:        23.07 – 22.08\n  Дева:       23.08 – 22.09\n  Весы:       23.09 – 22.10\n  Скорпион:   23.10 – 21.11\n  Стрелец:    22.11 – 21.12\n  Козерог:    22.12 – 31.12  и  01.01 – 19.01  ← два диапазона\n  Водолей:    20.01 – 18.02\n  Рыбы:       19.02 – 20.03\n\nФОРМАТ ОТВЕТА, ПРИМЕР — строго одна строка, ничего больше:\n\n[Сегодняшняя дата (как пример, 21 февраля)]. [Знак зодиака].\n\n\\n\\n ✨ [Пожелание на день] ✨\n\nПРАВИЛА:\n— Знак зодиака определяй в соответствии с {{ $json.birth_date }}, а не с текущим днём!\n— Тёплый, чуть ироничный тон — как от мудрого друга.\n— Каждый день новое, непохожее пожелание.\n— Никаких приветствий, подписей, объяснений — только строка с ✨.\n- Так же, можно использовать другие эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1376,
+        2336
+      ],
+      "id": "71709cd9-8767-4df5-ba99-e02cb83de9a0",
+      "name": "AI Agent — Ежедневный прогноз",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1408,
+        2528
+      ],
+      "id": "a90c69dd-c670-4009-8b0a-08e974ac9d17",
+      "name": "OpenAI Daily Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Фильтр: кому сейчас отправлять').item.json.telegram_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.output }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -976,
+        2336
+      ],
+      "id": "b988564a-35d3-49dd-8995-d99a182b1b5f",
+      "name": "Отправить прогноз в Max"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Фильтр: кому сейчас отправлять').item.json.telegram_id }}",
+            "last_daily_sent": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -720,
+        2336
+      ],
+      "id": "c4b91c22-493a-4142-9ce6-103803cdc4f4",
+      "name": "Обновить last_daily_sent",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Отлично! ✨\\n\\nДля кого ты хочешь рассчитать натальную карту?\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Для себя\", \"payload\": \"natal_self\"},\n            {\"type\": \"callback\", \"text\": \"Для другого\", \"payload\": \"natal_other\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        368
+      ],
+      "id": "a3a5e85f-f7b1-416a-9b47-088a8967f588",
+      "name": "Натальная карта",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Хорошо! 🌟 Расскажи мне о человеке, чью натальную карту хочешь рассчитать.\\n\\nКак его/её зовут? 😊\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        704
+      ],
+      "id": "42607144-c598-46ea-99b2-3769b0c4fddf",
+      "name": "Начало онбординга (натальная — другой)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Хорошо! 🌟 Расскажи мне о человеке, чью натальную карту хочешь рассчитать.\\n\\nКак его/её зовут? 😊\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        1408
+      ],
+      "id": "81e7e2e1-2c1f-4027-a461-f91e865a088c",
+      "name": "Начало онбординга (натальная — другой, без профиля)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.output }}\\n\\n✨ Хочешь узнать что-то ещё? Выбери режим:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [\n            {\"type\": \"callback\", \"text\": \"Гороскоп\", \"payload\": \"mode_horoscope\"},\n            {\"type\": \"callback\", \"text\": \"Совместимость\", \"payload\": \"mode_compatibility\"},\n            {\"type\": \"callback\", \"text\": \"Натальная карта\", \"payload\": \"mode_natal\"}\n          ]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        1216
+      ],
+      "id": "3e3ba32f-7c7f-45fb-adea-c3bba3df4dec",
+      "name": "Text from bot (Натальная — другой)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?chat_id={{ $('Парсим callback').item.json.chatId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🔮 Сейчас составлю твою натальную карту.\\n\\nПросто выбери, что тебя интересует:\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [{\"type\": \"message\", \"text\": \"Составь мою натальную карту\", \"payload\": \"Составь мою натальную карту\"}],\n          [{\"type\": \"message\", \"text\": \"Расскажи о моих сильных сторонах\", \"payload\": \"Расскажи о моих сильных сторонах\"}],\n          [{\"type\": \"message\", \"text\": \"Что говорит мой асцендент\", \"payload\": \"Что говорит мой асцендент\"}]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        528
+      ],
+      "id": "dc2f72a6-28ff-471c-96e7-1735b094cea1",
+      "name": "Предложить натальную карту (для себя)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🥹 Подпишись на наш канал, чтобы я смог сделать расчёт.\\n\\nТам много всего интересного! 💫\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [{\"type\": \"link\", \"text\": \"📢 Подписаться на канал\", \"url\": \"https://max.ru/join/REPLACE_YOUR_CHANNEL_LINK\"}],\n          [{\"type\": \"callback\", \"text\": \"✅ Я подписался\", \"payload\": \"check_subscription\"}]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1984,
+        2000
+      ],
+      "id": "8cedf811-a43e-413c-9157-e10e2eae918c",
+      "name": "Требование подписки (онбординг)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Парсим callback').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🥹 Подпишись на наш канал, чтобы я смог сделать расчёт.\\n\\nТам много всего интересного! 💫\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [{\"type\": \"link\", \"text\": \"📢 Подписаться на канал\", \"url\": \"https://max.ru/join/REPLACE_YOUR_CHANNEL_LINK\"}],\n          [{\"type\": \"callback\", \"text\": \"✅ Я подписался\", \"payload\": \"check_subscription\"}]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -496,
+        1376
+      ],
+      "id": "03e8bef5-be5c-4e1a-87ac-698fade8cfb3",
+      "name": "Требование подписки (callback)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🥹 Подпишись на наш канал, чтобы я смог сделать расчёт.\\n\\nТам много всего интересного! 💫\",\n  \"attachments\": [\n    {\n      \"type\": \"inline_keyboard\",\n      \"payload\": {\n        \"buttons\": [\n          [{\"type\": \"link\", \"text\": \"📢 Подписаться на канал\", \"url\": \"https://max.ru/join/REPLACE_YOUR_CHANNEL_LINK\"}],\n          [{\"type\": \"callback\", \"text\": \"✅ Я подписался\", \"payload\": \"check_subscription\"}]\n        ]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        1760
+      ],
+      "id": "c5f575ee-1452-4a4e-b65f-7d5332daa3cf",
+      "name": "Требование подписки (текст)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "sub-check-onb",
+              "leftValue": "={{ $json.result && $json.result.status !== 'left' ? 'subscribed' : 'not_subscribed' }}",
+              "rightValue": "subscribed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1808,
+        1920
+      ],
+      "id": "1ee40a10-aafe-4b9c-ad10-222b679b860b",
+      "name": "Подписан? (онбординг)",
+      "notes": "ВНИМАНИЕ: Max API не поддерживает проверку подписки на канал через getChatMember как Telegram.\nЕсли проверка подписки не нужна — соедините выход True напрямую с нодой отправки приветствия.\nЕсли нужна проверка — реализуйте через свою логику или всегда пропускайте (always True)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "sub-check-cb",
+              "leftValue": "={{ $json.result && $json.result.status !== 'left' ? 'subscribed' : 'not_subscribed' }}",
+              "rightValue": "subscribed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        1152
+      ],
+      "id": "2579501e-3864-4728-945d-445f52c82770",
+      "name": "Подписан? (callback)",
+      "notes": "ВНИМАНИЕ: Max API не поддерживает проверку подписки на канал как Telegram.\nЕсли не нужна проверка — соедините выход напрямую с Роутером."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "sub-check-txt",
+              "leftValue": "={{ $json.result && $json.result.status !== 'left' ? 'subscribed' : 'not_subscribed' }}",
+              "rightValue": "subscribed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        1744
+      ],
+      "id": "2d1bac24-07af-4a78-a7ab-d59420edcdd9",
+      "name": "Подписан? (текст)",
+      "notes": "ВНИМАНИЕ: Max API не поддерживает проверку подписки на канал как Telegram.\nЕсли не нужна проверка — соедините выход напрямую с Роутером."
+    },
+    {
+      "parameters": {
+        "jsCode": "// В Max нет прямого аналога getChatMember для проверки подписки на канал.\n// Этот узел является заглушкой — всегда возвращает 'subscribed'.\n// Если нужна реальная проверка подписки — реализуйте собственную логику\n// (например, через базу данных или другой механизм).\nreturn [{ json: { result: { status: 'member' } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        1920
+      ],
+      "id": "fcf27115-a312-48e4-82be-12d204423ee1",
+      "name": "Проверка подписки (онбординг)",
+      "notes": "Заглушка. Max API не поддерживает getChatMember как Telegram. Всегда возвращает 'subscribed'."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Заглушка проверки подписки для callback-ветки.\n// Max API не поддерживает проверку членства в канале.\n// Всегда возвращаем 'subscribed'.\nreturn [{ json: { result: { status: 'member' } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        1456
+      ],
+      "id": "97e58a67-cfb4-421f-9566-e65a2a3b44d5",
+      "name": "Проверка подписки (callback)",
+      "notes": "Заглушка. Max API не поддерживает getChatMember как Telegram. Всегда возвращает 'subscribed'."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Заглушка проверки подписки для текстовой ветки.\n// Max API не поддерживает проверку членства в канале.\n// Всегда возвращаем 'subscribed'.\nreturn [{ json: { result: { status: 'member' } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        1744
+      ],
+      "id": "b2d85b19-1e82-4fe6-9aa4-91949e1d2ddb",
+      "name": "Проверка подписки (текст)",
+      "notes": "Заглушка. Max API не поддерживает getChatMember как Telegram. Всегда возвращает 'subscribed'."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — помощник-астролог. Твоя задача — собрать данные о человеке, чью натальную карту хочет узнать пользователь.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ (кто запрашивает):\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\n\nТВОЯ ЗАДАЧА — собрать три параметра другого человека:\n1. Имя\n2. Дата рождения (день, месяц, год — принимай в любом формате)\n3. Город рождения\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался.\n— Стиль тёплый, неформальный, на «ты». Обращайся по имени.\n— Задавай по одному вопросу за раз — никогда не объединяй несколько.\n— Не используй шаблонные переходы («Отлично! Теперь...», «Хорошо, следующий вопрос...»).\n— Пиши живо и естественно.\n— Эмодзи: ✨💫🌟\n\n\nКогда все три параметра собраны, верни СТРОГО в следующем формате (и ничего кроме этого блока):\nДАННЫЕ_СОБРАНЫ\nимя: <имя>\nдата_рождения: <дата в формате ДД.ММ.ГГГГ>\nгород: <город>\n\nПока данные не собраны — задавай вопросы. НЕ выводи блок ДАННЫЕ_СОБРАНЫ раньше времени.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        1376
+      ],
+      "id": "b7db0e9f-f59a-4995-b490-2486e2381326",
+      "name": "AI Agent 1 (Сбор данных — другой)",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1152,
+        1584
+      ],
+      "id": "aba1e55e-1c1a-48b8-9a4e-02485fd025ab",
+      "name": "OpenAI Сбор данных (другой)",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=natal_other_collect_{{ $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        1584
+      ],
+      "id": "87907761-c4db-407b-a3c1-ac68708368af",
+      "name": "Memory Сбор данных (другой)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.item.json.output || '';\n\nif (output.includes('ДАННЫЕ_СОБРАНЫ')) {\n  // Parse collected data\n  const nameMatch = output.match(/имя:\\s*(.+)/i);\n  const dateMatch = output.match(/дата_рождения:\\s*(.+)/i);\n  const cityMatch = output.match(/город:\\s*(.+)/i);\n\n  const otherName = nameMatch ? nameMatch[1].trim() : '';\n  const otherDate = dateMatch ? dateMatch[1].trim() : '';\n  const otherCity = cityMatch ? cityMatch[1].trim() : '';\n\n  return [{\n    json: {\n      ...$input.item.json,\n      dataReady: true,\n      otherName,\n      otherDate,\n      otherCity,\n      messageToUser: null\n    }\n  }];\n} else {\n  // Still collecting — pass through agent's question to user\n  return [{\n    json: {\n      ...$input.item.json,\n      dataReady: false,\n      messageToUser: output\n    }\n  }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        1376
+      ],
+      "id": "95df80de-aee1-439a-a5d5-a2617cf8b6ce",
+      "name": "Парсим ответ агента 1 (другой)"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.dataReady }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "cond-data-ready"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Данные собраны"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.dataReady }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    },
+                    "id": "cond-data-not-ready"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ещё вопросы"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1936,
+        1536
+      ],
+      "id": "351d5a5d-cf97-4ea7-8815-0cc11f14d6a7",
+      "name": "Данные о другом собраны?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://platform-api.max.ru/messages?user_id={{ $('Разбираем апдейт').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.messageToUser }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2256,
+        1568
+      ],
+      "id": "ddcdbef8-0830-4ca4-abd4-7ff043f24f89",
+      "name": "Отправить вопрос (сбор данных — другой)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Составь полную натальную карту для человека по имени {{ $json.otherName }}, дата рождения: {{ $json.otherDate }}, город рождения: {{ $json.otherCity }}.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог. Составляешь натальную карту другого человека и интерпретируешь её для пользователя.\n\nДАННЫЕ ПОЛЬЗОВАТЕЛЯ (кто запрашивает):\nИмя: {{ $('Узнаем обращался ли клиент ранее?').item.json.first_name || 'не указано' }}\n\nТЕКУЩАЯ ДАТА:\nСегодня: {{ $now.toFormat('dd.MM.yyyy') }} ({{ $now.toFormat('EEEE') }})\nЗавтра: {{ $now.plus({days: 1}).toFormat('dd.MM.yyyy') }}\nНачало текущей недели (пн): {{ $now.startOf('week').toFormat('dd.MM.yyyy') }}\nКонец текущей недели (вс): {{ $now.endOf('week').toFormat('dd.MM.yyyy') }}\nТекущий месяц: {{ $now.toFormat('MMMM yyyy') }}\n\nОПРЕДЕЛЕНИЕ ЗНАКА ЗОДИАКА ДРУГОГО ЧЕЛОВЕКА:\nИспользуй только день и месяц из даты рождения. Год не нужен.\n  Овен:       21.03 – 19.04\n  Телец:      20.04 – 20.05\n  Близнецы:   21.05 – 20.06\n  Рак:        21.06 – 22.07\n  Лев:        23.07 – 22.08\n  Дева:       23.08 – 22.09\n  Весы:       23.09 – 22.10\n  Скорпион:   23.10 – 21.11\n  Стрелец:    22.11 – 21.12\n  Козерог:    22.12 – 31.12  и  01.01 – 19.01  ← два диапазона\n  Водолей:    20.01 – 18.02\n  Рыбы:       19.02 – 20.03\n\nКАК ТЫ ОБЩАЕШЬСЯ:\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался.\n— Стиль тёплый, неформальный, на «ты». Обращайся к пользователю по его имени.\n— Используй астрологическую терминологию, объясняй доступно.\n— Избегай категоричных негативных предсказаний.\n— Не используй шаблонные переходы между разделами.\n— Эмодзи: ✨🥺💫💞🔮🌠🎑💗🥹\n\nВАЖНО: Ты рассказываешь карту ДРУГОГО человека, не самого пользователя.\nИспользуй третье лицо: «он», «она», «его», «её», «этот человек» — в зависимости от имени.\nНе путай с пользователем — пользователь только слушает.\n- НЕ ИСПОЛЬЗУЙ \"Твоя натальная карта\"\n\nСТРУКТУРА ОТВЕТА (2–4 предложения на каждый раздел):\n☀️ Солнечный знак — ядро личности\n🌙 Лунный знак — эмоциональный мир\n⬆️ Асцендент — как этого человека видят окружающие\n💫 Доминирующие планеты и их влияние\n🔥 Сильные стороны\n🌊 Зоны роста и вызовы\n💼 Профессиональные склонности\n💞 В любви и отношениях\n🌟 Главная жизненная задача\n✨ Аффирмация для него/неё\n\nСтиль: тёплый, вдохновляющий. Эмодзи: ✨🌟💫🔮🌙☀️💞\n\nВАЖНЫЕ ПРАВИЛА:\n— Не используй '---' для разделов — только разрыв строки.\n— Не делай медицинских, юридических или финансовых рекомендаций.\n— Привязывай интерпретацию к реальным астрологическим событиям текущего периода.\n- На этом этапе не нужно здороваться с юзером, ты уже до этого поздоровался."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2240,
+        1232
+      ],
+      "id": "50e71b9f-d530-48be-8e48-f80acd5bf394",
+      "name": "AI Agent 2 (Натальная карта — другой)",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2240,
+        1424
+      ],
+      "id": "ace55f88-b477-4e8c-8373-1bbd517270df",
+      "name": "OpenAI Натальная (другой)",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=natal_other_chart_{{ $('Разбираем апдейт').item.json.userId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2384,
+        1424
+      ],
+      "id": "6ddbca40-75a3-4cc3-b84b-71616e680850",
+      "name": "Memory Натальная (другой)"
+    }
+  ],
+  "connections": {
+    "Max Trigger": {
+      "main": [
+        [
+          {
+            "node": "Разбираем апдейт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбираем апдейт": {
+      "main": [
+        [
+          {
+            "node": "Switch по типу",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch по типу": {
+      "main": [
+        [
+          {
+            "node": "Отправить приветствие с кнопками",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Парсим callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch (текст/голос)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch (текст/голос)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим callback": {
+      "main": [
+        [
+          {
+            "node": "Ответ на callback (убрать часики)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ на callback (убрать часики)": {
+      "main": [
+        [
+          {
+            "node": "Проверяем юзера (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверяем юзера (callback)": {
+      "main": [
+        [
+          {
+            "node": "Сохраняем mode в Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохраняем mode в Sheets": {
+      "main": [
+        [
+          {
+            "node": "Определяем финальный mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Определяем финальный mode": {
+      "main": [
+        [
+          {
+            "node": "Профиль заполнен? (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Профиль заполнен? (callback)": {
+      "main": [
+        [
+          {
+            "node": "Проверка подписки (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Роутер по режиму (нет профиля)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка подписки (callback)": {
+      "main": [
+        [
+          {
+            "node": "Подписан? (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подписан? (callback)": {
+      "main": [
+        [
+          {
+            "node": "Роутер по режиму (профиль заполнен)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Требование подписки (callback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Роутер по режиму (профиль заполнен)": {
+      "main": [
+        [
+          {
+            "node": "Предложить запросить гороскоп",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Предложить ввести партнёра",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Натальная карта",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Начало онбординга (натальная — другой)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Предложить натальную карту (для себя)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Роутер по режиму (нет профиля)": {
+      "main": [
+        [
+          {
+            "node": "Начало онбординга (гороскоп)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Начало онбординга (совместимость)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Начало онбординга (натальная)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Начало онбординга (натальная — другой, без профиля)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Начало онбординга (натальная)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch (текст/голос)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get audio URL (Max)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get audio URL (Max)": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Узнаем обращался ли клиент ранее?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Узнаем обращался ли клиент ранее?": {
+      "main": [
+        [
+          {
+            "node": "Профиль заполнен? (текст)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Профиль заполнен? (текст)": {
+      "main": [
+        [
+          {
+            "node": "Проверка подписки (текст)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка подписки (текст)": {
+      "main": [
+        [
+          {
+            "node": "Подписан? (текст)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подписан? (текст)": {
+      "main": [
+        [
+          {
+            "node": "Роутер по режиму (текстовое сообщение)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Требование подписки (текст)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Роутер по режиму (текстовое сообщение)": {
+      "main": [
+        [
+          {
+            "node": "AI Agent (Гороскоп)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent (Совместимость)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent (Натальная карта)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent 1 (Сбор данных — другой)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Onboarding": {
+      "ai_memory": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Onboarding Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Onboarding Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Onboarding Response": {
+      "main": [
+        [
+          {
+            "node": "Онбординг завершён?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Онбординг завершён?": {
+      "main": [
+        [
+          {
+            "node": "Сохранить профиль в Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отправить вопрос онбординга",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить профиль в Sheets": {
+      "main": [
+        [
+          {
+            "node": "Проверка подписки (онбординг)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка подписки (онбординг)": {
+      "main": [
+        [
+          {
+            "node": "Подписан? (онбординг)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подписан? (онбординг)": {
+      "main": [
+        [
+          {
+            "node": "Отправить приветствие (онбординг завершён)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Требование подписки (онбординг)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent (Гороскоп)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (Гороскоп)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (Гороскоп)": {
+      "main": [
+        [
+          {
+            "node": "Text from bot (Гороскоп)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (Совместимость)": {
+      "main": [
+        [
+          {
+            "node": "Text from bot (Совместимость)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (Натальная карта)": {
+      "main": [
+        [
+          {
+            "node": "Text from bot (Натальная)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Совместимость": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent (Совместимость)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Совместимость": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (Совместимость)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Натальная": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent (Натальная карта)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Натальная": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (Натальная карта)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot (Гороскоп)": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_time_ask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot (Совместимость)": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_time_ask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot (Натальная)": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_time_ask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot (Натальная — другой)": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_time_ask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Триггер каждые 15 минут": {
+      "main": [
+        [
+          {
+            "node": "Получить всех клиентов из Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить всех клиентов из Sheets": {
+      "main": [
+        [
+          {
+            "node": "Фильтр: кому сейчас отправлять",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фильтр: кому сейчас отправлять": {
+      "main": [
+        [
+          {
+            "node": "AI Agent — Ежедневный прогноз",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — Ежедневный прогноз": {
+      "main": [
+        [
+          {
+            "node": "Отправить прогноз в Max",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Daily Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — Ежедневный прогноз",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отправить прогноз в Max": {
+      "main": [
+        [
+          {
+            "node": "Обновить last_daily_sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent 1 (Сбор данных — другой)": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента 1 (другой)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Сбор данных (другой)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent 1 (Сбор данных — другой)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Сбор данных (другой)": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent 1 (Сбор данных — другой)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим ответ агента 1 (другой)": {
+      "main": [
+        [
+          {
+            "node": "Данные о другом собраны?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Данные о другом собраны?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent 2 (Натальная карта — другой)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отправить вопрос (сбор данных — другой)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent 2 (Натальная карта — другой)": {
+      "main": [
+        [
+          {
+            "node": "Text from bot (Натальная — другой)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Натальная (другой)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent 2 (Натальная карта — другой)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Натальная (другой)": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent 2 (Натальная карта — другой)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2ae5a462-f89e-4da0-bc99-2ea51eb3034f",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-26T19:37:24.146Z",
+      "createdAt": "2026-02-26T19:37:24.146Z",
+      "role": "workflow:owner",
+      "workflowId": "gjrUQG3J8pEGBbHL",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
