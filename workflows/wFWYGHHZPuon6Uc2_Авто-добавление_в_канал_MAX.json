@@ -1,0 +1,374 @@
+{
+  "updatedAt": "2026-02-27T20:06:32.493Z",
+  "createdAt": "2026-02-27T20:01:10.956Z",
+  "id": "wFWYGHHZPuon6Uc2",
+  "name": "Авто-добавление в канал MAX",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔐 Авто-добавление в канал MAX\n\n**Как работает:**\n1. Пользователь пишет боту любое сообщение или нажимает кнопку\n2. Бот проверяет: уже участник канала?\n3. Если нет — добавляет через API и отправляет приветствие со ссылкой\n4. Если уже участник — сообщает об этом\n\n**Перед запуском:**\n- Убедитесь, что бот добавлен **администратором** канала с правом добавлять участников\n- Замените `CHANNEL_ID` в ноде «Инициализация» на ID вашего канала\n- Замените ссылку на канал в нодах с сообщениями",
+        "height": 380,
+        "width": 1200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f2fcedc1-82dc-4269-9f9c-67ede8ed6e1d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.maxTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        400
+      ],
+      "id": "faff190f-602c-45d1-b330-de1f5b7dd7c8",
+      "name": "Max Trigger",
+      "webhookId": "86f17100-5e89-4a67-875e-0b0d0d34c088",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const update = $input.item.json;\nconst updateType = update.update_type || '';\nconst isCallback = updateType === 'message_callback';\nconst isMessage  = updateType === 'message_created';\nconst isBotStart = updateType === 'bot_started';\n\nlet chatId, userId, firstName, username;\n\nconst fallbackChatId = update.message?.recipient?.chat_id || '';\n\nif (isCallback) {\n  const cb = update.callback;\n  userId    = cb.user?.user_id || '';\n  username  = cb.user?.username || '';\n  firstName = cb.user?.name || '';\n  chatId    = cb.message?.recipient?.chat_id || fallbackChatId;\n} else if (isMessage) {\n  const msg = update.message;\n  userId    = msg.sender?.user_id || '';\n  username  = msg.sender?.username || '';\n  firstName = msg.sender?.name || '';\n  chatId    = msg.recipient?.chat_id || fallbackChatId;\n} else if (isBotStart) {\n  userId    = update.user?.user_id || '';\n  username  = update.user?.username || '';\n  firstName = update.user?.name || '';\n  chatId    = update.chat_id || fallbackChatId;\n} else {\n  chatId = fallbackChatId;\n  userId = username = firstName = '';\n}\n\nreturn [{ json: { chatId, userId, username, firstName, updateType } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        400
+      ],
+      "id": "1d698c39-db16-4b37-9222-1dae8a74df96",
+      "name": "Разбираем апдейт"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Проверяем, является ли пользователь уже участником канала\nconst channelId = '-71330141790344';\nconst token = 'f9LHodD0cOKwdUROqAYYQEHJy9BDPFABPH9aym21zkZFQEOUn5FOixpjk9SjzMo3FMnF-Q52G86Jpz8M2x6r';\nconst userId = String($('Разбираем апдейт').item.json.userId);\n\nlet marker = null;\nlet isMember = false;\n\nfor (let page = 0; page < 50; page++) {\n  const url = `https://platform-api.max.ru/chats/${channelId}/members` +\n              (marker ? `?marker=${marker}` : '');\n\n  const res = await fetch(url, {\n    method: 'GET',\n    headers: { 'Authorization': token }\n  });\n\n  const body = await res.json();\n  const members = body.members || [];\n\n  if (members.some(m => String(m.user_id) === userId)) {\n    isMember = true;\n    break;\n  }\n\n  if (!body.marker) break;\n  marker = body.marker;\n}\n\nreturn [{ json: { ...$('Разбираем апдейт').item.json, is_member: isMember } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        400
+      ],
+      "id": "77fea6d3-6a80-4bcc-b784-2451b1b05926",
+      "name": "Проверяем участника"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7e9b5022-66e2-49de-9bc5-e887a8238fa0",
+              "leftValue": "={{ $json.is_member }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        400
+      ],
+      "id": "18ab3871-7991-4e71-942f-5658e71f61a5",
+      "name": "Уже в канале?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://platform-api.max.ru/chats/-71330141790344/members",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "f9LHodD0cOKwdUROqAYYQEHJy9BDPFABPH9aym21zkZFQEOUn5FOixpjk9SjzMo3FMnF-Q52G86Jpz8M2x6r"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ user_ids: [ $('Разбираем апдейт').item.json.userId ] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        560
+      ],
+      "id": "d8d05898-4a9f-4ebc-8ef2-dfc39f6052c1",
+      "name": "Добавляем в канал"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f84bdcf3-d4a6-48a0-a453-14315a8098c6",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        560
+      ],
+      "id": "ec5772aa-ebda-4a5b-86b5-1397179d33c8",
+      "name": "Успешно добавлен?"
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Разбираем апдейт').item.json.chatId }}",
+        "text": "✅ Ты уже являешься участником нашего канала!\n\nПереходи: [наш канал](https://max.ru/join/sdtfFccRJ-Lz6XyOm6VdgIwLN0logMW_1x1i3Lsb2OM)",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        400
+      ],
+      "id": "04deac07-503d-4af8-97d7-630a05eb010d",
+      "name": "Уже участник — сообщение"
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Разбираем апдейт').item.json.chatId }}",
+        "text": "🎉 Добро пожаловать! Ты успешно добавлен в наш канал.\n\nПереходи: [наш канал](https://max.ru/join/sdtfFccRJ-Lz6XyOm6VdgIwLN0logMW_1x1i3Lsb2OM)",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        480
+      ],
+      "id": "aac0a13b-fa94-4bca-95ff-7294d4883a6c",
+      "name": "Добавлен — приветствие"
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Разбираем апдейт').item.json.chatId }}",
+        "text": "😔 Не удалось добавить тебя в канал. Попробуй ещё раз или обратись к администратору.",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        640
+      ],
+      "id": "24ca3b7b-546b-4f77-9f5b-cee2d04a0145",
+      "name": "Ошибка добавления"
+    }
+  ],
+  "connections": {
+    "Max Trigger": {
+      "main": [
+        [
+          {
+            "node": "Разбираем апдейт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбираем апдейт": {
+      "main": [
+        [
+          {
+            "node": "Проверяем участника",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверяем участника": {
+      "main": [
+        [
+          {
+            "node": "Уже в канале?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Уже в канале?": {
+      "main": [
+        [
+          {
+            "node": "Уже участник — сообщение",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Добавляем в канал",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Добавляем в канал": {
+      "main": [
+        [
+          {
+            "node": "Успешно добавлен?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Успешно добавлен?": {
+      "main": [
+        [
+          {
+            "node": "Добавлен — приветствие",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка добавления",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "573478ab-5b67-41ca-8b0b-6606d1225ac9",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-27T20:01:10.956Z",
+      "createdAt": "2026-02-27T20:01:10.956Z",
+      "role": "workflow:owner",
+      "workflowId": "wFWYGHHZPuon6Uc2",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
