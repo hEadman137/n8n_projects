@@ -1,0 +1,337 @@
+{
+  "updatedAt": "2026-03-01T12:26:09.099Z",
+  "createdAt": "2026-03-01T12:26:06.437Z",
+  "id": "ElvADwIf6o4d1O3Z",
+  "name": "1 этап.",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        144
+      ],
+      "id": "51ca0ae7-0319-4439-b6ec-4acf81094f7f",
+      "name": "Get a file",
+      "webhookId": "2d19065f-61e6-41d9-9af1-cae1770705a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "5e9cfeba-ffc3-4993-a9ea-41933e0aaf3f",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edit-text",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -64
+      ],
+      "id": "c0a7e1c4-5c64-4615-b859-fa3d36db3b9d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "cuid",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "6c0ed581-a6eb-4aa5-8949-f514bea1c63a",
+      "name": "Читаем данные пользователя",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -624,
+        -48
+      ],
+      "id": "6038c57e-a2ee-43d0-94fe-7cca6f14a1c2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -832,
+        -48
+      ],
+      "id": "7811fff5-06cc-4cf7-b85e-ba2b0547b3e3",
+      "name": "Telegram Trigger",
+      "webhookId": "2ffcd741-2d9a-4181-88ef-2b8bc72e6a3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Читаем данные пользователя",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "be5ff4c9-76f4-4c62-8871-ec94ecb6beb3",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-01T12:26:06.437Z",
+      "createdAt": "2026-03-01T12:26:06.437Z",
+      "role": "workflow:owner",
+      "workflowId": "ElvADwIf6o4d1O3Z",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
