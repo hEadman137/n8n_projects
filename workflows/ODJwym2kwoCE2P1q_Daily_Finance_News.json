@@ -1,0 +1,451 @@
+{
+  "updatedAt": "2026-02-05T20:24:03.817Z",
+  "createdAt": "2026-02-05T20:24:03.817Z",
+  "id": "ODJwym2kwoCE2P1q",
+  "name": "Daily Finance News",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "e102dfef-8031-4130-815d-573c0d63deca",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Проанализируй российские экономические новости.\nНовости получены сегодня (UTC): {{ $now.toUTC().toISO() }}  \nНОВОСТИ,ПОЛУЧЕННЫЕ ИЗ ИНТЕРНЕТА:\n{{ $json.concatenated_content }}\n\nОриентируйся строго на НОВОСТИ,ПОЛУЧЕННЫЕ ИЗ ИНТЕРНЕТА, которые я передал тебе выше.\n\nСоздай краткий дайджест:\n1. Решения ЦБ и регуляторов\n2. Динамика рубля и сырьевых цен\n3. Корпоративные новости\n4. Новости рынка Ценных бумаг\n5. Влияние на российский бизнес\n\nНа основании всех приведенных данных, предоставь краткие выводы, прогнозы и рекомендации по стратегии инвестирования: куда сейчас лучше всего инвестировать, от чего воздержаться, чего опасаться, какие возможности открываются для получения дохода.\n\nПример результата:\n\n📊 РОССИЙСКАЯ ЭКОНОМИКА | {{ $now.format('yyyy-MM-dd').toJsonString() }}\n\n\n🏦 РЕШЕНИЯ РЕГУЛЯТОРОВ:\n...\n\n💱 ВАЛЮТА И СЫРЬЕ:\n...\n\n🏢 КОРПОРАТИВНЫЕ НОВОСТИ:\n...\n\n💼 НОВОСТИ РЫНКА ЦЕННЫХ БУМАГ НА БИЗНЕС:\n...\n\n💼 ВЛИЯНИЕ НА БИЗНЕС:\n...\n\nВЫВОДЫ, РЕКОМЕНДАЦИИ И ПРОГНОЗЫ:\n",
+        "options": {
+          "systemMessage": "Ты известный экономический аналитик, который анализирует новости из открытых источников и предоставляет полезные советы, рекомендации, выводы. \nТы помогаешь увидеть дополнительные возможности, которые открываются для получения дохода = это твоя основная задача. Каждую новость ты должен интепретировать с точки зрения того, как ей воспользоваться: как себя обезопасить от потерь либо как получить дополнительный доход - это твой главный фокус."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        464,
+        304
+      ],
+      "id": "af847ed1-48c2-45e6-96f6-c840c9ccd69d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        528
+      ],
+      "id": "e3d5401d-e918-4721-acc7-8e8cafb74b65",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ce569db-3c3a-4792-9593-954e25c5cdd7",
+              "name": "output",
+              "value": "={{ $json.output.replace(/<think>[\\s\\S]*?<\\/think>\\s*/g, '').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        304
+      ],
+      "id": "c367365f-0bec-4fd3-9d6c-dbfdc420fadd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Вход: { \"output\": \"тут ваш текст...\" }\n\nreturn items.map(item => {\n  const text = item.json.output || \"\";\n  const parts = text.split(\"\\n\\n\"); // делим по \\n\\n\n\n  return parts.map(p => ({ json: { part: p } }));\n}).flat();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        304
+      ],
+      "id": "ba17aac9-5e1f-4915-8ccb-922808c8bed9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "=454918257",
+        "text": "={{ $json.part }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "2e17bb28-b2b8-44ad-ad99-bc8e6989b107",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        304
+      ],
+      "webhookId": "50f55a09-fa1e-4b36-bbc2-1b1433084685",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b70ee3d4-78c8-46d6-b725-ad90baa630e6",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 0.2,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "ae5ba1a2-2d83-4984-9301-96d8ba60bf7a",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        784,
+        0
+      ],
+      "id": "eeb271fa-a9b2-4437-bbe5-8ec0d5c66b6f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "results[0].raw_content",
+              "separateBy": "other",
+              "customSeparator": "/n/n NEXT ARTICLE: /n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        304
+      ],
+      "id": "f4e5a39c-9e60-46f5-a228-453d4dd8a60a",
+      "name": "Summarize1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"российская экономика ключевые новости сегодня\",\n  \"topic\": \"finance\",\n  \"search_depth\": \"advanced\",\n  \"start_date\":{{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd').toJsonString() }},\n  \"end_date\": {{ $now.format('yyyy-MM-dd').toJsonString() }},\n  \"chunks_per_source\": 5,\n  \"include_domains\": [\n    \"rbc.ru\",\n    \"vedomosti.ru\",\n    \"interfax.ru\",\n    \"cbr.ru\",\n    \"moex.com\",\n    \"investing.com\",\n    \"smart-lab.ru\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        176,
+        0
+      ],
+      "id": "96932bfa-6a1d-450e-b5ec-9890fa59330f",
+      "name": "Search Tavily"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/extract",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": {{ $json.url.toJsonString() }},\n  \"extract_depth\": \"advanced\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        304
+      ],
+      "id": "54126414-1154-4e75-8793-927041caef56",
+      "name": "Extract Tavily"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15
+            }
+          ]
+        }
+      },
+      "id": "fb9ce0f6-ade7-49c7-8fdd-904c2fa79cd5",
+      "name": "Daily at 3:00 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Extract Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Tavily": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Tavily": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily at 3:00 PM": {
+      "main": [
+        [
+          {
+            "node": "Search Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4419b2eb-27f1-4d1a-a04f-1cbf659280ba",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-05T20:24:03.817Z",
+      "createdAt": "2026-02-05T20:24:03.817Z",
+      "role": "workflow:owner",
+      "workflowId": "ODJwym2kwoCE2P1q",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
