@@ -1,0 +1,4612 @@
+{
+  "updatedAt": "2026-03-08T10:29:17.699Z",
+  "createdAt": "2026-02-18T14:36:08.409Z",
+  "id": "SpcaC8OlU1BELWGX",
+  "name": "Metal News Bot v3",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8,10,12,14,16,18,20 * * 1-6"
+            }
+          ]
+        }
+      },
+      "id": "2bab919c-879a-46cd-bac8-c3e3e9ad2008",
+      "name": "Каждый час",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%9D%D0%9B%D0%9C%D0%9A+%D0%9C%D0%9C%D0%9A+%D0%A1%D0%B5%D0%B2%D0%B5%D1%80%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D0%95%D0%B2%D1%80%D0%B0%D0%B7+%D0%9C%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%B8%D0%BD%D0%B2%D0%B5%D1%81%D1%82&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "29b7b597-d546-48e4-8a39-6939fe24d9cb",
+      "name": "RSS Google Компании",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%B0%D1%80%D0%BC%D0%B0%D1%82%D1%83%D1%80%D0%B0+%D0%BF%D1%80%D0%BE%D0%BA%D0%B0%D1%82+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "7cc5bdd2-8fa4-487d-9dc4-966180db453e",
+      "name": "RSS Google Цены",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D1%83%D1%80%D0%B3%D0%B8%D1%8F+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE+%D0%B7%D0%B0%D0%B2%D0%BE%D0%B4+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "dae41f91-7794-44d3-8af9-28297fa452b0",
+      "name": "RSS Google Производство",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        320
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%BF%D1%80%D0%BE%D0%BA%D0%B0%D1%82+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA+%D1%81%D0%BF%D1%80%D0%BE%D1%81&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "e5c72966-0825-4cc4-a235-564797d016af",
+      "name": "RSS Google Строительство",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        480
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://www.kommersant.ru/rss/news.xml",
+        "options": {}
+      },
+      "id": "rss-metalinfo-001",
+      "name": "RSS Коммерсантъ",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        640
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%8D%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82+%D1%82%D0%B0%D1%80%D0%B8%D1%84%D1%8B+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-rcmm-001",
+      "name": "RSS Google Торговля",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        800
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=china+steel+iron+production+export+prices&hl=en&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "rss-int-china-001",
+      "name": "RSS Google Китай",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        960
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=europe+steel+market+production+demand+ferrous&hl=en&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "rss-int-europe-001",
+      "name": "RSS Google Европа",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1120
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=US+steel+tariffs+import+production+ferrous&hl=en&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "rss-int-usa-001",
+      "name": "RSS Google США",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1280
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "66fa6b6b-a991-4af4-880b-273c5a81479c",
+      "name": "Merge 1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "202152b7-fe12-427b-80b2-9136977842c0",
+      "name": "Merge 2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "8f2a98f6-88e7-4348-abaa-6c75fc4fb12d",
+      "name": "Все источники",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        240
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-extra-001",
+      "name": "Merge Extra",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        720
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-all-001",
+      "name": "Все новости RU",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-int-001",
+      "name": "Merge Int",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        1040
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-int-002",
+      "name": "Merge Int B",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        960
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-final-001",
+      "name": "Все новости",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\n\nconst maxAgeMs = 100 * 60 * 60 * 1000;\nconst now = Date.now();\nconst seen = new Set();\nconst articles = [];\n\nfor (const item of $input.all()) {\n  if (item.json.error) continue;\n  const link = item.json.link || item.json.guid || '';\n  if (!link) continue;\n  if (seen.has(link)) continue;\n  seen.add(link);\n\n  const title = item.json.title || '';\n  if (title.includes('\\uFFFD')) continue;\n\n  const pubDate = item.json.pubDate || item.json.isoDate || item.json.date || '';\n  if (pubDate) {\n    const ts = new Date(pubDate).getTime();\n    if (!isNaN(ts) && (now - ts) > maxAgeMs) continue;\n  }\n\n  if (staticData.sentLinks[link]) continue;\n\n  articles.push({\n    idx: articles.length,\n    title,\n    link,\n    pubDate,\n    snippet: (item.json.contentSnippet || item.json.description || '').slice(0, 150)\n  });\n  if (articles.length >= 15) break;\n}\n\nif (articles.length === 0) return [];\n\nconst articlesText = articles\n  .map(a => '[' + a.idx + '] ' + a.title + (a.snippet ? '. ' + a.snippet : ''))\n  .join('\\n');\n\nreturn [{ json: { articles, articlesText } }];"
+      },
+      "id": "date-filter-001",
+      "name": "Фильтр",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o\", messages: [{ role: \"system\", content: \"Ты аналитик черной металлургии и строительной отрасли России. Проанализируй каждую новость из списка (могут быть на русском или английском).\\n\\nЕсли новость связана с металлургией, сталью, прокатом, ценами на металл, компаниями НЛМК/ММК/Северсталь/Евраз/Металлоинвест, экспортом/импортом стали, мировым рынком стали, строительством, ЦБ РФ, ключевой ставкой, тарифами, санкциями — relevant:true.\\nПолитика без связи с металлом, культура, спорт, медицина — relevant:false.\\n\\nДля каждой relevant:true:\\n1. Напиши short_post — КРАТКИЙ аналитический пост до 700 символов НА РУССКОМ для caption под картинкой в Telegram\\n2. Формат short_post: эмодзи + <b>тема</b>, 1-2 коротких абзаца анализа, итог одной строкой. HTML: <b>, <i>. БЕЗ ссылки на источник (добавится автоматически)\\n3. НЕ пересказывай — дай оценку: что это значит для рынка\\n4. НЕ добавляй факты и цифры, которых нет в исходной новости\\n5. Напиши image_prompt — промпт на АНГЛИЙСКОМ для генерации editorial illustration к этой новости. Стиль: modern editorial illustration, clean vector style, business/industry theme. Описание должно отражать СУТЬ новости (steel prices, construction site, factory, export ship, etc). НЕ используй текст на картинке.\\n6. Важность 1-10\\n\\nВерни ТОЛЬКО JSON массив без markdown:\\n[{\\\"idx\\\":0,\\\"relevant\\\":true,\\\"short_post\\\":\\\"краткий пост до 700 символов\\\",\\\"image_prompt\\\":\\\"English prompt for illustration\\\",\\\"category\\\":\\\"Металлургия\\\",\\\"score\\\":8}]\" }, { role: \"user\", content: \"Новости:\\n\" + ($json.articlesText || \"\") }], max_tokens: 4000, temperature: 0.7 }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "f03d4856-283d-49a3-82f7-ff4dd85126d7",
+      "name": "GPT-4o Анализ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1408,
+        1152
+      ],
+      "continueOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\nif (!staticData.pendingPosts) staticData.pendingPosts = {};\nconst now = Date.now();\n\nconst dsItem = $input.first();\nif (!dsItem) return [];\n\nconst articles = ($('Фильтр').first()?.json?.articles) || [];\nif (articles.length === 0) return [];\n\nlet results = [];\ntry {\n  const raw = dsItem.json?.choices?.[0]?.message?.content || '[]';\n  const cleaned = raw.replace(/```json|```/g, '').trim();\n  results = JSON.parse(cleaned);\n  if (!Array.isArray(results)) results = [];\n} catch(e) { return []; }\n\nconst relevant = [];\nfor (const ai of results) {\n  if (ai.relevant !== true) continue;\n  const src = articles[ai.idx];\n  if (!src) continue;\n  if (staticData.sentLinks[src.link]) continue;\n\n  // Build short_post with source link appended\n  let shortPost = ai.short_post || ai.post || '';\n  if (shortPost && src.link) {\n    shortPost += '\\n\\n📌 <a href=\"' + src.link + '\">Источник</a>';\n  }\n\n  const postId = 'post_' + now + '_' + ai.idx;\n\n  relevant.push({ json: {\n    title:        src.title,\n    link:         src.link,\n    pubDate:      src.pubDate || '',\n    short_post:   shortPost,\n    image_prompt: ai.image_prompt || '',\n    category:     ai.category || 'Металлургия',\n    score:        typeof ai.score === 'number' ? ai.score : 5,\n    postId:       postId\n  }});\n}\n\n// Sort by score, take top 3\nrelevant.sort((a, b) => (b.json.score || 0) - (a.json.score || 0));\nconst top = relevant.slice(0, 3);\n\n// Mark as sent + save pending posts for callback\nfor (const item of top) {\n  const lnk = item.json.link;\n  if (lnk) staticData.sentLinks[lnk] = now;\n\n  // Save post data for callback retrieval\n  staticData.pendingPosts[item.json.postId] = {\n    short_post: item.json.short_post,\n    link: item.json.link,\n    title: item.json.title,\n    category: item.json.category,\n    savedAt: now\n  };\n}\n\n// Cleanup old sentLinks (7 days)\nfor (const key of Object.keys(staticData.sentLinks)) {\n  if (now - staticData.sentLinks[key] > 7 * 24 * 60 * 60 * 1000) delete staticData.sentLinks[key];\n}\n// Cleanup old pendingPosts (1 hour — stale callbacks)\nfor (const key of Object.keys(staticData.pendingPosts)) {\n  if (now - (staticData.pendingPosts[key].savedAt || 0) > 60 * 60 * 1000) delete staticData.pendingPosts[key];\n}\n\nreturn top;"
+      },
+      "id": "918a3f70-d35f-4e92-9635-92e66754b24a",
+      "name": "Парсинг + Топ 3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "-1003334820713",
+        "text": "={{ $json.short_post }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": false
+        }
+      },
+      "id": "b4aeb527-0aab-4b1b-b925-c78ce9d5dd6e",
+      "name": "Отправить в Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2384,
+        1680
+      ],
+      "webhookId": "027a1165-7a31-4d5c-9beb-753db24ab3d2",
+      "credentials": {
+        "telegramApi": {
+          "id": "pEB2M34FK0yhPYmi",
+          "name": "KIE AI Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D1%87%D0%B5%D1%80%D0%BD%D0%B0%D1%8F+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D1%83%D1%80%D0%B3%D0%B8%D1%8F+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-new-1",
+      "name": "RSS Google Черная",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1440
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%BB%D0%BE%D0%BC+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%BB%D0%BE%D0%BC+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D0%BF%D0%B5%D1%80%D0%B5%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-new-2",
+      "name": "RSS Google Лом",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1600
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%B6%D0%B5%D0%BB%D0%B5%D0%B7%D0%BD%D0%B0%D1%8F+%D1%80%D1%83%D0%B4%D0%B0+%D1%86%D0%B5%D0%BD%D0%B0+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-new-3",
+      "name": "RSS Google Руда",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1760
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://worldsteel.org/feed/",
+        "options": {}
+      },
+      "id": "rss-new-4",
+      "name": "RSS WorldSteel",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1920
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://www.steelonthenet.com/feeds/all-feed-pages.php",
+        "options": {}
+      },
+      "id": "rss-new-5",
+      "name": "RSS SteelOnTheNet",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2080
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=iron+ore+price+steel+scrap+ferrous+market&hl=en&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "rss-new-6",
+      "name": "RSS Google Iron Ore",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2240
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "merge-new-1",
+      "name": "Merge New 1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        1520
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-new-2",
+      "name": "Merge New 2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        1840
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-new-3",
+      "name": "Merge New 3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        2160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-new-12",
+      "name": "Merge New 12",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        1680
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-new-all",
+      "name": "Merge Новые",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        1920
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-final",
+      "name": "Merge Финал",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://minfin.gov.ru/rss_news?mod=news&lim=50",
+        "options": {}
+      },
+      "id": "rss-minfin",
+      "name": "RSS Минфин",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        2400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D1%80%D0%BE%D1%81%D1%81%D1%82%D0%B0%D1%82+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE+%D0%BF%D1%80%D0%BE%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D1%8C+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-rosstat",
+      "name": "RSS Google Росстат",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        2560
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B8%D0%BD%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D1%8F+%D0%BA%D0%BE%D0%BD%D1%8A%D1%8E%D0%BD%D0%BA%D1%82%D1%83%D1%80%D0%B0+%D0%BD%D0%B5%D1%84%D1%82%D1%8C+%D1%81%D1%8B%D1%80%D1%8C%D1%91+%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B0&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-mineconom",
+      "name": "RSS Google МинЭк",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=eurostat+steel+construction+industry+production+EU&hl=en&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "id": "rss-eurostat",
+      "name": "RSS Google Eurostat",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        2880
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=irn.ru+%D0%BD%D0%B5%D0%B4%D0%B2%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-irn",
+      "name": "RSS Google IRN",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        3040
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=metaltorg.ru+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B&hl=ru&gl=RU&ceid=RU:ru",
+        "options": {}
+      },
+      "id": "rss-metaltorg",
+      "name": "RSS Google MetalTorg",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        3200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://rusmet.ru/feed/",
+        "options": {}
+      },
+      "id": "rss-rusmet",
+      "name": "RSS Rusmet",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        3360
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://stroygaz.ru/rss/",
+        "options": {}
+      },
+      "id": "rss-stroygaz",
+      "name": "RSS Стройгазета",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        3520
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.cbr.ru/rss/RssPress",
+        "options": {}
+      },
+      "id": "rss-cbr",
+      "name": "RSS ЦБ РФ",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        16,
+        3680
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-1",
+      "name": "Merge V3-1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        272,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-2",
+      "name": "Merge V3-2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        272,
+        2800
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-12",
+      "name": "Merge V3-12",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        528,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-3",
+      "name": "Merge V3-3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        272,
+        3280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-4",
+      "name": "Merge V3-4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        272,
+        3600
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-34",
+      "name": "Merge V3-34",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        528,
+        3440
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-1234",
+      "name": "Merge V3-1234",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        784,
+        3040
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-v3-all",
+      "name": "Merge V3 All",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        3040
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-combined-v3",
+      "name": "Merge Все новые",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        784,
+        2200
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-batches-v3",
+      "name": "По одному",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1984,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.dailyKieCount) sd.dailyKieCount = 0;\n\nconst MAX_DAILY_IMAGES = 21;\nconst item = $input.first().json;\nconst postId = item.postId || 'unknown';\n\n// Check if daily limit reached\nif (sd.dailyKieCount >= MAX_DAILY_IMAGES) {\n  return [{json: {postId, skipImage: true, short_post: item.short_post, image_prompt: ''}}];\n}\n\nconst imagePrompt = item.image_prompt || 'Modern editorial illustration of steel industry and construction';\nconst cbUrl = 'https://n8n-eremeev-me.ru/webhook/news-image-callback?postId=' + postId;\n\nconst kieBody = JSON.stringify({\n  model: 'nano-banana-2',\n  input: {\n    prompt: imagePrompt,\n    resolution: '1K',\n    aspect_ratio: '16:9'\n  },\n  callBackUrl: cbUrl\n});\n\nreturn [{json: {postId, kieBody, cbUrl, short_post: item.short_post, image_prompt: imagePrompt, skipImage: false}}];"
+      },
+      "id": "prep-image-v3",
+      "name": "Prep Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2184,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 6cf82a5d33a57d916cc47f13d0804ada"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.kieBody }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "kie-image-v3",
+      "name": "KIE Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        1680
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "seconds"
+      },
+      "id": "pause-3s-v3",
+      "name": "Пауза 3 сек",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2584,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "news-image-callback",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-img-v3",
+      "name": "Image Callback",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        2080
+      ],
+      "webhookId": "news-image-callback"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.pendingPosts) sd.pendingPosts = {};\n\nconst input = $input.first().json;\nconst query = input.query || {};\nconst body = input.body || {};\nconst postId = query.postId || '';\n\n// Get saved post data\nconst postData = sd.pendingPosts[postId];\nif (!postData) {\n  return [{json: {hasImage: false, skip: true, reason: 'Unknown postId: ' + postId}}];\n}\n\n// Extract result URL from KIE callback (all formats)\nfunction extractResultUrl(b) {\n  if (b.data && b.data.resultJson) {\n    try {\n      const rj = typeof b.data.resultJson === 'string' ? JSON.parse(b.data.resultJson) : b.data.resultJson;\n      if (rj.resultUrls && Array.isArray(rj.resultUrls) && rj.resultUrls.length > 0) return rj.resultUrls[0];\n    } catch(e) {}\n  }\n  if (b.data && b.data.info && b.data.info.result_urls) {\n    const urls = b.data.info.result_urls;\n    if (Array.isArray(urls) && urls.length > 0) return urls[0];\n  }\n  if (b.data && b.data.info && b.data.info.resultUrls) {\n    try {\n      const urls = typeof b.data.info.resultUrls === 'string' ? JSON.parse(b.data.info.resultUrls) : b.data.info.resultUrls;\n      if (Array.isArray(urls) && urls.length > 0) return urls[0];\n    } catch(e) {}\n  }\n  if (b.data && b.data.response && b.data.response.resultUrls) {\n    try {\n      const urls = typeof b.data.response.resultUrls === 'string' ? JSON.parse(b.data.response.resultUrls) : b.data.response.resultUrls;\n      if (Array.isArray(urls) && urls.length > 0) return urls[0];\n    } catch(e) {}\n  }\n  return null;\n}\n\nconst imageUrl = extractResultUrl(body);\nlet caption = postData.short_post || '';\n\n// Caption safety: truncate to 950 chars + close HTML tags\nif (caption.length > 950) {\n  caption = caption.slice(0, 947) + '...';\n}\n\n// Close unclosed HTML tags\nconst openB = (caption.match(/<b>/gi) || []).length;\nconst closeB = (caption.match(/<\\/b>/gi) || []).length;\nconst openI = (caption.match(/<i>/gi) || []).length;\nconst closeI = (caption.match(/<\\/i>/gi) || []).length;\nconst openA = (caption.match(/<a[^>]*>/gi) || []).length;\nconst closeA = (caption.match(/<\\/a>/gi) || []).length;\n\nif (openA > closeA) caption += '</a>'.repeat(openA - closeA);\nif (openI > closeI) caption += '</i>'.repeat(openI - closeI);\nif (openB > closeB) caption += '</b>'.repeat(openB - closeB);\n\n// Cleanup pending post\ndelete sd.pendingPosts[postId];\n\nreturn [{json: {\n  hasImage: !!imageUrl,\n  imageUrl: imageUrl || '',\n  caption,\n  chatId: '-1003334820713',\n  postId,\n  skip: false\n}}];"
+      },
+      "id": "parse-cb-v3",
+      "name": "Parse Callback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2184,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "renameOutput": true,
+              "outputKey": "has_image",
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "img1",
+                    "leftValue": "={{ $json.hasImage }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                }
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "if-image-v3",
+      "name": "Has Image?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2384,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendPhoto",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({chat_id: $json.chatId, photo: $json.imageUrl, caption: $json.caption, parse_mode: \"HTML\"}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "send-photo-v3",
+      "name": "Send Photo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2684,
+        1980
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({chat_id: $json.chatId, text: $json.caption, parse_mode: \"HTML\"}) }}",
+        "options": {}
+      },
+      "id": "send-text-v3",
+      "name": "Send Text Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2684,
+        2180
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "OK",
+        "options": {}
+      },
+      "id": "respond-ok-v3",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2984,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.todaySent) sd.todaySent = 0;\nsd.todaySent++;\nif (!sd.dailyKieCount) sd.dailyKieCount = 0;\nsd.dailyKieCount++;\nreturn [$input.first()];"
+      },
+      "id": "track-send-v3",
+      "name": "Track Send",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2884,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = new Date();\nconst msk = new Date(now.getTime() + 3 * 60 * 60 * 1000);\nconst datetime = msk.toISOString().replace('T', ' ').slice(0, 19) + ' MSK';\n\nlet totalArticles = 0;\nlet filteredArticles = 0;\ntry {\n  const filterData = $('Фильтр').first()?.json;\n  totalArticles = filterData?.totalCount || 0;\n  filteredArticles = filterData?.articles?.length || 0;\n} catch(e) {}\n\nlet sentCount = 0;\ntry {\n  sentCount = $('Парсинг + Топ 3').all()?.length || 0;\n} catch(e) {}\n\nreturn [{json: {\n  datetime,\n  total_articles: totalArticles,\n  filtered: filteredArticles,\n  sent: sentCount,\n  todaySent: sd.todaySent || 0,\n  dailyKie: sd.dailyKieCount || 0,\n  gpt_model: 'gpt-4o'\n}}];"
+      },
+      "id": "log-run-v3",
+      "name": "Log Run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2584,
+        1480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Log"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "log-sheets-v3",
+      "name": "Log to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2784,
+        1480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 21 * * 1-6"
+            }
+          ]
+        }
+      },
+      "id": "heartbeat-trigger-v3",
+      "name": "Heartbeat Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst todaySent = sd.todaySent || 0;\nconst dailyKie = sd.dailyKieCount || 0;\n\n// Reset counters for next day\nsd.todaySent = 0;\nsd.dailyKieCount = 0;\n\nreturn [{json: {\n  todaySent,\n  dailyKie,\n  noNews: todaySent === 0\n}}];"
+      },
+      "id": "check-daily-v3",
+      "name": "Check Daily Stats",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2184,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "nn1",
+              "leftValue": "={{ $json.noNews }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        }
+      },
+      "id": "if-no-news-v3",
+      "name": "No News Today?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2384,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({chat_id: \"136356612\", text: \"\\u26a0\\ufe0f Metal News Bot: \\u0441\\u0435\\u0433\\u043e\\u0434\\u043d\\u044f \\u043d\\u0435 \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u0435\\u043d\\u043e \\u043d\\u0438 \\u043e\\u0434\\u043d\\u043e\\u0439 \\u043d\\u043e\\u0432\\u043e\\u0441\\u0442\\u0438 \\u0432 \\u043a\\u0430\\u043d\\u0430\\u043b.\\n\\n\\u041f\\u0440\\u043e\\u0432\\u0435\\u0440\\u044c\\u0442\\u0435 n8n executions.\", parse_mode: \"HTML\"}) }}",
+        "options": {}
+      },
+      "id": "alert-admin-v3",
+      "name": "Alert Admin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2684,
+        2380
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\n// Check if GPT-4o returned an error\nconst hasError = !!(item.error || item.statusCode >= 400 || !item.choices);\n\nif (hasError) {\n  // Pass through articles text for fallback\n  const articlesText = $('Фильтр').first()?.json?.articlesText || '';\n  return [{json: {gptError: true, articlesText, errorDetail: item.error || item.statusMessage || 'Unknown error'}}];\n}\n\n// GPT-4o succeeded — pass through\nreturn [{json: {...item, gptError: false}}];"
+      },
+      "id": "check-gpt-v3",
+      "name": "Check GPT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "gpt1",
+              "leftValue": "={{ $json.gptError }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        }
+      },
+      "id": "if-gpt-error-v3",
+      "name": "IF GPT Error",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o-mini\", messages: [{ role: \"system\", content: \"Ты аналитик черной металлургии и строительной отрасли России. Проанализируй каждую новость из списка (могут быть на русском или английском).\\n\\nЕсли новость связана с металлургией, сталью, прокатом, ценами на металл, компаниями НЛМК/ММК/Северсталь/Евраз/Металлоинвест, экспортом/импортом стали, мировым рынком стали, строительством, ЦБ РФ, ключевой ставкой, тарифами, санкциями — relevant:true.\\nПолитика без связи с металлом, культура, спорт, медицина — relevant:false.\\n\\nДля каждой relevant:true:\\n1. Напиши short_post — КРАТКИЙ аналитический пост до 700 символов НА РУССКОМ для caption под картинкой в Telegram\\n2. Формат short_post: эмодзи + <b>тема</b>, 1-2 коротких абзаца анализа, итог одной строкой. HTML: <b>, <i>. БЕЗ ссылки на источник (добавится автоматически)\\n3. НЕ пересказывай — дай оценку: что это значит для рынка\\n4. НЕ добавляй факты и цифры, которых нет в исходной новости\\n5. Напиши image_prompt — промпт на АНГЛИЙСКОМ для генерации editorial illustration к этой новости. Стиль: modern editorial illustration, clean vector style, business/industry theme. Описание должно отражать СУТЬ новости (steel prices, construction site, factory, export ship, etc). НЕ используй текст на картинке.\\n6. Важность 1-10\\n\\nВерни ТОЛЬКО JSON массив без markdown:\\n[{\\\"idx\\\":0,\\\"relevant\\\":true,\\\"short_post\\\":\\\"краткий пост до 700 символов\\\",\\\"image_prompt\\\":\\\"English prompt for illustration\\\",\\\"category\\\":\\\"Металлургия\\\",\\\"score\\\":8}]\" }, { role: \"user\", content: \"Новости:\\n\" + ($json.articlesText || \"\") }], max_tokens: 4000, temperature: 0.7 }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "gpt-mini-fallback-v3",
+      "name": "GPT-4o-mini Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1728,
+        1312
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "skip1",
+              "leftValue": "={{ $json.skipImage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        }
+      },
+      "id": "if-skip-image-v3",
+      "name": "IF Skip Image",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2484,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({chat_id: \"-1003334820713\", text: $json.short_post, parse_mode: \"HTML\"}) }}",
+        "options": {}
+      },
+      "id": "skip-send-text-v3",
+      "name": "Skip Send Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2684,
+        1780
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "SentLinks"
+        },
+        "options": {}
+      },
+      "id": "load-sentlinks-v3",
+      "name": "Load SentLinks",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1040,
+        896
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\n\n// Load links from Google Sheets\nconst now = Date.now();\nconst sevenDaysMs = 7 * 24 * 60 * 60 * 1000;\n\ntry {\n  const sheetRows = $('Load SentLinks').all();\n  for (const row of sheetRows) {\n    const link = row.json.link || '';\n    const sentAt = row.json.sent_at || '';\n    if (!link) continue;\n\n    // Parse sent_at timestamp\n    let ts = 0;\n    if (sentAt) {\n      ts = new Date(sentAt).getTime();\n      if (isNaN(ts)) ts = now;\n    } else {\n      ts = now;\n    }\n\n    // Only keep links from last 7 days\n    if (now - ts <= sevenDaysMs) {\n      if (!staticData.sentLinks[link]) {\n        staticData.sentLinks[link] = ts;\n      }\n    }\n  }\n} catch(e) {\n  // Sheets might be empty or fail — continue with staticData only\n}\n\n// Pass through RSS items from Merge Финал\nconst rssItems = $('Merge Финал').all();\nreturn rssItems.length > 0 ? rssItems : [];"
+      },
+      "id": "sync-cache-v3",
+      "name": "Sync Cache",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "SentLinks"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "save-sentlink-v3",
+      "name": "Save SentLink",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2984,
+        2280
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cMfHQBCUu9ZCn7MT",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the link from the callback data\nconst input = $input.first().json;\nconst caption = input.caption || '';\n\n// Extract link from caption (📌 <a href=\"...\">Источник</a>)\nlet link = '';\nconst match = caption.match(/<a href=\"([^\"]+)\">/);\nif (match) link = match[1];\n\nreturn [{json: {\n  link: link,\n  sent_at: new Date().toISOString()\n}}];"
+      },
+      "id": "save-prep-v3",
+      "name": "Prep Save Link",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2884,
+        2280
+      ]
+    }
+  ],
+  "connections": {
+    "Каждый час": {
+      "main": [
+        [
+          {
+            "node": "RSS Google Компании",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Цены",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Производство",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Строительство",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Коммерсантъ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Торговля",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Китай",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Европа",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google США",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Черная",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Лом",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Руда",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS WorldSteel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS SteelOnTheNet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Iron Ore",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Минфин",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Росстат",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google МинЭк",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google Eurostat",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google IRN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Google MetalTorg",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Rusmet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Стройгазета",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS ЦБ РФ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Компании": {
+      "main": [
+        [
+          {
+            "node": "Merge 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Цены": {
+      "main": [
+        [
+          {
+            "node": "Merge 1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google Производство": {
+      "main": [
+        [
+          {
+            "node": "Merge 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Строительство": {
+      "main": [
+        [
+          {
+            "node": "Merge 2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Коммерсантъ": {
+      "main": [
+        [
+          {
+            "node": "Merge Extra",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Торговля": {
+      "main": [
+        [
+          {
+            "node": "Merge Extra",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google Китай": {
+      "main": [
+        [
+          {
+            "node": "Merge Int",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Европа": {
+      "main": [
+        [
+          {
+            "node": "Merge Int",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google США": {
+      "main": [
+        [
+          {
+            "node": "Merge Int B",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge 1": {
+      "main": [
+        [
+          {
+            "node": "Все источники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge 2": {
+      "main": [
+        [
+          {
+            "node": "Все источники",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Все источники": {
+      "main": [
+        [
+          {
+            "node": "Все новости RU",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Extra": {
+      "main": [
+        [
+          {
+            "node": "Все новости RU",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Int": {
+      "main": [
+        [
+          {
+            "node": "Merge Int B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Все новости RU": {
+      "main": [
+        [
+          {
+            "node": "Все новости",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Int B": {
+      "main": [
+        [
+          {
+            "node": "Все новости",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Все новости": {
+      "main": [
+        [
+          {
+            "node": "Merge Финал",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фильтр": {
+      "main": [
+        [
+          {
+            "node": "GPT-4o Анализ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Черная": {
+      "main": [
+        [
+          {
+            "node": "Merge New 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Лом": {
+      "main": [
+        [
+          {
+            "node": "Merge New 1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google Руда": {
+      "main": [
+        [
+          {
+            "node": "Merge New 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS WorldSteel": {
+      "main": [
+        [
+          {
+            "node": "Merge New 2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS SteelOnTheNet": {
+      "main": [
+        [
+          {
+            "node": "Merge New 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Iron Ore": {
+      "main": [
+        [
+          {
+            "node": "Merge New 3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge New 1": {
+      "main": [
+        [
+          {
+            "node": "Merge New 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge New 2": {
+      "main": [
+        [
+          {
+            "node": "Merge New 12",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge New 12": {
+      "main": [
+        [
+          {
+            "node": "Merge Новые",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge New 3": {
+      "main": [
+        [
+          {
+            "node": "Merge Новые",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Новые": {
+      "main": [
+        [
+          {
+            "node": "Merge Все новые",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Финал": {
+      "main": [
+        [
+          {
+            "node": "Load SentLinks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Минфин": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Росстат": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google МинЭк": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google Eurostat": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Google MetalTorg": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Rusmet": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Стройгазета": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS ЦБ РФ": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge V3-1": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge V3-2": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-12",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge V3-3": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge V3-4": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-34",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge V3-12": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-1234",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge V3-34": {
+      "main": [
+        [
+          {
+            "node": "Merge V3-1234",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge V3-1234": {
+      "main": [
+        [
+          {
+            "node": "Merge V3 All",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Google IRN": {
+      "main": [
+        [
+          {
+            "node": "Merge V3 All",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge V3 All": {
+      "main": [
+        [
+          {
+            "node": "Merge Все новые",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Все новые": {
+      "main": [
+        [
+          {
+            "node": "Merge Финал",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GPT-4o Анализ": {
+      "main": [
+        [
+          {
+            "node": "Check GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсинг + Топ 3": {
+      "main": [
+        [
+          {
+            "node": "По одному",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "По одному": {
+      "main": [
+        [
+          {
+            "node": "Log Run",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prep Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Image": {
+      "main": [
+        [
+          {
+            "node": "IF Skip Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KIE Image": {
+      "main": [
+        [
+          {
+            "node": "Пауза 3 сек",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Пауза 3 сек": {
+      "main": [
+        [
+          {
+            "node": "По одному",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Callback": {
+      "main": [
+        [
+          {
+            "node": "Parse Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Callback": {
+      "main": [
+        [
+          {
+            "node": "Has Image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image?": {
+      "main": [
+        [
+          {
+            "node": "Send Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Text Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Photo": {
+      "main": [
+        [
+          {
+            "node": "Track Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Text Fallback": {
+      "main": [
+        [
+          {
+            "node": "Track Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Send": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep Save Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Run": {
+      "main": [
+        [
+          {
+            "node": "Log to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Heartbeat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Daily Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Daily Stats": {
+      "main": [
+        [
+          {
+            "node": "No News Today?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No News Today?": {
+      "main": [
+        [
+          {
+            "node": "Alert Admin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Check GPT": {
+      "main": [
+        [
+          {
+            "node": "IF GPT Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF GPT Error": {
+      "main": [
+        [
+          {
+            "node": "GPT-4o-mini Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Парсинг + Топ 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4o-mini Fallback": {
+      "main": [
+        [
+          {
+            "node": "Парсинг + Топ 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Skip Image": {
+      "main": [
+        [
+          {
+            "node": "Skip Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "KIE Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Send Text": {
+      "main": [
+        [
+          {
+            "node": "По одному",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load SentLinks": {
+      "main": [
+        [
+          {
+            "node": "Sync Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync Cache": {
+      "main": [
+        [
+          {
+            "node": "Фильтр",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Save Link": {
+      "main": [
+        [
+          {
+            "node": "Save SentLink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Каждые 3 часа": {
+      "recurrenceRules": [
+        18
+      ]
+    },
+    "global": {
+      "sentLinks": {
+        "https://news.google.com/rss/articles/CBMipgFBVV95cUxOWUN1Wko4YWhfLXlaOG93NWRJTng5ZnAtVC1RQkNGS2FIWjJOMTRmTk1RbjljZUpldDFXNGtKVFJ1Yl9RWHF6RVZBU2hKektkdXRBbmtraUx3UzZ6RlNwNTVPR1RGazRLY3FOMlpyaUREdjgzNmxFR1dXUnA5aHNjUU84d09NRkxxVGVodHJlbFpBMWVpeUk5RzltTHpUQzMyalZBWnZn0gGrAUFVX3lxTE1BSmZzTFBVSDVadWVYNnc3WTJPSWgyd1JpUDUxS056UzJlWWRqWTdDNE4yNERieEpRWGpBNzRNODlhazVha2ZZd3R5UkxCS1pPWTNoTE5VMEpoVzNhSGJIYlhMbU85Rk9aSWJmZFBEZnJCNU9uYU9TVjBRNnRYNDd4dmN4VTlTbVh4aW5TN3ltSExBU0pVTV9rcjlzNlVmbHhqZ0EtaWQwcUpRSQ?oc=5": 1772787649593,
+        "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOSE03YzV2bXhFQkpXaG5SdVU0a1c4OUVZODJYQU42dW9ITlRxeWRxS095SVNxZzU1TnZGWmU1WC1jNXIxSHNYYjd6NGVCTkdSREE5dkVhaGpGa3E1akUtWWtqZGV4QV9MSFYxYmNhYXlENXBfWFBnSnZaTnIxNkFCTldkOEtmbXliNElBdHdHazd6VkNzUU1lNHRzU0dKQzRLTW8zNlU0THdDYmNCQUtxdzdudlpDd0dCMGNvMjJ3dm5WQWNhT1otSdIBzgFBVV95cUxOaVNaeTRYaGpNbDI5T2tQMEI1ZkhWM1dJd2FYUXN2TGttT1kxbHQxcEdka2FiQlpTSmJxWXU3eEFwbU1JaFREMDREUzRuRVluQkcza05ONk9NX25STVVPYkVHNjdFQlJfZTVCQ2JvWlRRSjNOQmY4NGt1ay1sZEowazlwUzhJZWtTM3BNNEFqVzRoLXU3V0REMXZTWkZ4a05Jd2RTRGpQaWM4cjV2VjFWYU5GRVY5aTRjUEZRdmk1UkVOdUVtejJhY3R0MkxNUQ?oc=5": 1772787649593,
+        "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPZG5RWE1ZM0d5dTdrUGxva2txRFMyamlhUjMzc2s5ODJpa1QweUJqdkZRMGFidUhheF9MOUo4ZDZjNnpyWGtNX2xGQTlhMXhIaWJnSEpxZnQ3UFgzRGtjeXBlME00UUZIWnpjdlJKNngzTFNOU1l2RzZ6cEtTSENpZ1ZlWmQ5SWtmdEV5YWdFeTZ3bE83eEhTTHhkNHU3dnN3eFRqYVk4dDN1TUU?oc=5": 1772787649593,
+        "https://news.google.com/rss/articles/CBMif0FVX3lxTE51bWZLZTdtOU9RbllWZTBuUm9zZ1NQUDhEWUJYSnB0WFRRLUlhNEZHNjctM28zX25DeFhyS1IzMzdxSzhGTDl3bHExUjlwcmlqdlp1VHYwSlQzd29GbExoUGluZXlLd25uUkNWeUlEZVZ3aHR0Z252bjA1YWwyR0k?oc=5": 1772794900461,
+        "https://news.google.com/rss/articles/CBMiUEFVX3lxTE84XzZYVXhjWm5weXZQSGd1eDVNTk5SVEdCTjJjQ3YxZ1B4SHg0NjZYLVEzSTY3Z2h6V3ZwbE1sVkhFSzFiOHRXZjM3WC1YV0l0?oc=5": 1772794900461,
+        "https://news.google.com/rss/articles/CBMihwFBVV95cUxNQzgzMUVnR2Z6R1Frd24xWVNQdVRoZGI3djktLS0ydko3VEZob3YwN0E1NmFyY1NHbi1mR3pMZW5sakFzNWNxb0ZxVWYxeHRac0JyNXhhU2o1WUZKNi0xbW15cldtSDl6NmE5TDBpWjJiY3BUYVdCcGpGX25Pek9uX3o5a2xlcmc?oc=5": 1772794900461,
+        "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1QUGhvWERpaEcwSFN6azRqd1QycTh1dGExUy0xamVVdzJpTmFLNE1aMllrMjZqd1JkWjhxZTBzTWF1Z2xXN3lEdzA3ZlI0UEN1cVBsQkt5MHduQlBOV3diQ0dvMERfZw?oc=5": 1772802037554,
+        "https://news.google.com/rss/articles/CBMioAFBVV95cUxNNXByRnFFTDJXQ1FJTlExR0Nxam44bnVXUGFRQ2NnTGZuRUt6M2FRSGFaZS05YlhfblBlMHJKeW5tbGgzOEdvV0g1cjBtSERWUUZ5VXVMZElVZ1ZsdTA5eGxXcGYyT3FfTUVuY25UZ3VNRTNDdWoxdHBvb01FWWs5VU1jLWROZzdSQVU2Tk9TallUaEI3OU5wVzBILXNEMExQ?oc=5": 1772802037554,
+        "https://news.google.com/rss/articles/CBMipwFBVV95cUxQQ09VY0J2a1BEdUhtVG9fVWp5c2RSc1h3My1COXdWVk9KbGZkamhhWWFtTTBreUw5bVEyRGFibVBaeDZSTHlaYm5BZENqN29FYUhMNTBtaDNrbmo4ZENGV0F6OUdZQ2o2MG84NHI3MmlQbGRoUDhLVVdZVmVpTDJHVVZ5Y1VCM0xaVkpUR2M1bWhKQWhKanc4VzhMQlBCN3BELS1oazlhRQ?oc=5": 1772802037554,
+        "https://news.google.com/rss/articles/CBMifEFVX3lxTE1vRWxGSTVQOUp2bm9qZno2TnRmYVBkMDZQNVpWYTFPVzNVbWNjNGx1YkRVOVpjUlJIbktydzZSMnB6Y2xEV2ZPbXpsbzVZM2ZtTGo3cXRFby0tV05tZFNIbVlqNXFQQ29KcU1ZT0o4UW5YRzVNMkxFRC1OX1g?oc=5": 1772809243675,
+        "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9nMjBYU3ROWU1lVFNCd1FHUC1TUGMyRFNaUi1IRHhIQmk1TXNvenpfWi1McnVlbFpYQjBlYTdGSUFNUDVXWkpaVGE4TTVENGpnTEowRzZ0em0yanZkUDBOSg?oc=5": 1772809243675,
+        "https://news.google.com/rss/articles/CBMifkFVX3lxTE9XdjdhSVVTbGVGQ3ZCMzJDY2M1T1Zrc3ZkU2VLS29uUWs2RW1wLU9tRDZ0R09QbmE4bFhfWS1xalJ1NFRmbC1Gc2QtU3FFekhObWNrRmN5SVRvQldLU3FVWEMwSlJJV1lVTjkwbm1odlN2TkgtS0xqaE0yeU44QQ?oc=5": 1772809243675,
+        "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5nZTR2UjRjRWdSNkNnMlZhTVU1OEZwLUxMQ0tjbk5EaFp4THp4NnRuellXNjh6ZGxlTkE1MkJsRklaSjdrUEhSNVN0UF9KS192?oc=5": 1772816427949,
+        "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPNTRQbDhjMWhWWnVRWEJSMGZfUHFIR1ZhM1BQZXdzdHlQbDNyNGpYMGtZSDVjTjRZUEdsS1VYQVVMdDc1bURNcTFvSGkzY0tLQ2hUS2Z4NExIdHNESWNKTHBDZDBoUC1GMWRLdUJ3WW5ET1NLanYzOUI3WXRld3lBWjFNWUNQdW9HRmVhWHhNMU1XY2lNSy1wdVg5OG9MQ2RpU0FJVWlwMTAwNHRVaTJMZUpPX1FYRy1wWWdrYUtsOEtRZDIyTG1MSGhrTkJtUm9GbU5vSEpxd9IB6AFBVV95cUxOYUdjNzZkVlZWejc1VlF6UHRoN0ZLMl9KdGM0bnc1Ql9XRUEwUnhRVVBnaHBUdVFpYWRxUWNKVHdFZmMyZ2xZb0ZTUkVob0FnQU5oZVBfWEh2RHhPazhwSGxuSTBvNXl2bHRxc2xPOUVwZUl1cm1nVC1pcUNjUlNtY29nN2lfVUN1cEZKVk1TNTJuQWc1YWpEc0ZHM25FcVJMM29TbVhqZ2x0RERRd085Y3U2N1BrZVJIeGlEUUpReEJiNHVuaDZHdjJnUDBoQk96akFDdU5xOE9qUFZodERYSldSTm9INWhZ?oc=5": 1772902825765,
+        "https://rusmet.ru/press-center/zheleznaya-ruda-desheveet-na-fone-snizheniya-aktivnosti-v-kitae-i-pereizbytka-predlozheniya/": 1772962020202,
+        "https://rusmet.ru/press-center/sanktsii-protiv-rossii-priveli-k-sboyam-v-metallurgii-kazakhstana/": 1772962020202,
+        "https://rusmet.ru/press-center/rzhd-vvodyat-masshtabnye-skidki-na-perevozki-metallov-i-drugoy-produktsii/": 1772962020202,
+        "https://news.google.com/rss/articles/CBMiUkFVX3lxTE9wMVhOS0RNaWxRWDN3ZnZJTEZScHpBa21TY2dQYXg0YS1kdU50SHhSeXJ6eGtxTlY3UkpkVXhQVEFJaXRwOVRhdGFWR2Nnd0dtdWfSAUtBVV95cUxOenZEQ0UzMjBDSGN5WTZFeklKcFlLUC1lM0tiM0tYbXEzMzJzQng4LTh2SWlkUkpib1ZLY2ZLUVhXSHNMeVZUR0ExRFk?oc=5": 1772965252694,
+        "https://rusmet.ru/press-center/eek-nachala-rassledovanie-protiv-deshevogo-importa-beloy-zhesti-ugrozhayushchego-proizvoditelyam-iz-/": 1772965800731
+      },
+      "pendingPosts": {},
+      "dailyKieCount": 2,
+      "todaySent": 2
+    },
+    "node:Каждый час": {
+      "recurrenceRules": []
+    },
+    "node:Heartbeat Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "16466627-516e-42ec-aaa2-023209becee9",
+  "activeVersionId": "16466627-516e-42ec-aaa2-023209becee9",
+  "versionCounter": 225,
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2026-02-18T14:36:08.409Z",
+      "createdAt": "2026-02-18T14:36:08.409Z",
+      "role": "workflow:owner",
+      "workflowId": "SpcaC8OlU1BELWGX",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T10:29:17.701Z",
+    "createdAt": "2026-03-08T10:29:17.701Z",
+    "versionId": "16466627-516e-42ec-aaa2-023209becee9",
+    "workflowId": "SpcaC8OlU1BELWGX",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 8,10,12,14,16,18,20 * * 1-6"
+              }
+            ]
+          }
+        },
+        "id": "2bab919c-879a-46cd-bac8-c3e3e9ad2008",
+        "name": "Каждый час",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -240,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%9D%D0%9B%D0%9C%D0%9A+%D0%9C%D0%9C%D0%9A+%D0%A1%D0%B5%D0%B2%D0%B5%D1%80%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D0%95%D0%B2%D1%80%D0%B0%D0%B7+%D0%9C%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%B8%D0%BD%D0%B2%D0%B5%D1%81%D1%82&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "29b7b597-d546-48e4-8a39-6939fe24d9cb",
+        "name": "RSS Google Компании",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%B0%D1%80%D0%BC%D0%B0%D1%82%D1%83%D1%80%D0%B0+%D0%BF%D1%80%D0%BE%D0%BA%D0%B0%D1%82+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "7cc5bdd2-8fa4-487d-9dc4-966180db453e",
+        "name": "RSS Google Цены",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          160
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D1%83%D1%80%D0%B3%D0%B8%D1%8F+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE+%D0%B7%D0%B0%D0%B2%D0%BE%D0%B4+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "dae41f91-7794-44d3-8af9-28297fa452b0",
+        "name": "RSS Google Производство",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          320
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%BF%D1%80%D0%BE%D0%BA%D0%B0%D1%82+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA+%D1%81%D0%BF%D1%80%D0%BE%D1%81&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "e5c72966-0825-4cc4-a235-564797d016af",
+        "name": "RSS Google Строительство",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          480
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://www.kommersant.ru/rss/news.xml",
+          "options": {}
+        },
+        "id": "rss-metalinfo-001",
+        "name": "RSS Коммерсантъ",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          640
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%8D%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82+%D1%82%D0%B0%D1%80%D0%B8%D1%84%D1%8B+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-rcmm-001",
+        "name": "RSS Google Торговля",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          800
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=china+steel+iron+production+export+prices&hl=en&gl=US&ceid=US:en",
+          "options": {}
+        },
+        "id": "rss-int-china-001",
+        "name": "RSS Google Китай",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          960
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=europe+steel+market+production+demand+ferrous&hl=en&gl=US&ceid=US:en",
+          "options": {}
+        },
+        "id": "rss-int-europe-001",
+        "name": "RSS Google Европа",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1120
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=US+steel+tariffs+import+production+ferrous&hl=en&gl=US&ceid=US:en",
+          "options": {}
+        },
+        "id": "rss-int-usa-001",
+        "name": "RSS Google США",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1280
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {},
+        "id": "66fa6b6b-a991-4af4-880b-273c5a81479c",
+        "name": "Merge 1",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          80
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "202152b7-fe12-427b-80b2-9136977842c0",
+        "name": "Merge 2",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          400
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "8f2a98f6-88e7-4348-abaa-6c75fc4fb12d",
+        "name": "Все источники",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          528,
+          240
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-extra-001",
+        "name": "Merge Extra",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          720
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-all-001",
+        "name": "Все новости RU",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          528,
+          480
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-int-001",
+        "name": "Merge Int",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          1040
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-int-002",
+        "name": "Merge Int B",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          528,
+          960
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-final-001",
+        "name": "Все новости",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          784,
+          720
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\n\nconst maxAgeMs = 100 * 60 * 60 * 1000;\nconst now = Date.now();\nconst seen = new Set();\nconst articles = [];\n\nfor (const item of $input.all()) {\n  if (item.json.error) continue;\n  const link = item.json.link || item.json.guid || '';\n  if (!link) continue;\n  if (seen.has(link)) continue;\n  seen.add(link);\n\n  const title = item.json.title || '';\n  if (title.includes('\\uFFFD')) continue;\n\n  const pubDate = item.json.pubDate || item.json.isoDate || item.json.date || '';\n  if (pubDate) {\n    const ts = new Date(pubDate).getTime();\n    if (!isNaN(ts) && (now - ts) > maxAgeMs) continue;\n  }\n\n  if (staticData.sentLinks[link]) continue;\n\n  articles.push({\n    idx: articles.length,\n    title,\n    link,\n    pubDate,\n    snippet: (item.json.contentSnippet || item.json.description || '').slice(0, 150)\n  });\n  if (articles.length >= 15) break;\n}\n\nif (articles.length === 0) return [];\n\nconst articlesText = articles\n  .map(a => '[' + a.idx + '] ' + a.title + (a.snippet ? '. ' + a.snippet : ''))\n  .join('\\n');\n\nreturn [{ json: { articles, articlesText } }];"
+        },
+        "id": "date-filter-001",
+        "name": "Фильтр",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1168,
+          896
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o\", messages: [{ role: \"system\", content: \"Ты аналитик черной металлургии и строительной отрасли России. Проанализируй каждую новость из списка (могут быть на русском или английском).\\n\\nЕсли новость связана с металлургией, сталью, прокатом, ценами на металл, компаниями НЛМК/ММК/Северсталь/Евраз/Металлоинвест, экспортом/импортом стали, мировым рынком стали, строительством, ЦБ РФ, ключевой ставкой, тарифами, санкциями — relevant:true.\\nПолитика без связи с металлом, культура, спорт, медицина — relevant:false.\\n\\nДля каждой relevant:true:\\n1. Напиши short_post — КРАТКИЙ аналитический пост до 700 символов НА РУССКОМ для caption под картинкой в Telegram\\n2. Формат short_post: эмодзи + <b>тема</b>, 1-2 коротких абзаца анализа, итог одной строкой. HTML: <b>, <i>. БЕЗ ссылки на источник (добавится автоматически)\\n3. НЕ пересказывай — дай оценку: что это значит для рынка\\n4. НЕ добавляй факты и цифры, которых нет в исходной новости\\n5. Напиши image_prompt — промпт на АНГЛИЙСКОМ для генерации editorial illustration к этой новости. Стиль: modern editorial illustration, clean vector style, business/industry theme. Описание должно отражать СУТЬ новости (steel prices, construction site, factory, export ship, etc). НЕ используй текст на картинке.\\n6. Важность 1-10\\n\\nВерни ТОЛЬКО JSON массив без markdown:\\n[{\\\"idx\\\":0,\\\"relevant\\\":true,\\\"short_post\\\":\\\"краткий пост до 700 символов\\\",\\\"image_prompt\\\":\\\"English prompt for illustration\\\",\\\"category\\\":\\\"Металлургия\\\",\\\"score\\\":8}]\" }, { role: \"user\", content: \"Новости:\\n\" + ($json.articlesText || \"\") }], max_tokens: 4000, temperature: 0.7 }) }}",
+          "options": {
+            "timeout": 120000
+          }
+        },
+        "id": "f03d4856-283d-49a3-82f7-ff4dd85126d7",
+        "name": "GPT-4o Анализ",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1408,
+          1152
+        ],
+        "continueOnFail": true,
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\nif (!staticData.pendingPosts) staticData.pendingPosts = {};\nconst now = Date.now();\n\nconst dsItem = $input.first();\nif (!dsItem) return [];\n\nconst articles = ($('Фильтр').first()?.json?.articles) || [];\nif (articles.length === 0) return [];\n\nlet results = [];\ntry {\n  const raw = dsItem.json?.choices?.[0]?.message?.content || '[]';\n  const cleaned = raw.replace(/```json|```/g, '').trim();\n  results = JSON.parse(cleaned);\n  if (!Array.isArray(results)) results = [];\n} catch(e) { return []; }\n\nconst relevant = [];\nfor (const ai of results) {\n  if (ai.relevant !== true) continue;\n  const src = articles[ai.idx];\n  if (!src) continue;\n  if (staticData.sentLinks[src.link]) continue;\n\n  // Build short_post with source link appended\n  let shortPost = ai.short_post || ai.post || '';\n  if (shortPost && src.link) {\n    shortPost += '\\n\\n📌 <a href=\"' + src.link + '\">Источник</a>';\n  }\n\n  const postId = 'post_' + now + '_' + ai.idx;\n\n  relevant.push({ json: {\n    title:        src.title,\n    link:         src.link,\n    pubDate:      src.pubDate || '',\n    short_post:   shortPost,\n    image_prompt: ai.image_prompt || '',\n    category:     ai.category || 'Металлургия',\n    score:        typeof ai.score === 'number' ? ai.score : 5,\n    postId:       postId\n  }});\n}\n\n// Sort by score, take top 3\nrelevant.sort((a, b) => (b.json.score || 0) - (a.json.score || 0));\nconst top = relevant.slice(0, 3);\n\n// Mark as sent + save pending posts for callback\nfor (const item of top) {\n  const lnk = item.json.link;\n  if (lnk) staticData.sentLinks[lnk] = now;\n\n  // Save post data for callback retrieval\n  staticData.pendingPosts[item.json.postId] = {\n    short_post: item.json.short_post,\n    link: item.json.link,\n    title: item.json.title,\n    category: item.json.category,\n    savedAt: now\n  };\n}\n\n// Cleanup old sentLinks (7 days)\nfor (const key of Object.keys(staticData.sentLinks)) {\n  if (now - staticData.sentLinks[key] > 7 * 24 * 60 * 60 * 1000) delete staticData.sentLinks[key];\n}\n// Cleanup old pendingPosts (1 hour — stale callbacks)\nfor (const key of Object.keys(staticData.pendingPosts)) {\n  if (now - (staticData.pendingPosts[key].savedAt || 0) > 60 * 60 * 1000) delete staticData.pendingPosts[key];\n}\n\nreturn top;"
+        },
+        "id": "918a3f70-d35f-4e92-9635-92e66754b24a",
+        "name": "Парсинг + Топ 3",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1856,
+          1392
+        ]
+      },
+      {
+        "parameters": {
+          "chatId": "-1003334820713",
+          "text": "={{ $json.short_post }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": false
+          }
+        },
+        "id": "b4aeb527-0aab-4b1b-b925-c78ce9d5dd6e",
+        "name": "Отправить в Telegram",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2384,
+          1680
+        ],
+        "webhookId": "027a1165-7a31-4d5c-9beb-753db24ab3d2",
+        "credentials": {
+          "telegramApi": {
+            "id": "pEB2M34FK0yhPYmi",
+            "name": "KIE AI Telegram Bot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D1%87%D0%B5%D1%80%D0%BD%D0%B0%D1%8F+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D1%83%D1%80%D0%B3%D0%B8%D1%8F+%D1%80%D1%8B%D0%BD%D0%BE%D0%BA+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-new-1",
+        "name": "RSS Google Черная",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1440
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%BB%D0%BE%D0%BC+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB%D0%BE%D0%BB%D0%BE%D0%BC+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D0%BF%D0%B5%D1%80%D0%B5%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-new-2",
+        "name": "RSS Google Лом",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1600
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%B6%D0%B5%D0%BB%D0%B5%D0%B7%D0%BD%D0%B0%D1%8F+%D1%80%D1%83%D0%B4%D0%B0+%D1%86%D0%B5%D0%BD%D0%B0+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-new-3",
+        "name": "RSS Google Руда",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1760
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://worldsteel.org/feed/",
+          "options": {}
+        },
+        "id": "rss-new-4",
+        "name": "RSS WorldSteel",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          1920
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://www.steelonthenet.com/feeds/all-feed-pages.php",
+          "options": {}
+        },
+        "id": "rss-new-5",
+        "name": "RSS SteelOnTheNet",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          2080
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=iron+ore+price+steel+scrap+ferrous+market&hl=en&gl=US&ceid=US:en",
+          "options": {}
+        },
+        "id": "rss-new-6",
+        "name": "RSS Google Iron Ore",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          0,
+          2240
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {},
+        "id": "merge-new-1",
+        "name": "Merge New 1",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          1520
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-new-2",
+        "name": "Merge New 2",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          1840
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-new-3",
+        "name": "Merge New 3",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          272,
+          2160
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-new-12",
+        "name": "Merge New 12",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          528,
+          1680
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-new-all",
+        "name": "Merge Новые",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          784,
+          1920
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "merge-final",
+        "name": "Merge Финал",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1,
+        "position": [
+          912,
+          720
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://minfin.gov.ru/rss_news?mod=news&lim=50",
+          "options": {}
+        },
+        "id": "rss-minfin",
+        "name": "RSS Минфин",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          2400
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D1%80%D0%BE%D1%81%D1%81%D1%82%D0%B0%D1%82+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE+%D0%BF%D1%80%D0%BE%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D1%8C+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-rosstat",
+        "name": "RSS Google Росстат",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          2560
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=%D0%BC%D0%B8%D0%BD%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D1%8F+%D0%BA%D0%BE%D0%BD%D1%8A%D1%8E%D0%BD%D0%BA%D1%82%D1%83%D1%80%D0%B0+%D0%BD%D0%B5%D1%84%D1%82%D1%8C+%D1%81%D1%8B%D1%80%D1%8C%D1%91+%D1%8D%D0%BA%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D0%BA%D0%B0&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-mineconom",
+        "name": "RSS Google МинЭк",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          2720
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=eurostat+steel+construction+industry+production+EU&hl=en&gl=US&ceid=US:en",
+          "options": {}
+        },
+        "id": "rss-eurostat",
+        "name": "RSS Google Eurostat",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          2880
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=irn.ru+%D0%BD%D0%B5%D0%B4%D0%B2%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B+%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-irn",
+        "name": "RSS Google IRN",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          3040
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://news.google.com/rss/search?q=metaltorg.ru+%D0%BC%D0%B5%D1%82%D0%B0%D0%BB%D0%BB+%D1%81%D1%82%D0%B0%D0%BB%D1%8C+%D1%86%D0%B5%D0%BD%D1%8B&hl=ru&gl=RU&ceid=RU:ru",
+          "options": {}
+        },
+        "id": "rss-metaltorg",
+        "name": "RSS Google MetalTorg",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          3200
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://rusmet.ru/feed/",
+          "options": {}
+        },
+        "id": "rss-rusmet",
+        "name": "RSS Rusmet",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          3360
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://stroygaz.ru/rss/",
+          "options": {}
+        },
+        "id": "rss-stroygaz",
+        "name": "RSS Стройгазета",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          3520
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://www.cbr.ru/rss/RssPress",
+          "options": {}
+        },
+        "id": "rss-cbr",
+        "name": "RSS ЦБ РФ",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          16,
+          3680
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-1",
+        "name": "Merge V3-1",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          272,
+          2480
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-2",
+        "name": "Merge V3-2",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          272,
+          2800
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-12",
+        "name": "Merge V3-12",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          528,
+          2640
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-3",
+        "name": "Merge V3-3",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          272,
+          3280
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-4",
+        "name": "Merge V3-4",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          272,
+          3600
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-34",
+        "name": "Merge V3-34",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          528,
+          3440
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-1234",
+        "name": "Merge V3-1234",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          784,
+          3040
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-v3-all",
+        "name": "Merge V3 All",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          1040,
+          3040
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "merge-combined-v3",
+        "name": "Merge Все новые",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          784,
+          2200
+        ]
+      },
+      {
+        "parameters": {
+          "batchSize": 1,
+          "options": {}
+        },
+        "id": "split-batches-v3",
+        "name": "По одному",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1984,
+          1680
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.dailyKieCount) sd.dailyKieCount = 0;\n\nconst MAX_DAILY_IMAGES = 21;\nconst item = $input.first().json;\nconst postId = item.postId || 'unknown';\n\n// Check if daily limit reached\nif (sd.dailyKieCount >= MAX_DAILY_IMAGES) {\n  return [{json: {postId, skipImage: true, short_post: item.short_post, image_prompt: ''}}];\n}\n\nconst imagePrompt = item.image_prompt || 'Modern editorial illustration of steel industry and construction';\nconst cbUrl = 'https://n8n-eremeev-me.ru/webhook/news-image-callback?postId=' + postId;\n\nconst kieBody = JSON.stringify({\n  model: 'nano-banana-2',\n  input: {\n    prompt: imagePrompt,\n    resolution: '1K',\n    aspect_ratio: '16:9'\n  },\n  callBackUrl: cbUrl\n});\n\nreturn [{json: {postId, kieBody, cbUrl, short_post: item.short_post, image_prompt: imagePrompt, skipImage: false}}];"
+        },
+        "id": "prep-image-v3",
+        "name": "Prep Image",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2184,
+          1680
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.kie.ai/api/v1/jobs/createTask",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer 6cf82a5d33a57d916cc47f13d0804ada"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.kieBody }}",
+          "options": {
+            "timeout": 30000
+          }
+        },
+        "id": "kie-image-v3",
+        "name": "KIE Image",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2384,
+          1680
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "amount": 3,
+          "unit": "seconds"
+        },
+        "id": "pause-3s-v3",
+        "name": "Пауза 3 сек",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          2584,
+          1680
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "news-image-callback",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "webhook-img-v3",
+        "name": "Image Callback",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          1984,
+          2080
+        ],
+        "webhookId": "news-image-callback"
+      },
+      {
+        "parameters": {
+          "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.pendingPosts) sd.pendingPosts = {};\n\nconst input = $input.first().json;\nconst query = input.query || {};\nconst body = input.body || {};\nconst postId = query.postId || '';\n\n// Get saved post data\nconst postData = sd.pendingPosts[postId];\nif (!postData) {\n  return [{json: {hasImage: false, skip: true, reason: 'Unknown postId: ' + postId}}];\n}\n\n// Extract result URL from KIE callback (all formats)\nfunction extractResultUrl(b) {\n  if (b.data && b.data.resultJson) {\n    try {\n      const rj = typeof b.data.resultJson === 'string' ? JSON.parse(b.data.resultJson) : b.data.resultJson;\n      if (rj.resultUrls && Array.isArray(rj.resultUrls) && rj.resultUrls.length > 0) return rj.resultUrls[0];\n    } catch(e) {}\n  }\n  if (b.data && b.data.info && b.data.info.result_urls) {\n    const urls = b.data.info.result_urls;\n    if (Array.isArray(urls) && urls.length > 0) return urls[0];\n  }\n  if (b.data && b.data.info && b.data.info.resultUrls) {\n    try {\n      const urls = typeof b.data.info.resultUrls === 'string' ? JSON.parse(b.data.info.resultUrls) : b.data.info.resultUrls;\n      if (Array.isArray(urls) && urls.length > 0) return urls[0];\n    } catch(e) {}\n  }\n  if (b.data && b.data.response && b.data.response.resultUrls) {\n    try {\n      const urls = typeof b.data.response.resultUrls === 'string' ? JSON.parse(b.data.response.resultUrls) : b.data.response.resultUrls;\n      if (Array.isArray(urls) && urls.length > 0) return urls[0];\n    } catch(e) {}\n  }\n  return null;\n}\n\nconst imageUrl = extractResultUrl(body);\nlet caption = postData.short_post || '';\n\n// Caption safety: truncate to 950 chars + close HTML tags\nif (caption.length > 950) {\n  caption = caption.slice(0, 947) + '...';\n}\n\n// Close unclosed HTML tags\nconst openB = (caption.match(/<b>/gi) || []).length;\nconst closeB = (caption.match(/<\\/b>/gi) || []).length;\nconst openI = (caption.match(/<i>/gi) || []).length;\nconst closeI = (caption.match(/<\\/i>/gi) || []).length;\nconst openA = (caption.match(/<a[^>]*>/gi) || []).length;\nconst closeA = (caption.match(/<\\/a>/gi) || []).length;\n\nif (openA > closeA) caption += '</a>'.repeat(openA - closeA);\nif (openI > closeI) caption += '</i>'.repeat(openI - closeI);\nif (openB > closeB) caption += '</b>'.repeat(openB - closeB);\n\n// Cleanup pending post\ndelete sd.pendingPosts[postId];\n\nreturn [{json: {\n  hasImage: !!imageUrl,\n  imageUrl: imageUrl || '',\n  caption,\n  chatId: '-1003334820713',\n  postId,\n  skip: false\n}}];"
+        },
+        "id": "parse-cb-v3",
+        "name": "Parse Callback",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2184,
+          2080
+        ]
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "renameOutput": true,
+                "outputKey": "has_image",
+                "conditions": {
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "id": "img1",
+                      "leftValue": "={{ $json.hasImage }}",
+                      "rightValue": true,
+                      "operator": {
+                        "type": "boolean",
+                        "operation": "true"
+                      }
+                    }
+                  ],
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose"
+                  }
+                }
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "id": "if-image-v3",
+        "name": "Has Image?",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3,
+        "position": [
+          2384,
+          2080
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendPhoto",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({chat_id: $json.chatId, photo: $json.imageUrl, caption: $json.caption, parse_mode: \"HTML\"}) }}",
+          "options": {
+            "timeout": 30000
+          }
+        },
+        "id": "send-photo-v3",
+        "name": "Send Photo",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2684,
+          1980
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({chat_id: $json.chatId, text: $json.caption, parse_mode: \"HTML\"}) }}",
+          "options": {}
+        },
+        "id": "send-text-v3",
+        "name": "Send Text Fallback",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2684,
+          2180
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "OK",
+          "options": {}
+        },
+        "id": "respond-ok-v3",
+        "name": "Respond OK",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          2984,
+          2080
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const sd = $getWorkflowStaticData('global');\nif (!sd.todaySent) sd.todaySent = 0;\nsd.todaySent++;\nif (!sd.dailyKieCount) sd.dailyKieCount = 0;\nsd.dailyKieCount++;\nreturn [$input.first()];"
+        },
+        "id": "track-send-v3",
+        "name": "Track Send",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2884,
+          2080
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = new Date();\nconst msk = new Date(now.getTime() + 3 * 60 * 60 * 1000);\nconst datetime = msk.toISOString().replace('T', ' ').slice(0, 19) + ' MSK';\n\nlet totalArticles = 0;\nlet filteredArticles = 0;\ntry {\n  const filterData = $('Фильтр').first()?.json;\n  totalArticles = filterData?.totalCount || 0;\n  filteredArticles = filterData?.articles?.length || 0;\n} catch(e) {}\n\nlet sentCount = 0;\ntry {\n  sentCount = $('Парсинг + Топ 3').all()?.length || 0;\n} catch(e) {}\n\nreturn [{json: {\n  datetime,\n  total_articles: totalArticles,\n  filtered: filteredArticles,\n  sent: sentCount,\n  todaySent: sd.todaySent || 0,\n  dailyKie: sd.dailyKieCount || 0,\n  gpt_model: 'gpt-4o'\n}}];"
+        },
+        "id": "log-run-v3",
+        "name": "Log Run",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2584,
+          1480
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Log"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {}
+          },
+          "options": {}
+        },
+        "id": "log-sheets-v3",
+        "name": "Log to Sheets",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2784,
+          1480
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "cMfHQBCUu9ZCn7MT",
+            "name": "Google Sheets account 2"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 21 * * 1-6"
+              }
+            ]
+          }
+        },
+        "id": "heartbeat-trigger-v3",
+        "name": "Heartbeat Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          1984,
+          2480
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const sd = $getWorkflowStaticData('global');\nconst todaySent = sd.todaySent || 0;\nconst dailyKie = sd.dailyKieCount || 0;\n\n// Reset counters for next day\nsd.todaySent = 0;\nsd.dailyKieCount = 0;\n\nreturn [{json: {\n  todaySent,\n  dailyKie,\n  noNews: todaySent === 0\n}}];"
+        },
+        "id": "check-daily-v3",
+        "name": "Check Daily Stats",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2184,
+          2480
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "nn1",
+                "leftValue": "={{ $json.noNews }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ]
+          }
+        },
+        "id": "if-no-news-v3",
+        "name": "No News Today?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2384,
+          2480
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({chat_id: \"136356612\", text: \"\\u26a0\\ufe0f Metal News Bot: \\u0441\\u0435\\u0433\\u043e\\u0434\\u043d\\u044f \\u043d\\u0435 \\u043e\\u0442\\u043f\\u0440\\u0430\\u0432\\u043b\\u0435\\u043d\\u043e \\u043d\\u0438 \\u043e\\u0434\\u043d\\u043e\\u0439 \\u043d\\u043e\\u0432\\u043e\\u0441\\u0442\\u0438 \\u0432 \\u043a\\u0430\\u043d\\u0430\\u043b.\\n\\n\\u041f\\u0440\\u043e\\u0432\\u0435\\u0440\\u044c\\u0442\\u0435 n8n executions.\", parse_mode: \"HTML\"}) }}",
+          "options": {}
+        },
+        "id": "alert-admin-v3",
+        "name": "Alert Admin",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2684,
+          2380
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.first().json;\n\n// Check if GPT-4o returned an error\nconst hasError = !!(item.error || item.statusCode >= 400 || !item.choices);\n\nif (hasError) {\n  // Pass through articles text for fallback\n  const articlesText = $('Фильтр').first()?.json?.articlesText || '';\n  return [{json: {gptError: true, articlesText, errorDetail: item.error || item.statusMessage || 'Unknown error'}}];\n}\n\n// GPT-4o succeeded — pass through\nreturn [{json: {...item, gptError: false}}];"
+        },
+        "id": "check-gpt-v3",
+        "name": "Check GPT",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          1152
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "gpt1",
+                "leftValue": "={{ $json.gptError }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ]
+          }
+        },
+        "id": "if-gpt-error-v3",
+        "name": "IF GPT Error",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1728,
+          1152
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o-mini\", messages: [{ role: \"system\", content: \"Ты аналитик черной металлургии и строительной отрасли России. Проанализируй каждую новость из списка (могут быть на русском или английском).\\n\\nЕсли новость связана с металлургией, сталью, прокатом, ценами на металл, компаниями НЛМК/ММК/Северсталь/Евраз/Металлоинвест, экспортом/импортом стали, мировым рынком стали, строительством, ЦБ РФ, ключевой ставкой, тарифами, санкциями — relevant:true.\\nПолитика без связи с металлом, культура, спорт, медицина — relevant:false.\\n\\nДля каждой relevant:true:\\n1. Напиши short_post — КРАТКИЙ аналитический пост до 700 символов НА РУССКОМ для caption под картинкой в Telegram\\n2. Формат short_post: эмодзи + <b>тема</b>, 1-2 коротких абзаца анализа, итог одной строкой. HTML: <b>, <i>. БЕЗ ссылки на источник (добавится автоматически)\\n3. НЕ пересказывай — дай оценку: что это значит для рынка\\n4. НЕ добавляй факты и цифры, которых нет в исходной новости\\n5. Напиши image_prompt — промпт на АНГЛИЙСКОМ для генерации editorial illustration к этой новости. Стиль: modern editorial illustration, clean vector style, business/industry theme. Описание должно отражать СУТЬ новости (steel prices, construction site, factory, export ship, etc). НЕ используй текст на картинке.\\n6. Важность 1-10\\n\\nВерни ТОЛЬКО JSON массив без markdown:\\n[{\\\"idx\\\":0,\\\"relevant\\\":true,\\\"short_post\\\":\\\"краткий пост до 700 символов\\\",\\\"image_prompt\\\":\\\"English prompt for illustration\\\",\\\"category\\\":\\\"Металлургия\\\",\\\"score\\\":8}]\" }, { role: \"user\", content: \"Новости:\\n\" + ($json.articlesText || \"\") }], max_tokens: 4000, temperature: 0.7 }) }}",
+          "options": {
+            "timeout": 120000
+          }
+        },
+        "id": "gpt-mini-fallback-v3",
+        "name": "GPT-4o-mini Fallback",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1728,
+          1312
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "skip1",
+                "leftValue": "={{ $json.skipImage }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ]
+          }
+        },
+        "id": "if-skip-image-v3",
+        "name": "IF Skip Image",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2484,
+          1680
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot8636402663:AAHw4sVk7hAlNKROtyHQ6t8X9Aa7xP6mIvI/sendMessage",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({chat_id: \"-1003334820713\", text: $json.short_post, parse_mode: \"HTML\"}) }}",
+          "options": {}
+        },
+        "id": "skip-send-text-v3",
+        "name": "Skip Send Text",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2684,
+          1780
+        ],
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "SentLinks"
+          },
+          "options": {}
+        },
+        "id": "load-sentlinks-v3",
+        "name": "Load SentLinks",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1040,
+          896
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "cMfHQBCUu9ZCn7MT",
+            "name": "Google Sheets account 2"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.sentLinks) staticData.sentLinks = {};\n\n// Load links from Google Sheets\nconst now = Date.now();\nconst sevenDaysMs = 7 * 24 * 60 * 60 * 1000;\n\ntry {\n  const sheetRows = $('Load SentLinks').all();\n  for (const row of sheetRows) {\n    const link = row.json.link || '';\n    const sentAt = row.json.sent_at || '';\n    if (!link) continue;\n\n    // Parse sent_at timestamp\n    let ts = 0;\n    if (sentAt) {\n      ts = new Date(sentAt).getTime();\n      if (isNaN(ts)) ts = now;\n    } else {\n      ts = now;\n    }\n\n    // Only keep links from last 7 days\n    if (now - ts <= sevenDaysMs) {\n      if (!staticData.sentLinks[link]) {\n        staticData.sentLinks[link] = ts;\n      }\n    }\n  }\n} catch(e) {\n  // Sheets might be empty or fail — continue with staticData only\n}\n\n// Pass through RSS items from Merge Финал\nconst rssItems = $('Merge Финал').all();\nreturn rssItems.length > 0 ? rssItems : [];"
+        },
+        "id": "sync-cache-v3",
+        "name": "Sync Cache",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1104,
+          896
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1oXIFY36sTy5e703mkRPRS0A2MswXNFsMszrdj-AzBFA"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "SentLinks"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {}
+          },
+          "options": {}
+        },
+        "id": "save-sentlink-v3",
+        "name": "Save SentLink",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2984,
+          2280
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "cMfHQBCUu9ZCn7MT",
+            "name": "Google Sheets account 2"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get the link from the callback data\nconst input = $input.first().json;\nconst caption = input.caption || '';\n\n// Extract link from caption (📌 <a href=\"...\">Источник</a>)\nlet link = '';\nconst match = caption.match(/<a href=\"([^\"]+)\">/);\nif (match) link = match[1];\n\nreturn [{json: {\n  link: link,\n  sent_at: new Date().toISOString()\n}}];"
+        },
+        "id": "save-prep-v3",
+        "name": "Prep Save Link",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2884,
+          2280
+        ]
+      }
+    ],
+    "connections": {
+      "Каждый час": {
+        "main": [
+          [
+            {
+              "node": "RSS Google Компании",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Цены",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Производство",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Строительство",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Коммерсантъ",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Торговля",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Китай",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Европа",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google США",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Черная",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Лом",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Руда",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS WorldSteel",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS SteelOnTheNet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Iron Ore",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Минфин",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Росстат",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google МинЭк",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google Eurostat",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google IRN",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Google MetalTorg",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Rusmet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Стройгазета",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS ЦБ РФ",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Компании": {
+        "main": [
+          [
+            {
+              "node": "Merge 1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Цены": {
+        "main": [
+          [
+            {
+              "node": "Merge 1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google Производство": {
+        "main": [
+          [
+            {
+              "node": "Merge 2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Строительство": {
+        "main": [
+          [
+            {
+              "node": "Merge 2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Коммерсантъ": {
+        "main": [
+          [
+            {
+              "node": "Merge Extra",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Торговля": {
+        "main": [
+          [
+            {
+              "node": "Merge Extra",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google Китай": {
+        "main": [
+          [
+            {
+              "node": "Merge Int",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Европа": {
+        "main": [
+          [
+            {
+              "node": "Merge Int",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google США": {
+        "main": [
+          [
+            {
+              "node": "Merge Int B",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge 1": {
+        "main": [
+          [
+            {
+              "node": "Все источники",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge 2": {
+        "main": [
+          [
+            {
+              "node": "Все источники",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Все источники": {
+        "main": [
+          [
+            {
+              "node": "Все новости RU",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Extra": {
+        "main": [
+          [
+            {
+              "node": "Все новости RU",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge Int": {
+        "main": [
+          [
+            {
+              "node": "Merge Int B",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Все новости RU": {
+        "main": [
+          [
+            {
+              "node": "Все новости",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Int B": {
+        "main": [
+          [
+            {
+              "node": "Все новости",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Все новости": {
+        "main": [
+          [
+            {
+              "node": "Merge Финал",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Фильтр": {
+        "main": [
+          [
+            {
+              "node": "GPT-4o Анализ",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Черная": {
+        "main": [
+          [
+            {
+              "node": "Merge New 1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Лом": {
+        "main": [
+          [
+            {
+              "node": "Merge New 1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google Руда": {
+        "main": [
+          [
+            {
+              "node": "Merge New 2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS WorldSteel": {
+        "main": [
+          [
+            {
+              "node": "Merge New 2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS SteelOnTheNet": {
+        "main": [
+          [
+            {
+              "node": "Merge New 3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Iron Ore": {
+        "main": [
+          [
+            {
+              "node": "Merge New 3",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge New 1": {
+        "main": [
+          [
+            {
+              "node": "Merge New 12",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge New 2": {
+        "main": [
+          [
+            {
+              "node": "Merge New 12",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge New 12": {
+        "main": [
+          [
+            {
+              "node": "Merge Новые",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge New 3": {
+        "main": [
+          [
+            {
+              "node": "Merge Новые",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge Новые": {
+        "main": [
+          [
+            {
+              "node": "Merge Все новые",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Финал": {
+        "main": [
+          [
+            {
+              "node": "Load SentLinks",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Минфин": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Росстат": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google МинЭк": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google Eurostat": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-2",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Google MetalTorg": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Rusmet": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-3",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "RSS Стройгазета": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS ЦБ РФ": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-4",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge V3-1": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-12",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge V3-2": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-12",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge V3-3": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-34",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge V3-4": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-34",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge V3-12": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-1234",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge V3-34": {
+        "main": [
+          [
+            {
+              "node": "Merge V3-1234",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge V3-1234": {
+        "main": [
+          [
+            {
+              "node": "Merge V3 All",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Google IRN": {
+        "main": [
+          [
+            {
+              "node": "Merge V3 All",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge V3 All": {
+        "main": [
+          [
+            {
+              "node": "Merge Все новые",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge Все новые": {
+        "main": [
+          [
+            {
+              "node": "Merge Финал",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "GPT-4o Анализ": {
+        "main": [
+          [
+            {
+              "node": "Check GPT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Парсинг + Топ 3": {
+        "main": [
+          [
+            {
+              "node": "По одному",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "По одному": {
+        "main": [
+          [
+            {
+              "node": "Log Run",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Prep Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prep Image": {
+        "main": [
+          [
+            {
+              "node": "IF Skip Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KIE Image": {
+        "main": [
+          [
+            {
+              "node": "Пауза 3 сек",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Пауза 3 сек": {
+        "main": [
+          [
+            {
+              "node": "По одному",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Image Callback": {
+        "main": [
+          [
+            {
+              "node": "Parse Callback",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Callback": {
+        "main": [
+          [
+            {
+              "node": "Has Image?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Image?": {
+        "main": [
+          [
+            {
+              "node": "Send Photo",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send Text Fallback",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Photo": {
+        "main": [
+          [
+            {
+              "node": "Track Send",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Text Fallback": {
+        "main": [
+          [
+            {
+              "node": "Track Send",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Track Send": {
+        "main": [
+          [
+            {
+              "node": "Respond OK",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Prep Save Link",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Run": {
+        "main": [
+          [
+            {
+              "node": "Log to Sheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Heartbeat Trigger": {
+        "main": [
+          [
+            {
+              "node": "Check Daily Stats",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Daily Stats": {
+        "main": [
+          [
+            {
+              "node": "No News Today?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "No News Today?": {
+        "main": [
+          [
+            {
+              "node": "Alert Admin",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Check GPT": {
+        "main": [
+          [
+            {
+              "node": "IF GPT Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF GPT Error": {
+        "main": [
+          [
+            {
+              "node": "GPT-4o-mini Fallback",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Парсинг + Топ 3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GPT-4o-mini Fallback": {
+        "main": [
+          [
+            {
+              "node": "Парсинг + Топ 3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Skip Image": {
+        "main": [
+          [
+            {
+              "node": "Skip Send Text",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "KIE Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Skip Send Text": {
+        "main": [
+          [
+            {
+              "node": "По одному",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Load SentLinks": {
+        "main": [
+          [
+            {
+              "node": "Sync Cache",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sync Cache": {
+        "main": [
+          [
+            {
+              "node": "Фильтр",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prep Save Link": {
+        "main": [
+          [
+            {
+              "node": "Save SentLink",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Daniil Eremeev",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-08T10:29:19.024Z",
+        "id": 744,
+        "workflowId": "SpcaC8OlU1BELWGX",
+        "versionId": "16466627-516e-42ec-aaa2-023209becee9",
+        "event": "activated",
+        "userId": "6c6302e5-57bb-4489-affe-e0566560a18c"
+      }
+    ]
+  }
+}
