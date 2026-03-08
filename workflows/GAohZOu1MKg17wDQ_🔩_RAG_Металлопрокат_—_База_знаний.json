@@ -1,0 +1,680 @@
+{
+  "updatedAt": "2026-03-03T17:03:52.037Z",
+  "createdAt": "2026-03-01T18:51:42.129Z",
+  "id": "GAohZOu1MKg17wDQ",
+  "name": "🔩 RAG Металлопрокат — База знаний",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "trigger-telegram",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "rag-metal-bot-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "cond-doc",
+                    "leftValue": "={{ $json.message.document }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputLabel": "Документ"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "cond-text",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputLabel": "Текст"
+            }
+          ]
+        }
+      },
+      "id": "switch-msg-type",
+      "name": "Тип сообщения",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "cond-start",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputLabel": "/start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "cond-other",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notStartsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputLabel": "Вопрос"
+            }
+          ]
+        }
+      },
+      "id": "switch-command",
+      "name": "Команда?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "👋 Привет! Я бот-консультант по металлопрокату.\n\n📚 Я отвечаю на вопросы менеджеров на основе загруженной базы знаний.\n\n💡 Просто напиши свой вопрос — например:\n• Какие марки стали используются для арматуры?\n• Чем отличается горячекатаный лист от холоднокатаного?\n• Какой допуск по длине у швеллера?\n\n📄 Чтобы добавить документ в базу знаний — просто отправь файл (Word, Excel, TXT, PDF).",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "reply-start",
+      "name": "Приветствие",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Ты — эксперт-консультант по металлопрокату. Твоя задача — отвечать на вопросы менеджеров по продажам, используя ТОЛЬКО информацию из загруженной базы знаний.\n\nПРАВИЛА:\n1. Отвечай ТОЛЬКО на основе информации из базы знаний (контекста).\n2. Если в базе знаний НЕТ ответа на вопрос — честно скажи: \"В моей базе знаний нет информации по этому вопросу.\"\n3. НЕ выдумывай информацию. НЕ используй знания из интернета.\n4. Отвечай чётко, структурированно, по делу.\n5. Если возможно, указывай источник информации (название документа).\n6. Общайся на русском языке.\n7. Если вопрос неясен — уточни.\n\nФОРМАТ ОТВЕТА:\n- Краткий и понятный ответ\n- Если нужно — списки, таблицы\n- В конце можешь предложить задать уточняющий вопрос"
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        700,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "openai-chat",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        720
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "memory-buffer",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        700,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "name": "metal_knowledge_base",
+        "description": "База знаний по металлопрокату. Содержит информацию о сортаменте, марках стали, ГОСТах, условиях поставки и ответы на частые вопросы менеджеров."
+      },
+      "id": "vector-store-tool",
+      "name": "Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        840,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "tableName": "documents",
+        "queryName": "match_documents",
+        "mode": "retrieve",
+        "topK": 5
+      },
+      "id": "supabase-retrieve",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        840,
+        900
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ua36YNZRwaoV601G",
+          "name": "Supabase RAG Metal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small"
+      },
+      "id": "embeddings-search",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        840,
+        1080
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "reply-ai",
+      "name": "Ответ AI",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        500
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "📄 Получен файл: {{ $('Telegram Trigger').item.json.message.document.file_name }}\n⏳ Обрабатываю и добавляю в базу знаний...",
+        "additionalFields": {}
+      },
+      "id": "reply-processing",
+      "name": "Обрабатываю...",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}"
+      },
+      "id": "download-file",
+      "name": "Скачать файл",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        160
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "documents",
+        "queryName": "match_documents"
+      },
+      "id": "supabase-insert",
+      "name": "Сохранить в Supabase",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ua36YNZRwaoV601G",
+          "name": "Supabase RAG Metal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "doc-loader",
+      "name": "Загрузчик документа",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        700,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 1000,
+        "chunkOverlap": 200
+      },
+      "id": "text-splitter",
+      "name": "Разбивка на чанки",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        700,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small"
+      },
+      "id": "embeddings-insert",
+      "name": "Embeddings Insert",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        260
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Файл \"{{ $('Telegram Trigger').item.json.message.document.file_name }}\" успешно добавлен в базу знаний!\n\n📚 Теперь я могу отвечать на вопросы по этому документу.\n💡 Задайте вопрос!",
+        "additionalFields": {}
+      },
+      "id": "reply-success",
+      "name": "Файл добавлен!",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        100
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wApBPvzot6DBpWNs",
+          "name": "RAG Metal Bot (Telegram)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Тип сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Тип сообщения": {
+      "main": [
+        [
+          {
+            "node": "Скачать файл",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Обрабатываю...",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Команда?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Команда?": {
+      "main": [
+        [
+          {
+            "node": "Приветствие",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Ответ AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Скачать файл": {
+      "main": [
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Загрузчик документа": {
+      "ai_document": [
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбивка на чанки": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Загрузчик документа",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Insert": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить в Supabase": {
+      "main": [
+        [
+          {
+            "node": "Файл добавлен!",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "90384731-7908-42bc-bb28-d4661660476e",
+  "activeVersionId": null,
+  "versionCounter": 15,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-01T18:51:42.129Z",
+      "createdAt": "2026-03-01T18:51:42.129Z",
+      "role": "workflow:owner",
+      "workflowId": "GAohZOu1MKg17wDQ",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
