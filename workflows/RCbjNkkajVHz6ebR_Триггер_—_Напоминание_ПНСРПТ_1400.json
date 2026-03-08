@@ -1,0 +1,1501 @@
+{
+  "updatedAt": "2026-03-08T11:12:09.144Z",
+  "createdAt": "2026-03-07T18:33:40.517Z",
+  "id": "RCbjNkkajVHz6ebR",
+  "name": "Триггер — Напоминание ПН/СР/ПТ 14:00",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 14 * * 1,3,5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        2640
+      ],
+      "id": "ed8c91f8-c6d0-4d11-bf69-e08924aac83f",
+      "name": "Триггер ПН/СР/ПТ 14:00"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw",
+          "mode": "list",
+          "cachedResultName": "Наталка - тест",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        2640
+      ],
+      "id": "7a14c84a-e3c1-4a5d-8e1b-6a4ad191bf16",
+      "name": "Получить всех клиентов из Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const users = $input.all();\nconst now = new Date();\nconst result = [];\n\nfor (const user of users) {\n  const lastTimeAsk = user.json.last_time_ask;\n  const alertTimeTrigger = user.json.alert_time_trigger_option;\n\n  // Если last_time_ask пустое — пропускаем\n  if (!lastTimeAsk) continue;\n\n  // Проверка 1: пользователь не заходил больше 3 дней\n  const lastAskDate = new Date(lastTimeAsk);\n  const diffDaysAsk = (now - lastAskDate) / (1000 * 60 * 60 * 24);\n  if (diffDaysAsk <= 3) continue;\n\n  // Проверка 2: триггер ещё не отправлялся ИЛИ прошло больше 7 дней с последней отправки\n  if (alertTimeTrigger) {\n    const lastTriggerDate = new Date(alertTimeTrigger);\n    const diffDaysTrigger = (now - lastTriggerDate) / (1000 * 60 * 60 * 24);\n    if (diffDaysTrigger <= 7) continue;\n  }\n\n  result.push(user);\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        2640
+      ],
+      "id": "bb2be046-ca65-4258-8cff-22cd3cdb3511",
+      "name": "Фильтр: не заходил 3+ дня"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_mode }}",
+                    "rightValue": "horoscope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-horoscope"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "horoscope"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_mode }}",
+                    "rightValue": "natal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "cond-natal"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "natal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_mode }}",
+                    "rightValue": "compatibility",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-compatibility"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "compatibility"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1824,
+        2624
+      ],
+      "id": "4a3535bf-e030-430a-a20c-df120d1a1dfb",
+      "name": "Switch по current_mode"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+        "options": {
+          "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается гороскопами. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал натальную карту или проверку совместимости — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2304,
+        2240
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "AI Agent — horoscope"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        2400
+      ],
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "OpenAI Chat Model — horoscope",
+      "credentials": {
+        "openAiApi": {
+          "id": "6GJrzlgzfPfKBE2f",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+        "options": {
+          "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается натальными картами. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал гороскоп или проверку совместимости — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2304,
+        2624
+      ],
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "AI Agent — natal"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        2768
+      ],
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "OpenAI Chat Model — natal",
+      "credentials": {
+        "openAiApi": {
+          "id": "6GJrzlgzfPfKBE2f",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+        "options": {
+          "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается совместимостью знаков. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал натальную карту или гороскоп — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2304,
+        2976
+      ],
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "AI Agent — compatibility"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        3120
+      ],
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "OpenAI Chat Model — compatibility",
+      "credentials": {
+        "openAiApi": {
+          "id": "6GJrzlgzfPfKBE2f",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+        "text": "={{ $json.output }}",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        2240
+      ],
+      "id": "32a87cc1-620d-42d8-b679-ac7ffd7fd7ed",
+      "name": "Сообщение — horoscope",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+        "text": "={{ $json.output }}",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        2624
+      ],
+      "id": "1083312c-f6e7-4914-a8b6-e2a75224f34e",
+      "name": "Сообщение — natal",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "chat",
+        "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+        "text": "={{ $json.output }}",
+        "format": "markdown",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.max",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        2976
+      ],
+      "id": "6fde66a7-ae83-4ef1-9571-b9d88206723e",
+      "name": "Сообщение — compatibility",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw",
+          "mode": "list",
+          "cachedResultName": "Наталка - тест",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $('Фильтр: не заходил 3+ дня').item.json.telegram_id }}",
+            "row_number": 0,
+            "alert_time_trigger_option": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "telegram_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_id",
+              "displayName": "telegram_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "birth_date",
+              "displayName": "birth_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profile_complete",
+              "displayName": "profile_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_daily_sent",
+              "displayName": "last_daily_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timezone",
+              "displayName": "timezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_mode",
+              "displayName": "current_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alert_time_trigger_option",
+              "displayName": "alert_time_trigger_option",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2896,
+        2608
+      ],
+      "id": "eb57755d-a6e3-4333-92fe-ac3dcbd1bfaf",
+      "name": "Обновить alert_time_trigger_option",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Триггер ПН/СР/ПТ 14:00": {
+      "main": [
+        [
+          {
+            "node": "Получить всех клиентов из Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить всех клиентов из Sheets": {
+      "main": [
+        [
+          {
+            "node": "Фильтр: не заходил 3+ дня",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фильтр: не заходил 3+ дня": {
+      "main": [
+        [
+          {
+            "node": "Switch по current_mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch по current_mode": {
+      "main": [
+        [
+          {
+            "node": "AI Agent — horoscope",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent — natal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent — compatibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model — horoscope": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — horoscope",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model — natal": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — natal",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model — compatibility": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — compatibility",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — horoscope": {
+      "main": [
+        [
+          {
+            "node": "Сообщение — horoscope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — natal": {
+      "main": [
+        [
+          {
+            "node": "Сообщение — natal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — compatibility": {
+      "main": [
+        [
+          {
+            "node": "Сообщение — compatibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сообщение — horoscope": {
+      "main": [
+        [
+          {
+            "node": "Обновить alert_time_trigger_option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сообщение — natal": {
+      "main": [
+        [
+          {
+            "node": "Обновить alert_time_trigger_option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сообщение — compatibility": {
+      "main": [
+        [
+          {
+            "node": "Обновить alert_time_trigger_option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Триггер ВТ/ЧТ/ВС 15:00": {
+      "recurrenceRules": []
+    },
+    "node:Триггер ПН/СР/ПТ 14:00": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "05e525f2-f22c-4fe1-a554-cd41d6e6914e",
+  "activeVersionId": "05e525f2-f22c-4fe1-a554-cd41d6e6914e",
+  "versionCounter": 38,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-07T18:33:40.517Z",
+      "createdAt": "2026-03-07T18:33:40.517Z",
+      "role": "workflow:owner",
+      "workflowId": "RCbjNkkajVHz6ebR",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-08T11:12:09.145Z",
+    "createdAt": "2026-03-08T11:12:09.145Z",
+    "versionId": "05e525f2-f22c-4fe1-a554-cd41d6e6914e",
+    "workflowId": "RCbjNkkajVHz6ebR",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 14 * * 1,3,5"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          1360,
+          2640
+        ],
+        "id": "ed8c91f8-c6d0-4d11-bf69-e08924aac83f",
+        "name": "Триггер ПН/СР/ПТ 14:00"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw",
+            "mode": "list",
+            "cachedResultName": "Наталка - тест",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Лист1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1536,
+          2640
+        ],
+        "id": "7a14c84a-e3c1-4a5d-8e1b-6a4ad191bf16",
+        "name": "Получить всех клиентов из Sheets",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "xOKUe7K3pMyrMWca",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const users = $input.all();\nconst now = new Date();\nconst result = [];\n\nfor (const user of users) {\n  const lastTimeAsk = user.json.last_time_ask;\n  const alertTimeTrigger = user.json.alert_time_trigger_option;\n\n  // Если last_time_ask пустое — пропускаем\n  if (!lastTimeAsk) continue;\n\n  // Проверка 1: пользователь не заходил больше 3 дней\n  const lastAskDate = new Date(lastTimeAsk);\n  const diffDaysAsk = (now - lastAskDate) / (1000 * 60 * 60 * 24);\n  if (diffDaysAsk <= 3) continue;\n\n  // Проверка 2: триггер ещё не отправлялся ИЛИ прошло больше 7 дней с последней отправки\n  if (alertTimeTrigger) {\n    const lastTriggerDate = new Date(alertTimeTrigger);\n    const diffDaysTrigger = (now - lastTriggerDate) / (1000 * 60 * 60 * 24);\n    if (diffDaysTrigger <= 7) continue;\n  }\n\n  result.push(user);\n}\n\nreturn result;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1680,
+          2640
+        ],
+        "id": "bb2be046-ca65-4258-8cff-22cd3cdb3511",
+        "name": "Фильтр: не заходил 3+ дня"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.current_mode }}",
+                      "rightValue": "horoscope",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "cond-horoscope"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "horoscope"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.current_mode }}",
+                      "rightValue": "natal",
+                      "operator": {
+                        "type": "string",
+                        "operation": "startsWith"
+                      },
+                      "id": "cond-natal"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "natal"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.current_mode }}",
+                      "rightValue": "compatibility",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "cond-compatibility"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "compatibility"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          1824,
+          2624
+        ],
+        "id": "4a3535bf-e030-430a-a20c-df120d1a1dfb",
+        "name": "Switch по current_mode"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+          "options": {
+            "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается гороскопами. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал натальную карту или проверку совместимости — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          2304,
+          2240
+        ],
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "AI Agent — horoscope"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          2304,
+          2400
+        ],
+        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "name": "OpenAI Chat Model — horoscope",
+        "credentials": {
+          "openAiApi": {
+            "id": "6GJrzlgzfPfKBE2f",
+            "name": "OpenAi account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+          "options": {
+            "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается натальными картами. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал гороскоп или проверку совместимости — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          2304,
+          2624
+        ],
+        "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+        "name": "AI Agent — natal"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          2304,
+          2768
+        ],
+        "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+        "name": "OpenAI Chat Model — natal",
+        "credentials": {
+          "openAiApi": {
+            "id": "6GJrzlgzfPfKBE2f",
+            "name": "OpenAi account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ 'Имя: ' + $('Фильтр: не заходил 3+ дня').item.json.first_name + '. Дата рождения: ' + ($('Фильтр: не заходил 3+ дня').item.json.birth_date || 'не указана') + '. Город: ' + ($('Фильтр: не заходил 3+ дня').item.json.city || 'не указан') }}",
+          "options": {
+            "systemMessage": "Ты — подружка, которая хорошо разбирается в астрологии. Пишешь от первого лица, тепло и по-дружески. Никогда не используй слова «бот», «к нам», «у нас» — пиши так, будто сама предлагаешь попробовать. Пользователь давно не писал. Он увлекается совместимостью знаков. Напиши ему короткое напоминание (1–2 предложения), чтобы он попробовал натальную карту или гороскоп — выбери то, что покажется более уместным. Обращайся по имени. Без приветствия «Привет» в начале, без подписи. Только текст сообщения. 1–2 эмодзи по смыслу. На русском языке."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          2304,
+          2976
+        ],
+        "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+        "name": "AI Agent — compatibility"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          2304,
+          3120
+        ],
+        "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+        "name": "OpenAI Chat Model — compatibility",
+        "credentials": {
+          "openAiApi": {
+            "id": "6GJrzlgzfPfKBE2f",
+            "name": "OpenAi account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "chat",
+          "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+          "text": "={{ $json.output }}",
+          "format": "markdown",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-max.max",
+        "typeVersion": 1,
+        "position": [
+          2592,
+          2240
+        ],
+        "id": "32a87cc1-620d-42d8-b679-ac7ffd7fd7ed",
+        "name": "Сообщение — horoscope",
+        "credentials": {
+          "maxApi": {
+            "id": "90hedW26kt6JLlax",
+            "name": "Max account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "sendTo": "chat",
+          "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+          "text": "={{ $json.output }}",
+          "format": "markdown",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-max.max",
+        "typeVersion": 1,
+        "position": [
+          2592,
+          2624
+        ],
+        "id": "1083312c-f6e7-4914-a8b6-e2a75224f34e",
+        "name": "Сообщение — natal",
+        "credentials": {
+          "maxApi": {
+            "id": "90hedW26kt6JLlax",
+            "name": "Max account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "sendTo": "chat",
+          "chatId": "={{ $('Фильтр: не заходил 3+ дня').item.json.chat_id }}",
+          "text": "={{ $json.output }}",
+          "format": "markdown",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-max.max",
+        "typeVersion": 1,
+        "position": [
+          2624,
+          2976
+        ],
+        "id": "6fde66a7-ae83-4ef1-9571-b9d88206723e",
+        "name": "Сообщение — compatibility",
+        "credentials": {
+          "maxApi": {
+            "id": "90hedW26kt6JLlax",
+            "name": "Max account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw",
+            "mode": "list",
+            "cachedResultName": "Наталка - тест",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqQYKL5O1hy8_f3Z50B_J94zGNjoNqGbyd0p8qNwBzw/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Лист1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "telegram_id": "={{ $('Фильтр: не заходил 3+ дня').item.json.telegram_id }}",
+              "row_number": 0,
+              "alert_time_trigger_option": "={{ $now.toISO() }}"
+            },
+            "matchingColumns": [
+              "telegram_id"
+            ],
+            "schema": [
+              {
+                "id": "telegram_id",
+                "displayName": "telegram_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "first_name",
+                "displayName": "first_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "birth_date",
+                "displayName": "birth_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "profile_complete",
+                "displayName": "profile_complete",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "first_time_ask",
+                "displayName": "first_time_ask",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "last_time_ask",
+                "displayName": "last_time_ask",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "last_daily_sent",
+                "displayName": "last_daily_sent",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "city",
+                "displayName": "city",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "preferred_time",
+                "displayName": "preferred_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "timezone",
+                "displayName": "timezone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "current_mode",
+                "displayName": "current_mode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "alert_time_trigger_option",
+                "displayName": "alert_time_trigger_option",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2896,
+          2608
+        ],
+        "id": "eb57755d-a6e3-4333-92fe-ac3dcbd1bfaf",
+        "name": "Обновить alert_time_trigger_option",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "xOKUe7K3pMyrMWca",
+            "name": "Google Sheets account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Триггер ПН/СР/ПТ 14:00": {
+        "main": [
+          [
+            {
+              "node": "Получить всех клиентов из Sheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Получить всех клиентов из Sheets": {
+        "main": [
+          [
+            {
+              "node": "Фильтр: не заходил 3+ дня",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Фильтр: не заходил 3+ дня": {
+        "main": [
+          [
+            {
+              "node": "Switch по current_mode",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch по current_mode": {
+        "main": [
+          [
+            {
+              "node": "AI Agent — horoscope",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "AI Agent — natal",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "AI Agent — compatibility",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model — horoscope": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent — horoscope",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model — natal": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent — natal",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model — compatibility": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent — compatibility",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent — horoscope": {
+        "main": [
+          [
+            {
+              "node": "Сообщение — horoscope",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent — natal": {
+        "main": [
+          [
+            {
+              "node": "Сообщение — natal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent — compatibility": {
+        "main": [
+          [
+            {
+              "node": "Сообщение — compatibility",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Сообщение — horoscope": {
+        "main": [
+          [
+            {
+              "node": "Обновить alert_time_trigger_option",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Сообщение — natal": {
+        "main": [
+          [
+            {
+              "node": "Обновить alert_time_trigger_option",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Сообщение — compatibility": {
+        "main": [
+          [
+            {
+              "node": "Обновить alert_time_trigger_option",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Admin Admin",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-08T11:12:09.186Z",
+        "id": 749,
+        "workflowId": "RCbjNkkajVHz6ebR",
+        "versionId": "05e525f2-f22c-4fe1-a554-cd41d6e6914e",
+        "event": "activated",
+        "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d"
+      }
+    ]
+  }
+}
