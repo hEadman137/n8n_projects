@@ -1,0 +1,1898 @@
+{
+  "updatedAt": "2026-03-05T19:05:18.773Z",
+  "createdAt": "2026-03-03T18:30:11.641Z",
+  "id": "vwSJLamJGGXB0ZEK",
+  "name": "База знаний менеджера v3",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "t1",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "mgr-bot-v3",
+      "credentials": {
+        "telegramApi": {
+          "id": "VItRHyXRZFazSlcb",
+          "name": "Manager Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Ты — помощник менеджера по продажам металлопроката. Отвечай ТОЛЬКО на основе информации из контекста базы знаний, предоставленного в сообщении пользователя. Если в контексте нет нужной информации — скажи честно что не нашёл. Отвечай на русском, кратко и по делу."
+        }
+      },
+      "id": "t2",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "t3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        200,
+        500
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json._chatId }}_{{ new Date().toISOString().slice(0,10) }}_v3",
+        "contextWindowLength": 10
+      },
+      "id": "t4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Форматировать контекст').first().json._chatId }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "t7",
+      "name": "Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "VItRHyXRZFazSlcb",
+          "name": "Manager Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.document }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "u1",
+      "name": "Tип сообщения",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $json.message.document.file_id }}"
+      },
+      "id": "u2",
+      "name": "Скачать файл",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        100
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "VItRHyXRZFazSlcb",
+          "name": "Manager Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = [];\nfor (const item of $input.all()) {\n  const newItem = {...item};\n  if (newItem.binary) {\n    for (const key of Object.keys(newItem.binary)) {\n      const bin = newItem.binary[key];\n      const fileName = bin.fileName || '';\n      const ext = fileName.split('.').pop().toLowerCase();\n      const mimeMap = {\n        'pdf': 'application/pdf',\n        'doc': 'application/msword',\n        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n        'xls': 'application/vnd.ms-excel',\n        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n        'txt': 'text/plain',\n        'csv': 'text/csv',\n      };\n      if (mimeMap[ext]) { bin.mimeType = mimeMap[ext]; }\n      newItem.json.fileExt = ext;\n      newItem.json.isExcel = (ext === 'xlsx' || ext === 'xls');\n    }\n  }\n  items.push(newItem);\n}\nreturn items;"
+      },
+      "id": "u3",
+      "name": "Fix MIME Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-excel",
+              "leftValue": "={{ $json.isExcel }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "u4",
+      "name": "Excel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        800,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "manager_docs",
+        "options": {}
+      },
+      "id": "u6",
+      "name": "Сохранить в Supabase",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        200
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ua36YNZRwaoV601G",
+          "name": "Supabase RAG Metal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary"
+      },
+      "id": "u7",
+      "name": "Загрузчик документа",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 1000,
+        "chunkOverlap": 200
+      },
+      "id": "u8",
+      "name": "Разбивка на чанки",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small"
+      },
+      "id": "u9",
+      "name": "Embeddings Insert",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Документ загружен в базу знаний!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "u10",
+      "name": "Файл добавлен!",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "VItRHyXRZFazSlcb",
+          "name": "Manager Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 1
+      },
+      "id": "u11",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"model\": \"text-embedding-3-small\", \"input\": $json.message.text}) }}",
+        "options": {}
+      },
+      "id": "rag1",
+      "name": "Получить эмбеддинг",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        100
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const embResponse = $input.first().json;\nconst embedding = embResponse.data[0].embedding;\nconst userText = $('Telegram Trigger').item.json.message.text;\n\nreturn [{json: {\n  query_embedding: embedding,\n  match_threshold: 0.0,\n  match_count: 5,\n  filter: {},\n  _userText: userText,\n}}];"
+      },
+      "id": "rag2",
+      "name": "Подготовить RPC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://efpidoixjuujanwlsheq.supabase.co/rest/v1/rpc/match_manager_docs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({query_embedding: $json.query_embedding, match_count: $json.match_count, filter: $json.filter}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "rag3",
+      "name": "Поиск в базе",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        100
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ua36YNZRwaoV601G",
+          "name": "Supabase RAG Metal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format context from search results\nconst items = $input.all();\nconst userText = $('Подготовить RPC').first().json._userText;\nconst chatId = $('Telegram Trigger').first().json.message.chat.id;\n\nlet context = '';\nlet hasResults = false;\n\nfor (const item of items) {\n  const content = item.json?.content;\n  if (content && content.length > 5) {\n    context += content + '\\n\\n';\n    hasResults = true;\n  }\n}\n\nif (!hasResults) {\n  context = 'В базе знаний нет релевантной информации по этому вопросу.';\n}\n\nconst chatInput = `Контекст из базы знаний:\\n${context.trim()}\\n\\nВопрос пользователя: ${userText}`;\n\nreturn [{json: {\n  chatInput: chatInput,\n  _chatId: chatId,\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "rag4",
+      "name": "Форматировать контекст",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "fromFile",
+        "options": {},
+        "binaryPropertyName": "data"
+      },
+      "id": "xl1",
+      "name": "Парсить Excel",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"model\": \"text-embedding-3-small\", \"input\": $json.text}) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 200
+            }
+          }
+        }
+      },
+      "id": "xl3",
+      "name": "Embed Excel чанк",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        -200
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://efpidoixjuujanwlsheq.supabase.co/rest/v1/manager_docs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({content: $json.content, metadata: $json.metadata, embedding: $json.embedding}) }}",
+        "options": {}
+      },
+      "id": "xl5",
+      "name": "Сохранить Excel в БД",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        -200
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ua36YNZRwaoV601G",
+          "name": "Supabase RAG Metal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 1
+      },
+      "id": "xl6",
+      "name": "Limit Excel",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ 'Excel-файл обработан GPT и добавлен в базу знаний (' + $('Разбить на чанки').all().length + ' фрагментов).' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "xl7",
+      "name": "Excel добавлен!",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2800,
+        -200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "VItRHyXRZFazSlcb",
+          "name": "Manager Bot (Telegram)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all Excel rows into a single GPT prompt\nconst rows = $input.all();\nconst fileName = $('Telegram Trigger').first().json.message?.document?.file_name || 'excel';\nconst jsonData = rows.map(r => r.json);\n\n// Trim to fit context window (max ~15k chars of data)\nlet dataStr = JSON.stringify(jsonData, null, 0);\nif (dataStr.length > 15000) {\n  dataStr = dataStr.slice(0, 15000) + '... (truncated)';\n}\n\nconst prompt = `Преобразуй данные из Excel-файла \"${fileName}\" в читаемый текст для базы знаний.\n\nДанные (JSON, каждый объект = строка таблицы):\n${dataStr}\n\nПравила:\n- Определи тип таблицы: график производства, прайс-лист, отчёт, справочник\n- Для графиков производства: \"Продукт: прокат [даты] [месяц] [год]\"\n- Для прайсов: \"Продукт | Цена | Единица\"\n- Разбей на фрагменты по 10-15 строк\n- Каждый фрагмент должен содержать заголовок/контекст (название файла, тип данных)\n- Верни JSON массив строк: [\"фрагмент 1\", \"фрагмент 2\", ...]\n- НЕ добавляй комментарии вне JSON`;\n\nreturn [{json: {\n  model: 'gpt-4o-mini',\n  messages: [\n    {role: 'system', content: 'Ты помощник для обработки таблиц. Отвечай строго JSON массивом строк. Никакого текста вне JSON.'},\n    {role: 'user', content: prompt}\n  ],\n  temperature: 0.1,\n  max_tokens: 4000\n}}];\n",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "s1",
+      "name": "Собрать для GPT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "s2",
+      "name": "GPT: Текст из таблицы",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        -200
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "ocwGK5BKh9VONU17",
+          "name": "OpenAI account (new)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse GPT response into chunks for embedding\nconst response = $input.first().json;\nconst rawContent = response.choices[0].message.content;\nconst fileName = $('Telegram Trigger').first().json.message?.document?.file_name || 'excel';\n\n// Strip markdown code fences (```json ... ```)\nlet content = rawContent.trim();\nconst fenceMatch = content.match(/^```[a-z]*\\n([\\s\\S]*?)\\n?```$/);\nif (fenceMatch) {\n  content = fenceMatch[1].trim();\n}\n\nlet chunks;\ntry {\n  const parsed = JSON.parse(content);\n  chunks = Array.isArray(parsed) ? parsed : [String(parsed)];\n} catch (e) {\n  // Fallback: split by double newline\n  chunks = content.split(/\\n\\n+/).filter(c => c.trim().length > 10);\n  if (chunks.length === 0) chunks = [content];\n}\n\n// Filter out empty chunks\nchunks = chunks.filter(c => String(c).trim().length > 5);\n\nreturn chunks.map((text, i) => ({\n  json: {\n    text: String(text).trim(),\n    metadata: JSON.stringify({source: fileName, chunk: i + 1, total: chunks.length, type: 'excel_gpt'})\n  }\n}));\n",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "s3",
+      "name": "Разбить на чанки",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine chunk text with its embedding for Supabase insert\nconst items = $input.all();\nconst chunks = $('Разбить на чанки').all();\n\nreturn items.map((item, i) => ({\n  json: {\n    content: chunks[i]?.json?.text || '',\n    metadata: chunks[i]?.json?.metadata || '{}',\n    embedding: JSON.stringify(item.json.data[0].embedding)\n  }\n}));\n",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "s4",
+      "name": "Подготовить для БД",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure at least 1 item passes through even if search returned empty\nconst items = $input.all();\nif (items.length === 0) {\n  return [{json: {content: '', similarity: 0, _empty: true}}];\n}\nreturn items.map(item => ({json: item.json}));",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "rag3b",
+      "name": "Гарантировать результат",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Tип сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tип сообщения": {
+      "main": [
+        [
+          {
+            "node": "Скачать файл",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Получить эмбеддинг",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Скачать файл": {
+      "main": [
+        [
+          {
+            "node": "Fix MIME Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fix MIME Type": {
+      "main": [
+        [
+          {
+            "node": "Excel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Excel?": {
+      "main": [
+        [
+          {
+            "node": "Парсить Excel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить в Supabase": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Загрузчик документа": {
+      "ai_document": [
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбивка на чанки": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Загрузчик документа",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Insert": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Сохранить в Supabase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Файл добавлен!",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить эмбеддинг": {
+      "main": [
+        [
+          {
+            "node": "Подготовить RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить RPC": {
+      "main": [
+        [
+          {
+            "node": "Поиск в базе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Поиск в базе": {
+      "main": [
+        [
+          {
+            "node": "Гарантировать результат",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Форматировать контекст": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсить Excel": {
+      "main": [
+        [
+          {
+            "node": "Собрать для GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать для GPT": {
+      "main": [
+        [
+          {
+            "node": "GPT: Текст из таблицы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT: Текст из таблицы": {
+      "main": [
+        [
+          {
+            "node": "Разбить на чанки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбить на чанки": {
+      "main": [
+        [
+          {
+            "node": "Embed Excel чанк",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed Excel чанк": {
+      "main": [
+        [
+          {
+            "node": "Подготовить для БД",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить для БД": {
+      "main": [
+        [
+          {
+            "node": "Сохранить Excel в БД",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить Excel в БД": {
+      "main": [
+        [
+          {
+            "node": "Limit Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Excel": {
+      "main": [
+        [
+          {
+            "node": "Excel добавлен!",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Гарантировать результат": {
+      "main": [
+        [
+          {
+            "node": "Форматировать контекст",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "33fda5ae-e111-409c-920a-1e7f1ff76217",
+  "activeVersionId": "33fda5ae-e111-409c-920a-1e7f1ff76217",
+  "versionCounter": 98,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T18:30:11.641Z",
+      "createdAt": "2026-03-03T18:30:11.641Z",
+      "role": "workflow:owner",
+      "workflowId": "vwSJLamJGGXB0ZEK",
+      "projectId": "PInAUioNaxOJ4NoS",
+      "project": {
+        "updatedAt": "2026-02-05T20:29:17.832Z",
+        "createdAt": "2026-02-05T20:28:31.627Z",
+        "id": "PInAUioNaxOJ4NoS",
+        "name": "Daniil Eremeev <eremeevdaniil137@mail.ru>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-02-05T20:28:31.627Z",
+            "createdAt": "2026-02-05T20:28:31.627Z",
+            "userId": "6c6302e5-57bb-4489-affe-e0566560a18c",
+            "projectId": "PInAUioNaxOJ4NoS",
+            "user": {
+              "updatedAt": "2026-03-08T06:35:13.555Z",
+              "createdAt": "2026-02-05T20:28:31.627Z",
+              "id": "6c6302e5-57bb-4489-affe-e0566560a18c",
+              "email": "eremeevdaniil137@mail.ru",
+              "firstName": "Daniil",
+              "lastName": "Eremeev",
+              "personalizationAnswers": null,
+              "settings": {
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "9ZTFsqjRJ0hGYxM0",
+                "userActivated": true,
+                "userActivatedAt": 1770443072107,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1772560365050
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-05T19:05:18.774Z",
+    "createdAt": "2026-03-05T19:05:18.774Z",
+    "versionId": "33fda5ae-e111-409c-920a-1e7f1ff76217",
+    "workflowId": "vwSJLamJGGXB0ZEK",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "id": "t1",
+        "name": "Telegram Trigger",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          300
+        ],
+        "webhookId": "mgr-bot-v3",
+        "credentials": {
+          "telegramApi": {
+            "id": "VItRHyXRZFazSlcb",
+            "name": "Manager Bot (Telegram)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.chatInput }}",
+          "options": {
+            "systemMessage": "Ты — помощник менеджера по продажам металлопроката. Отвечай ТОЛЬКО на основе информации из контекста базы знаний, предоставленного в сообщении пользователя. Если в контексте нет нужной информации — скажи честно что не нашёл. Отвечай на русском, кратко и по делу."
+          }
+        },
+        "id": "t2",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          400,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "id": "t3",
+        "name": "OpenAI Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          200,
+          500
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $json._chatId }}_{{ new Date().toISOString().slice(0,10) }}_v3",
+          "contextWindowLength": 10
+        },
+        "id": "t4",
+        "name": "Window Buffer Memory",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          400,
+          500
+        ]
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Форматировать контекст').first().json._chatId }}",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "t7",
+        "name": "Reply",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          700,
+          300
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "VItRHyXRZFazSlcb",
+            "name": "Manager Bot (Telegram)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose"
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.message.document }}",
+                      "rightValue": "",
+                      "operator": {
+                        "type": "object",
+                        "operation": "exists",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "file"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "id": "u1",
+        "name": "Tип сообщения",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3,
+        "position": [
+          200,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "operation": "get",
+          "fileId": "={{ $json.message.document.file_id }}"
+        },
+        "id": "u2",
+        "name": "Скачать файл",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          400,
+          100
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "VItRHyXRZFazSlcb",
+            "name": "Manager Bot (Telegram)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = [];\nfor (const item of $input.all()) {\n  const newItem = {...item};\n  if (newItem.binary) {\n    for (const key of Object.keys(newItem.binary)) {\n      const bin = newItem.binary[key];\n      const fileName = bin.fileName || '';\n      const ext = fileName.split('.').pop().toLowerCase();\n      const mimeMap = {\n        'pdf': 'application/pdf',\n        'doc': 'application/msword',\n        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n        'xls': 'application/vnd.ms-excel',\n        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n        'txt': 'text/plain',\n        'csv': 'text/csv',\n      };\n      if (mimeMap[ext]) { bin.mimeType = mimeMap[ext]; }\n      newItem.json.fileExt = ext;\n      newItem.json.isExcel = (ext === 'xlsx' || ext === 'xls');\n    }\n  }\n  items.push(newItem);\n}\nreturn items;"
+        },
+        "id": "u3",
+        "name": "Fix MIME Type",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          600,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "id": "cond-excel",
+                "leftValue": "={{ $json.isExcel }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "id": "u4",
+        "name": "Excel?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          800,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "insert",
+          "tableName": "manager_docs",
+          "options": {}
+        },
+        "id": "u6",
+        "name": "Сохранить в Supabase",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          200
+        ],
+        "credentials": {
+          "supabaseApi": {
+            "id": "ua36YNZRwaoV601G",
+            "name": "Supabase RAG Metal"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "dataType": "binary"
+        },
+        "id": "u7",
+        "name": "Загрузчик документа",
+        "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          400
+        ]
+      },
+      {
+        "parameters": {
+          "chunkSize": 1000,
+          "chunkOverlap": 200
+        },
+        "id": "u8",
+        "name": "Разбивка на чанки",
+        "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          600
+        ]
+      },
+      {
+        "parameters": {
+          "model": "text-embedding-3-small"
+        },
+        "id": "u9",
+        "name": "Embeddings Insert",
+        "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+        "typeVersion": 1.1,
+        "position": [
+          1200,
+          400
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "Документ загружен в базу знаний!",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "u10",
+        "name": "Файл добавлен!",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1200,
+          200
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "VItRHyXRZFazSlcb",
+            "name": "Manager Bot (Telegram)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "maxItems": 1
+        },
+        "id": "u11",
+        "name": "Limit",
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          1100,
+          200
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/embeddings",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\"model\": \"text-embedding-3-small\", \"input\": $json.message.text}) }}",
+          "options": {}
+        },
+        "id": "rag1",
+        "name": "Получить эмбеддинг",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          400,
+          100
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const embResponse = $input.first().json;\nconst embedding = embResponse.data[0].embedding;\nconst userText = $('Telegram Trigger').item.json.message.text;\n\nreturn [{json: {\n  query_embedding: embedding,\n  match_threshold: 0.0,\n  match_count: 5,\n  filter: {},\n  _userText: userText,\n}}];"
+        },
+        "id": "rag2",
+        "name": "Подготовить RPC",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          600,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://efpidoixjuujanwlsheq.supabase.co/rest/v1/rpc/match_manager_docs",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({query_embedding: $json.query_embedding, match_count: $json.match_count, filter: $json.filter}) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true,
+                "fullResponse": false
+              }
+            }
+          }
+        },
+        "id": "rag3",
+        "name": "Поиск в базе",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          800,
+          100
+        ],
+        "credentials": {
+          "supabaseApi": {
+            "id": "ua36YNZRwaoV601G",
+            "name": "Supabase RAG Metal"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Format context from search results\nconst items = $input.all();\nconst userText = $('Подготовить RPC').first().json._userText;\nconst chatId = $('Telegram Trigger').first().json.message.chat.id;\n\nlet context = '';\nlet hasResults = false;\n\nfor (const item of items) {\n  const content = item.json?.content;\n  if (content && content.length > 5) {\n    context += content + '\\n\\n';\n    hasResults = true;\n  }\n}\n\nif (!hasResults) {\n  context = 'В базе знаний нет релевантной информации по этому вопросу.';\n}\n\nconst chatInput = `Контекст из базы знаний:\\n${context.trim()}\\n\\nВопрос пользователя: ${userText}`;\n\nreturn [{json: {\n  chatInput: chatInput,\n  _chatId: chatId,\n}}];",
+          "mode": "runOnceForAllItems"
+        },
+        "id": "rag4",
+        "name": "Форматировать контекст",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1200,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "fromFile",
+          "options": {},
+          "binaryPropertyName": "data"
+        },
+        "id": "xl1",
+        "name": "Парсить Excel",
+        "type": "n8n-nodes-base.spreadsheetFile",
+        "typeVersion": 2,
+        "position": [
+          1200,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/embeddings",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\"model\": \"text-embedding-3-small\", \"input\": $json.text}) }}",
+          "options": {
+            "batching": {
+              "batch": {
+                "batchSize": 1,
+                "batchInterval": 200
+              }
+            }
+          }
+        },
+        "id": "xl3",
+        "name": "Embed Excel чанк",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2000,
+          -200
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://efpidoixjuujanwlsheq.supabase.co/rest/v1/manager_docs",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({content: $json.content, metadata: $json.metadata, embedding: $json.embedding}) }}",
+          "options": {}
+        },
+        "id": "xl5",
+        "name": "Сохранить Excel в БД",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2400,
+          -200
+        ],
+        "credentials": {
+          "supabaseApi": {
+            "id": "ua36YNZRwaoV601G",
+            "name": "Supabase RAG Metal"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "maxItems": 1
+        },
+        "id": "xl6",
+        "name": "Limit Excel",
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          2600,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+          "text": "={{ 'Excel-файл обработан GPT и добавлен в базу знаний (' + $('Разбить на чанки').all().length + ' фрагментов).' }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "xl7",
+        "name": "Excel добавлен!",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2800,
+          -200
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "VItRHyXRZFazSlcb",
+            "name": "Manager Bot (Telegram)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Collect all Excel rows into a single GPT prompt\nconst rows = $input.all();\nconst fileName = $('Telegram Trigger').first().json.message?.document?.file_name || 'excel';\nconst jsonData = rows.map(r => r.json);\n\n// Trim to fit context window (max ~15k chars of data)\nlet dataStr = JSON.stringify(jsonData, null, 0);\nif (dataStr.length > 15000) {\n  dataStr = dataStr.slice(0, 15000) + '... (truncated)';\n}\n\nconst prompt = `Преобразуй данные из Excel-файла \"${fileName}\" в читаемый текст для базы знаний.\n\nДанные (JSON, каждый объект = строка таблицы):\n${dataStr}\n\nПравила:\n- Определи тип таблицы: график производства, прайс-лист, отчёт, справочник\n- Для графиков производства: \"Продукт: прокат [даты] [месяц] [год]\"\n- Для прайсов: \"Продукт | Цена | Единица\"\n- Разбей на фрагменты по 10-15 строк\n- Каждый фрагмент должен содержать заголовок/контекст (название файла, тип данных)\n- Верни JSON массив строк: [\"фрагмент 1\", \"фрагмент 2\", ...]\n- НЕ добавляй комментарии вне JSON`;\n\nreturn [{json: {\n  model: 'gpt-4o-mini',\n  messages: [\n    {role: 'system', content: 'Ты помощник для обработки таблиц. Отвечай строго JSON массивом строк. Никакого текста вне JSON.'},\n    {role: 'user', content: prompt}\n  ],\n  temperature: 0.1,\n  max_tokens: 4000\n}}];\n",
+          "mode": "runOnceForAllItems"
+        },
+        "id": "s1",
+        "name": "Собрать для GPT",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1400,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json) }}",
+          "options": {
+            "timeout": 60000
+          }
+        },
+        "id": "s2",
+        "name": "GPT: Текст из таблицы",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1600,
+          -200
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "ocwGK5BKh9VONU17",
+            "name": "OpenAI account (new)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse GPT response into chunks for embedding\nconst response = $input.first().json;\nconst rawContent = response.choices[0].message.content;\nconst fileName = $('Telegram Trigger').first().json.message?.document?.file_name || 'excel';\n\n// Strip markdown code fences (```json ... ```)\nlet content = rawContent.trim();\nconst fenceMatch = content.match(/^```[a-z]*\\n([\\s\\S]*?)\\n?```$/);\nif (fenceMatch) {\n  content = fenceMatch[1].trim();\n}\n\nlet chunks;\ntry {\n  const parsed = JSON.parse(content);\n  chunks = Array.isArray(parsed) ? parsed : [String(parsed)];\n} catch (e) {\n  // Fallback: split by double newline\n  chunks = content.split(/\\n\\n+/).filter(c => c.trim().length > 10);\n  if (chunks.length === 0) chunks = [content];\n}\n\n// Filter out empty chunks\nchunks = chunks.filter(c => String(c).trim().length > 5);\n\nreturn chunks.map((text, i) => ({\n  json: {\n    text: String(text).trim(),\n    metadata: JSON.stringify({source: fileName, chunk: i + 1, total: chunks.length, type: 'excel_gpt'})\n  }\n}));\n",
+          "mode": "runOnceForAllItems"
+        },
+        "id": "s3",
+        "name": "Разбить на чанки",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1800,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Combine chunk text with its embedding for Supabase insert\nconst items = $input.all();\nconst chunks = $('Разбить на чанки').all();\n\nreturn items.map((item, i) => ({\n  json: {\n    content: chunks[i]?.json?.text || '',\n    metadata: chunks[i]?.json?.metadata || '{}',\n    embedding: JSON.stringify(item.json.data[0].embedding)\n  }\n}));\n",
+          "mode": "runOnceForAllItems"
+        },
+        "id": "s4",
+        "name": "Подготовить для БД",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2200,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Ensure at least 1 item passes through even if search returned empty\nconst items = $input.all();\nif (items.length === 0) {\n  return [{json: {content: '', similarity: 0, _empty: true}}];\n}\nreturn items.map(item => ({json: item.json}));",
+          "mode": "runOnceForAllItems"
+        },
+        "id": "rag3b",
+        "name": "Гарантировать результат",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1000,
+          100
+        ]
+      }
+    ],
+    "connections": {
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Window Buffer Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Tип сообщения",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tип сообщения": {
+        "main": [
+          [
+            {
+              "node": "Скачать файл",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Получить эмбеддинг",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Скачать файл": {
+        "main": [
+          [
+            {
+              "node": "Fix MIME Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fix MIME Type": {
+        "main": [
+          [
+            {
+              "node": "Excel?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Excel?": {
+        "main": [
+          [
+            {
+              "node": "Парсить Excel",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Сохранить в Supabase",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Сохранить в Supabase": {
+        "main": [
+          [
+            {
+              "node": "Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Загрузчик документа": {
+        "ai_document": [
+          [
+            {
+              "node": "Сохранить в Supabase",
+              "type": "ai_document",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Разбивка на чанки": {
+        "ai_textSplitter": [
+          [
+            {
+              "node": "Загрузчик документа",
+              "type": "ai_textSplitter",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Insert": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Сохранить в Supabase",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit": {
+        "main": [
+          [
+            {
+              "node": "Файл добавлен!",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Получить эмбеддинг": {
+        "main": [
+          [
+            {
+              "node": "Подготовить RPC",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Подготовить RPC": {
+        "main": [
+          [
+            {
+              "node": "Поиск в базе",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Поиск в базе": {
+        "main": [
+          [
+            {
+              "node": "Гарантировать результат",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Форматировать контекст": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Парсить Excel": {
+        "main": [
+          [
+            {
+              "node": "Собрать для GPT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Собрать для GPT": {
+        "main": [
+          [
+            {
+              "node": "GPT: Текст из таблицы",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GPT: Текст из таблицы": {
+        "main": [
+          [
+            {
+              "node": "Разбить на чанки",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Разбить на чанки": {
+        "main": [
+          [
+            {
+              "node": "Embed Excel чанк",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embed Excel чанк": {
+        "main": [
+          [
+            {
+              "node": "Подготовить для БД",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Подготовить для БД": {
+        "main": [
+          [
+            {
+              "node": "Сохранить Excel в БД",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Сохранить Excel в БД": {
+        "main": [
+          [
+            {
+              "node": "Limit Excel",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit Excel": {
+        "main": [
+          [
+            {
+              "node": "Excel добавлен!",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Гарантировать результат": {
+        "main": [
+          [
+            {
+              "node": "Форматировать контекст",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Daniil Eremeev",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-05T19:05:20.653Z",
+        "id": 654,
+        "workflowId": "vwSJLamJGGXB0ZEK",
+        "versionId": "33fda5ae-e111-409c-920a-1e7f1ff76217",
+        "event": "activated",
+        "userId": "6c6302e5-57bb-4489-affe-e0566560a18c"
+      },
+      {
+        "createdAt": "2026-03-05T19:05:19.290Z",
+        "id": 653,
+        "workflowId": "vwSJLamJGGXB0ZEK",
+        "versionId": "33fda5ae-e111-409c-920a-1e7f1ff76217",
+        "event": "activated",
+        "userId": "6c6302e5-57bb-4489-affe-e0566560a18c"
+      }
+    ]
+  }
+}
