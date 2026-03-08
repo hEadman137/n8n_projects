@@ -1,0 +1,775 @@
+{
+  "updatedAt": "2026-02-17T19:41:40.766Z",
+  "createdAt": "2026-02-14T17:53:29.541Z",
+  "id": "Y9sv6U8pMa5aedng",
+  "name": "Bytegens News v1 (нерабочая версия)",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "5119910e-87ff-43c3-9c77-563899827499",
+      "name": "Daily at 9:00 AM2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4224,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"Ключевые новости про технологии, искусственный интеллект, интернет, мессенджеры в России\",\n  \"topic\": \"news\",\n  \"search_depth\": \"advanced\",\n  \"start_date\":{{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd').toJsonString() }},\n  \"end_date\": {{ $now.format('yyyy-MM-dd').toJsonString() }},\n  \"chunks_per_source\": 5,\n  \"include_images\": true,\n  \"include_domains\": [\n    \"habr.com\",\n    \"dzen.ru\",\n    \"ria.ru\",\n    \"lenta.ru\",\n    \"rbc.ru\",\n    \"vedomosti.ru\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4000,
+        304
+      ],
+      "id": "6904e869-8008-4d2f-b481-c1736cd73b9f",
+      "name": "Search Tavily"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -3776,
+        304
+      ],
+      "id": "2949a14a-1ae2-4b8e-8283-e194b3d0e42c",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b70ee3d4-78c8-46d6-b725-ad90baa630e6",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 0.2,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3552,
+        304
+      ],
+      "id": "1d056c14-9d50-4196-9859-22c7f51a1796",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -3328,
+        304
+      ],
+      "id": "adf9576b-7dda-439d-a13f-6bdb16f613d9",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/extract",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": {{ $json.url.toJsonString() }},\n  \"extract_depth\": \"advanced\",\n  \"include_images\": true\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3104,
+        304
+      ],
+      "id": "c1ca0425-d1f2-4bd1-b919-311b1d7550c3",
+      "name": "Extract Tavily"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI",
+          "mode": "list",
+          "cachedResultName": "База знаний для Bytegens",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2880,
+        304
+      ],
+      "id": "b6e4bd75-3875-42ca-a8ff-b24d9a9ac85e",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Получаем все результаты из Extract Tavily1\nconst tavilyData = $('Extract Tavily').first().json;\nconst allResults = tavilyData.results || [];\n\nconsole.log(`Total results from Tavily: ${allResults.length}`);\n\n// Получаем существующие URL из Google Sheets\n// (из предыдущего шага)\nconst sheetsData = $('Get row(s) in sheet').all();\nconst existingUrls = sheetsData.map(row => row.json.URL || row.json['Ссылки'] || row.json.url).filter(Boolean);\n\nconsole.log(`Existing URLs in sheet: ${existingUrls.length}`);\n\n// Фильтруем только новые URL\nconst newResults = allResults.filter(result => {\n  const url = result.url;\n  const isNew = !existingUrls.includes(url);\n  \n  if (!isNew) {\n    console.log('Skipping duplicate URL:', url);\n  }\n  \n  return isNew;\n});\n\nconsole.log(`New URLs found: ${newResults.length}`);\n\n// Если нет новых результатов - останавливаем workflow\nif (newResults.length === 0) {\n  throw new Error('No new articles found - all URLs already processed');\n}\n\n// Возвращаем новые результаты (они пойдут через Split Out)\nreturn [{ json: { results: newResults } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2656,
+        304
+      ],
+      "id": "2d2a5ed6-15d5-41f0-976d-026b8e346d50",
+      "name": "Code in JavaScript",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "results[0].raw_content",
+              "separateBy": "other",
+              "customSeparator": "/n/n NEXT ARTICLE: /n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -2432,
+        0
+      ],
+      "id": "fd66637c-fd6d-44db-b43f-2f1706fa85db",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "chatId": "=454918257",
+        "text": "=Cсылки закончились",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "29ca8220-4998-43c0-8c4d-f251a47cf67b",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2432,
+        400
+      ],
+      "webhookId": "50f55a09-fa1e-4b36-bbc2-1b1433084685",
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// В режиме \"Run Once for Each Item\" данные приходят через $input\nconst item = $input.item.json;\n\nconsole.log('Input keys:', JSON.stringify(Object.keys(item)));\nconsole.log('Input data:', JSON.stringify(item).substring(0, 300));\n\nconst title = item.title || '';\nconst content = item.raw_content || item.content || '';\nconst url = item.url || '';\n\nlet imageUrl = null;\n\nlet html = '';\ntry {\n  html = $input.item.json.data || \n         $('Fetch Article HTML').first().json.data || '';\n} catch(e) {}\n\n// Парсим og:image\nconst ogPatterns = [\n  /<meta[^>]+property=[\"']og:image[\"'][^>]+content=[\"']([^\"']+)[\"']/i,\n  /<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+property=[\"']og:image[\"']/i,\n  /<meta[^>]+name=[\"']twitter:image[\"'][^>]+content=[\"']([^\"']+)[\"']/i,\n];\n\nfor (const pattern of ogPatterns) {\n  const match = html.match(pattern);\n  if (match && match[1] && !match[1].includes('.svg')) {\n    imageUrl = match[1];\n    if (imageUrl.startsWith('/') && url) {\n      try { imageUrl = new URL(url).origin + imageUrl; } catch(e) {}\n    }\n    break;\n  }\n}\n\nif (!imageUrl && content) {\n  const imgMatch = content.match(/(https?:\\/\\/[^\\s\"'<>]+\\.(?:jpg|jpeg|png|webp))/i);\n  if (imgMatch) imageUrl = imgMatch[1];\n}\n\nreturn { title, content, url, imageUrl };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1872,
+        208
+      ],
+      "id": "1ba41237-5f26-4f64-999f-6a96b10b3f26",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Инструкция для ИИ-агента:\nТы — редактор Telegram-канала о технологиях, нейросетях и цифровых сервисах. Твоя задача — на основе предоставленной информации (новость, статья, событие) создавать готовый пост в стиле канала. Пост должен быть кратким, информативным, вовлекающим и содержать обязательную подпись с ботом.\n\nВажно учесть, что есть ограничение по количеству символов в тексте: должно быть не больше 1024 символов, с учетом вставленных ссылок в текст. Сокращай текст, если выходит за рамки ограничений.\n\nЗаголовок новости: {{ $json.title }}\n\nТекст новости: {{ $json.content }}\n\nИсточник: {{ $json.url }}\n\nСтруктура поста:\n\nЗаголовок — яркий, отражающий суть новости. Можешь выделить его жирным (текст) или просто первой строкой.\n\nОсновной текст — 3–5 предложений с ключевыми фактами (даты, цифры, имена, компании). Пиши разговорно, но без излишнего сленга. Важные моменты можно выделять жирным. Если новость содержит несколько аспектов — сфокусируйся на самом интересном.\n\nИнтерактивный вопрос — вопрос к подписчикам, который вытекает из новости и предлагает два варианта ответа. Варианты начинай с тире (— первый вариант / — второй вариант). Варианты должны быть короткими, часто контрастными.\n\nПодпись — обязательно добавь строку:\nНаш бот с актуальными нейросетями: @bytegens_bot\n\nСписок возможных эмодзи:\n⭐❤🔥🤷‍♂👎😱👍🤬🤡🤨👻👨‍💻✍🗿👾🍾😭👀😨🫡😁🤔\n\nПРАВИЛА ФОРМАТИРОВАНИЯ (строго HTML для Telegram):\n\n1. Заголовок оборачивай в тег: <b>заголовок</b>\n2. Варианты ответа оборачивай в тег:\n<blockquote>👍 — вариант 1\n👎 — вариант 2</blockquote>\n3. Никакого другого markdown не используй — \n   никаких **, *, #, [] и прочего.\n\nПример поста:\n\n<b>⭐ Цифровой рубль запустят для всех с сентября 2026</b>\n\nС 1 сентября 2026 года россияне смогут пользоваться цифровым рублем, заявила глава ЦБ Эльвира Набиуллина. Это третья форма нацвалюты, полностью эквивалентная наличным и безналичным деньгам.\n\n<b>Перешли бы на цифровой рубль?</b>\n<blockquote>👍 — да, если удобно\n👎 — оставьте наличку</blockquote>\n\n<b>Наш бот с актуальными нейросетями: @bytegens_bot</b>\n\n-------\n\nСписок возможных эмодзи:\n⭐❤🔥🤷‍♂👎😱👍🤬🤡🤨👻👨‍💻✍🗿👾🍾😭👀😨🫡😁🤔\n\n",
+        "options": {
+          "systemMessage": "Твоя задача — на основании предоставленных свежих новостей создать структурированный пост о о технологиях, нейросетях и цифровых сервисах.\n\nНе используй общие знания или информацию, не подтвержденную этими новостями, результат должен быть на русском языку.\n \nПри формировании ответа НЕ используй markdown-разметку для изображений (формат ![alt](url)). \n\nВыводи в поле output только текстовый контент без ссылок на изображения. Игнорируй любые ссылки, которые встречаются и не используй их в тексте.\n\nВажно учесть, что есть ограничение по количеству символов в тексте: должно быть не больше 1024 символов, с учетом вставленных ссылок в текст."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1648,
+        208
+      ],
+      "id": "9dbd15ed-8a4f-47bc-8ab5-398a7d978e3e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1680,
+        400
+      ],
+      "id": "dd6d2918-73e4-45ab-89da-7a6c7afa4c6f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ce569db-3c3a-4792-9593-954e25c5cdd7",
+              "name": "output",
+              "value": "={{ $json.output.replace(/<think>[\\s\\S]*?<\\/think>\\s*/g, '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "b91a59fc-a1ea-4ed7-8090-31f0ed3e557c",
+              "name": "imageUrl",
+              "value": "={{ $('Code in JavaScript1').item.json.imageUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        208
+      ],
+      "id": "d8794b10-2d27-42cf-acb5-c9500572dfc0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "454918257",
+        "file": "={{ $json.imageUrl }}",
+        "additionalFields": {
+          "caption": "={{ $json.output }}",
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -864,
+        304
+      ],
+      "id": "60191413-d4f3-4003-b876-1dc057c1fda1",
+      "name": "Send a photo message",
+      "webhookId": "db2713f1-c604-4229-979e-c40af3e424ec",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI",
+          "mode": "list",
+          "cachedResultName": "База знаний для Bytegens",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eRTpPoi78cEoMDu23ZXukD4Gf6av8rXxwIMuLTHsjsI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата использования": "={{ $now }}",
+            "Ссылки": "={{ $('Code in JavaScript').item.json.results[0].url }}"
+          },
+          "matchingColumns": [
+            "Ссылки"
+          ],
+          "schema": [
+            {
+              "id": "Дата использования",
+              "displayName": "Дата использования",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ссылки",
+              "displayName": "Ссылки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        288
+      ],
+      "id": "9b6b5951-f0d1-43c5-a0cc-27540b31ba2e",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "57b5e23b-c195-478f-b99d-70ffbc19c155",
+              "leftValue": "={{ $json.imageUrl }}",
+              "rightValue": "https://via.placeholder.com/800x400.png?text=No+Image+Available",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "8b9739e2-8f01-490c-9c60-791817977e9b",
+              "leftValue": "={{ $json.imageUrl }}",
+              "rightValue": ".svg",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "7e4d1358-3c02-4731-a7cb-6cb58da4f060",
+              "leftValue": "={{ $json.imageUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1088,
+        208
+      ],
+      "id": "2ece54a5-5dab-4553-a287-4881c9edf996",
+      "name": "Нет фото к посту?"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Aggregate').first().json.url[0] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {},
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2112,
+        208
+      ],
+      "id": "f82fe459-f455-457f-871d-c78bbe19746c",
+      "name": "Fetch Article HTML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2368,
+        208
+      ],
+      "id": "35a6cab0-9a63-4f66-9276-2f994afc1657",
+      "name": "Split Out2"
+    }
+  ],
+  "connections": {
+    "Daily at 9:00 AM2": {
+      "main": [
+        [
+          {
+            "node": "Search Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Tavily": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Extract Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Tavily": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Нет фото к посту?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Нет фото к посту?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Article HTML": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Fetch Article HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "0ad8e91f-8109-4c5c-8694-f54dd11ecbf4",
+  "activeVersionId": null,
+  "versionCounter": 8,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-14T17:53:29.541Z",
+      "createdAt": "2026-02-14T17:53:29.541Z",
+      "role": "workflow:owner",
+      "workflowId": "Y9sv6U8pMa5aedng",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
