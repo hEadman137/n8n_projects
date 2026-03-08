@@ -1,0 +1,210 @@
+{
+  "updatedAt": "2026-02-26T20:49:39.563Z",
+  "createdAt": "2026-02-26T20:45:10.735Z",
+  "id": "pX9wT7XvHm8B6WPP",
+  "name": "My workflow 27",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "bot_started",
+          "message_chat_created",
+          "message_created",
+          "message_callback"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.maxTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "acb31581-887d-4fed-a705-103c0b5fbbb6",
+      "name": "Max Trigger",
+      "webhookId": "9cb56815-c5a4-4395-b94a-40ac23960877",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Определяем тип входящего апдейта от Max Trigger\nconst update = $input.item.json;\n\nconst updateType = update.update_type || '';\n\nconst isCallback = updateType === 'message_callback';\nconst isMessage  = updateType === 'message_created';\nconst isBotStart = updateType === 'bot_started';\n\nlet chatId, userId, text, callbackData, username, firstName;\n\nif (isCallback) {\n  // update.callback — объект callback\n  const cb = update.callback;\n  userId   = cb.user?.user_id || '';\n  username = cb.user?.username || '';\n  firstName = cb.user?.name || '';\n  chatId   = cb.message?.recipient?.chat_id || '';\n  callbackData = cb.payload || '';\n  text = '';\n\n} else if (isMessage) {\n  // update.message — объект сообщения\n  const msg = update.message;\n  userId    = msg.sender?.user_id || '';\n  username  = msg.sender?.username || '';\n  firstName = msg.sender?.name || '';\n  chatId    = msg.recipient?.chat_id || '';\n  text      = msg.body?.text || '';\n  callbackData = '';\n\n} else if (isBotStart) {\n  // update.user — пользователь, update.chat_id — чат\n  userId    = update.user?.user_id || '';\n  username  = update.user?.username || '';\n  firstName = update.user?.name || '';\n  chatId    = update.chat_id || '';\n  text      = '';\n  callbackData = '';\n\n} else {\n  // Неизвестный тип — возвращаем пустые значения\n  chatId = userId = username = firstName = text = callbackData = '';\n}\n\nconst isStart = text === '/start' || isBotStart;\n\nreturn [{\n  json: {\n    chatId,\n    userId,\n    username,\n    firstName,\n    text,\n    callbackData,\n    isCallback,\n    isMessage,\n    isStart,\n    updateType,\n    isVoice: !!(update.message?.body?.attachments?.some(a => a.type === 'audio'))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "453d7ebd-6429-44e2-b738-3e34d45bda25",
+      "name": "Разбираем апдейт"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6f84602-324f-4a17-b4c2-dff46fe88116",
+              "name": "message.recipient.chat_id",
+              "value": "={{ $json.message.recipient.chat_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8edf3b30-e1a5-45f8-820b-2b2afb874568",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "events": [
+          "bot_started",
+          "message_chat_created",
+          "message_created",
+          "message_callback"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-max.maxTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        144
+      ],
+      "id": "6426ed0b-ff33-49d6-9f6b-1e5d6ab994e0",
+      "name": "Max Trigger1",
+      "webhookId": "9cb56815-c5a4-4395-b94a-40ac23960877",
+      "credentials": {
+        "maxApi": {
+          "id": "90hedW26kt6JLlax",
+          "name": "Max account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Определяем тип входящего апдейта от Max Trigger\nconst update = $input.item.json;\n\nconst updateType = update.update_type || '';\n\nconst isCallback = updateType === 'message_callback';\nconst isMessage  = updateType === 'message_created';\nconst isBotStart = updateType === 'bot_started';\n\nlet chatId, userId, text, callbackData, username, firstName;\n\n// Универсальный фолбек: всегда пытаемся достать chatId из message.recipient.chat_id\nconst fallbackChatId = update.message?.recipient?.chat_id || '';\n\nif (isCallback) {\n  // update.callback — объект callback\n  const cb = update.callback;\n  userId   = cb.user?.user_id || '';\n  username = cb.user?.username || '';\n  firstName = cb.user?.name || '';\n  chatId   = cb.message?.recipient?.chat_id || fallbackChatId;\n  callbackData = cb.payload || '';\n  text = '';\n\n} else if (isMessage) {\n  // update.message — объект сообщения\n  const msg = update.message;\n  userId    = msg.sender?.user_id || '';\n  username  = msg.sender?.username || '';\n  firstName = msg.sender?.name || '';\n  chatId    = msg.recipient?.chat_id || fallbackChatId;\n  text      = msg.body?.text || '';\n  callbackData = '';\n\n} else if (isBotStart) {\n  // update.user — пользователь, update.chat_id — чат\n  userId    = update.user?.user_id || '';\n  username  = update.user?.username || '';\n  firstName = update.user?.name || '';\n  chatId    = update.chat_id || fallbackChatId;\n  text      = '';\n  callbackData = '';\n\n} else {\n  // Неизвестный тип — пробуем фолбек\n  chatId = fallbackChatId;\n  userId = username = firstName = text = callbackData = '';\n}\n\nconst isStart = text === '/start' || isBotStart;\n\nreturn [{\n  json: {\n    chatId,\n    userId,\n    username,\n    firstName,\n    text,\n    callbackData,\n    isCallback,\n    isMessage,\n    isStart,\n    updateType,\n    isVoice: !!(update.message?.body?.attachments?.some(a => a.type === 'audio'))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        144
+      ],
+      "id": "6c55a75d-4c71-423c-b785-aaff9f53add0",
+      "name": "Разбираем апдейт1"
+    }
+  ],
+  "connections": {
+    "Max Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Разбираем апдейт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Разбираем апдейт1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e4e45085-373e-4271-a919-6acd188656ee",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-26T20:45:10.735Z",
+      "createdAt": "2026-02-26T20:45:10.735Z",
+      "role": "workflow:owner",
+      "workflowId": "pX9wT7XvHm8B6WPP",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
