@@ -1,0 +1,2364 @@
+{
+  "updatedAt": "2026-02-26T21:24:07.277Z",
+  "createdAt": "2026-02-26T21:18:30.322Z",
+  "id": "yBnEtIkvxlwidBR4",
+  "name": "My workflow 28",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2160,
+        1552
+      ],
+      "id": "3d148d2a-5dfc-422b-8a00-4f3e9316c576",
+      "name": "Get a file",
+      "webhookId": "2d19065f-61e6-41d9-9af1-cae1770705a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -2000,
+        1552
+      ],
+      "id": "1efc505a-28e2-408b-ac3e-cff6d340e92c",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edit-text",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        1344
+      ],
+      "id": "27074870-a193-4f49-84be-e4cb0d01ed57",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "cuid",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1504,
+        1344
+      ],
+      "id": "f96d6e57-11c2-4677-9ff1-95992cba398a",
+      "name": "Читаем данные пользователя",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "prep-query",
+              "name": "query",
+              "value": "={{ $('Edit Fields').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-cuid",
+              "name": "cuid",
+              "value": "={{ $json.cuid }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-name",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-age",
+              "name": "age",
+              "value": "={{ $json.age }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-phone",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-username",
+              "name": "username",
+              "value": "={{ $json.username }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-stage",
+              "name": "current_stage",
+              "value": "={{ $json.current_stage || 'START' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-task",
+              "name": "task_bank",
+              "value": "={{ $json.task_bank || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-history",
+              "name": "history_of_messages",
+              "value": "={{ $json.history_of_messages || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-vtb-apply",
+              "name": "link_vtb_apply",
+              "value": "={{ $json.link_vtb_apply || '{link_vtb_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-vtb-report",
+              "name": "link_vtb_report",
+              "value": "={{ $json.link_vtb_report || '{link_vtb_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-gpb-apply",
+              "name": "link_gpb_apply",
+              "value": "={{ $json.link_gpb_apply || '{link_gpb_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-gpb-report",
+              "name": "link_gpb_report",
+              "value": "={{ $json.link_gpb_report || '{link_gpb_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-otp-apply",
+              "name": "link_otp_apply",
+              "value": "={{ $json.link_otp_apply || '{link_otp_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-otp-report",
+              "name": "link_otp_report",
+              "value": "={{ $json.link_otp_report || '{link_otp_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-alfa-apply",
+              "name": "link_alfa_apply",
+              "value": "={{ $json.link_alfa_apply || '{link_alfa_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-alfa-report",
+              "name": "link_alfa_report",
+              "value": "={{ $json.link_alfa_report || '{link_alfa_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-task2",
+              "name": "link_task2_apply",
+              "value": "={{ $json.link_task2_apply || '{link_task2_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-admin-chat",
+              "name": "admin_chat_id",
+              "value": "=454918257",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        1344
+      ],
+      "id": "d35c0cb1-1c56-423c-b8e9-f1ff8a4044b8",
+      "name": "Подготовка контекста"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Парсим JSON-ответ агента\nconst raw = $input.first().json.output || '';\nlet parsed;\ntry {\n  // Убираем возможные markdown-обёртки\n  const clean = raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  parsed = JSON.parse(clean);\n} catch(e) {\n  // Если не смогли распарсить — возвращаем raw как USER_MESSAGE\n  parsed = {\n    USER_MESSAGE: raw,\n    ADMIN_MESSAGE: '',\n    SHEET_UPDATE: {},\n    NEXT_STAGE: $('Подготовка контекста').item.json.current_stage\n  };\n}\n\nreturn [{\n  json: {\n    USER_MESSAGE: parsed.USER_MESSAGE || '',\n    ADMIN_MESSAGE: parsed.ADMIN_MESSAGE || '',\n    SHEET_UPDATE: parsed.SHEET_UPDATE || {},\n    NEXT_STAGE: parsed.NEXT_STAGE || 'START',\n    // Прокидываем нужные поля для следующих нод\n    cuid: $('Подготовка контекста').item.json.cuid,\n    admin_chat_id: $('Подготовка контекста').item.json.admin_chat_id,\n    telegram_chat_id: $('Telegram Trigger').item.json.message.chat.id,\n    user_message_text: $('Edit Fields').item.json.text,\n    old_history: $('Подготовка контекста').item.json.history_of_messages\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        336
+      ],
+      "id": "5263f31d-a046-4f9a-b53d-4d55a4504bc3",
+      "name": "Парсим ответ агента"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id }}",
+        "text": "={{ $json.USER_MESSAGE }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        160
+      ],
+      "id": "27aa77f2-1604-4cf2-9a6a-ff54cd75515d",
+      "name": "Отправить пользователю",
+      "webhookId": "c9354cac-5bc0-4f2e-b5f5-9ec93613ba10",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-admin-msg",
+              "leftValue": "={{ $json.ADMIN_MESSAGE }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        448
+      ],
+      "id": "3331533d-4849-4142-bd2f-46512a7c9033",
+      "name": "Есть ли ADMIN_MESSAGE?"
+    },
+    {
+      "parameters": {
+        "chatId": "=454918257",
+        "text": "={{ $json.ADMIN_MESSAGE }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1488,
+        432
+      ],
+      "id": "84f3326a-307c-4c64-9d80-26f56beb2f1b",
+      "name": "Отправить администратору",
+      "webhookId": "a913f4fe-6204-4879-9387-555b4d1fadb3",
+      "credentials": {
+        "telegramApi": {
+          "id": "THyuBhTvKIAhLe2O",
+          "name": "Admin Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Собираем объект для обновления Google Sheets\nconst sheetUpdate = $json.SHEET_UPDATE || {};\nconst oldHistory = $json.old_history || '';\nconst userMsg = $json.user_message_text || '';\nconst botMsg = $json.USER_MESSAGE || '';\n\n// Обновляем историю сообщений\nconst newHistory = oldHistory \n  ? `${oldHistory}\\n---\\nПользователь: ${userMsg}\\nНиколай: ${botMsg}`\n  : `Пользователь: ${userMsg}\\nНиколай: ${botMsg}`;\n\nreturn [{\n  json: {\n    cuid: $json.cuid,\n    last_time_ask: new Date().toISOString(),\n    history_of_messages: newHistory,\n    ...sheetUpdate\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        688
+      ],
+      "id": "72a4d02d-a794-4b82-b565-01a867c14891",
+      "name": "Подготовка данных для Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 0,
+            "cuid": "={{ $json.cuid }}",
+            "history_of_messages": "={{ $json.history_of_messages }}",
+            "current_stage": "={{ $json.current_stage }}"
+          },
+          "matchingColumns": [
+            "cuid"
+          ],
+          "schema": [
+            {
+              "id": "cuid",
+              "displayName": "cuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "stage",
+              "displayName": "stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "current_stage",
+              "displayName": "current_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "task_bank",
+              "displayName": "task_bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_datetime",
+              "displayName": "delivery_datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "compensation_requested_to_admin",
+              "displayName": "compensation_requested_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "purchase_screenshot_received",
+              "displayName": "purchase_screenshot_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "report_link_sent",
+              "displayName": "report_link_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "report_done_user_confirm",
+              "displayName": "report_done_user_confirm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_payout_requested_to_admin",
+              "displayName": "final_payout_requested_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_received",
+              "displayName": "review_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "handoff_to_admin",
+              "displayName": "handoff_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        688
+      ],
+      "id": "dd198e96-cfeb-4440-839e-26d44a32e143",
+      "name": "Обновить Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2352,
+        1360
+      ],
+      "id": "c52efc04-cfb2-4716-a239-f1db8e017df6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "START",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c51064ab-387d-4399-ace9-4147917dca1f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "START"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "FORMAT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "08854274-52e3-433e-b6e8-0cb824a96b54"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FORMAT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "ROUTING",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a4ed8ba1-4108-43e2-8412-594a5858a322"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ROUTING"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "SEND_LINK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3962262c-a31b-4ec3-930f-ad20a42d5ade"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SEND_LINK"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_DELIVERY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c89bfa9b-f425-4267-9d8e-f713774438bf"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_DELIVERY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_CARD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f1b81224-907e-4645-8eb1-0c76e153f36f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_CARD"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_PURCHASE_PROOF",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "49d02637-e523-48c6-b58d-7793579ef647"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_PURCHASE_PROOF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_REPORT_DONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8a0b3583-6900-4165-9751-8afa3236afb6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_REPORT_DONE"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_REVIEW",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "55b773b4-9732-4804-b7cc-dfa11d535295"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_REVIEW"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "TASK2_OFFER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9ad4b0fb-1f3d-4284-849c-3e203548d04d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TASK2_OFFER"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "TASK2_WAIT_APPLY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "93131856-f007-4474-bd9e-3d1279203d53"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TASK2_WAIT_APPLY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "HOLD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c7793a58-08da-4da5-b55a-e73b9f63924f"
+                  },
+                  {
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "DONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4f873f23-b339-49e1-a11f-3acbc470947e"
+                  }
+                ],
+                "combinator": "or"
+              },
+              "renameOutput": true,
+              "outputKey": "HOLD/DONE"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -800,
+        1168
+      ],
+      "id": "30b85e63-ee11-4794-b36d-522383a2693b",
+      "name": "Switch по Stage"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = START):\nПриветствуй пользователя.\nUSER_MESSAGE: «Привет! Я Николай, главный менеджер по работе с тестировщиками. Есть вопросы после прохождения бота или можем начать? 🙂»\nSHEET_UPDATE: current_stage=FORMAT\nNEXT_STAGE = FORMAT\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b6ff9a9-da5e-40b9-a409-e1efd0e71989",
+      "name": "Agent START"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "6c1d377e-11b5-4380-b7dc-4652ea2c0401",
+      "name": "OpenAI START",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "18996faa-9c7f-4da5-9d29-cfb28137ba3a",
+      "name": "Memory START"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = FORMAT):\nUSER_MESSAGE: «Отлично, тогда можем перейти к первой проверке.\n— Оплата сдельная, выплаты после выполнения и отчёта.\n— По времени обычно 20–60 минут (зависит от проверки).\n— Никаких переводов нам не нужно.\nПодходит такой формат?»\nЕсли «да» → SHEET_UPDATE: current_stage=ROUTING, NEXT_STAGE = ROUTING\nЕсли сомнения → объясни безопасность кратко → снова спроси «Подходит?» → NEXT_STAGE = FORMAT\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        384
+      ],
+      "id": "5b009a13-f9ed-423f-a65a-8e4b7a3c3490",
+      "name": "Agent FORMAT"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        544
+      ],
+      "id": "6391393c-5cc9-4545-afbe-a5abb4386f66",
+      "name": "OpenAI FORMAT",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        544
+      ],
+      "id": "666a2d3c-6318-42ec-b17a-18ea18f0dc51",
+      "name": "Memory FORMAT"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\n\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = ROUTING):\nЦель: выбрать банк, где пользователь НЕ является клиентом.\n1) Спроси: «Подскажи, ты раньше был(а) клиентом ВТБ?»\n   - Если НЕТ → task_bank = VTB\n   - Если ДА:\n     - если age < 18 → task_bank = ALFA\n     - если age >= 18 → спроси про Т-Банк:\n       «Понял, тогда такое задание для Вас не подходит. Аналогичное задание на тех же условиях, но уже на Т-Банк было бы Вам интересно?»\n       - Если НЕТ → task_bank = GPB\n       - Если ДА → task_bank = TBANK\nПосле выбора:\nADMIN_MESSAGE: «[{cuid}] {name} @{username} → выбран стартовый банк: {task_bank}. Возраст: {age}.»\nSHEET_UPDATE: task_bank=..., current_stage=SEND_LINK\nNEXT_STAGE = SEND_LINK\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        704
+      ],
+      "id": "d9e15add-97c1-43af-a137-d231328d0475",
+      "name": "Agent ROUTING"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        880
+      ],
+      "id": "cb59ee62-6132-462f-aae3-ff4f62abc456",
+      "name": "OpenAI ROUTING",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        880
+      ],
+      "id": "37b6bc00-78ee-4cfd-98ad-c012907d069e",
+      "name": "Memory ROUTING"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_tbank_apply: https://www.tbank.ru/\n- link_tbank_report: https://www.tbank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = SEND_LINK):\nОтправь ссылку по task_bank:\n- VTB → link_vtb_apply\n- GPB → link_gpb_apply\n- OTP → link_otp_apply\n- ALFA → link_alfa_apply\n- TBANK → link_vtb_apply\n\nUSER_MESSAGE: «Супер. Тогда шаг 1 — оставь заявку по ссылке:\\n[ССЫЛКА]\\nПосле оформления выбери дату/время доставки (или встречи) и пришли мне — дату и интервал времени (можно текстом).»\nADMIN_MESSAGE: «[{cuid}] Ссылка на оформление отправлена ({task_bank}). Ждём дату/время доставки.»\nSHEET_UPDATE: current_stage=WAIT_DELIVERY\nNEXT_STAGE = WAIT_DELIVERY\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        1040
+      ],
+      "id": "6af83f11-d49d-4c20-918d-f60a3bd4ffd2",
+      "name": "Agent SEND_LINK"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        1216
+      ],
+      "id": "bdda5f75-b4d8-4d55-837f-ac7e5718da20",
+      "name": "OpenAI SEND_LINK",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        1216
+      ],
+      "id": "00ef7959-943e-4819-ae71-6a2a64bf3d50",
+      "name": "Memory SEND_LINK"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = WAIT_DELIVERY):\nТриггер: пользователь прислал дату/время доставки.\nUSER_MESSAGE: «Принято ✅ Как закончится доставка/встреча и карта будет у тебя — напиши «Карта на руках».»\nADMIN_MESSAGE: «[{cuid}] Получили дату/время доставки: [дата] ({task_bank}).»\nSHEET_UPDATE: delivery_datetime=[дата], current_stage=WAIT_CARD\nNEXT_STAGE = WAIT_CARD\n\nОБРАБОТКА ЧАСТЫХ СИТУАЦИЙ:\n- «мне не звонят/долго»: «Ок, это тоже часть оценки сервиса. Как только назначат дату/время — скинь мне, пожалуйста.»\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        1360
+      ],
+      "id": "0f1244b4-3e7a-4dd3-9cab-2e93ef12738f",
+      "name": "Agent WAIT_DELIVERY"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        1584
+      ],
+      "id": "fbdd21ea-5770-4bb9-a27d-d84902bc86b1",
+      "name": "OpenAI WAIT_DELIVERY",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        1584
+      ],
+      "id": "87a0afd0-ade7-4562-8580-c53eb4f94b8a",
+      "name": "Memory WAIT_DELIVERY"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = WAIT_CARD):\nТриггер: пользователь написал что получил карту («карта на руках» или похожее).\nЕсли task_bank=VTB: comp_amount=500, min_purchase=500\nИначе: comp_amount=100, min_purchase=100\nUSER_MESSAGE: «Отлично! Теперь нужно сделать покупку одной транзакцией от {min_purchase}₽ (на любые личные нужды) и прислать скрин операции. Данные можно замазать — важны сумма/дата/статус.»\nADMIN_MESSAGE: «[{cuid}] Карта получена ({task_bank}). Нужна компенсация на покупку: {comp_amount}₽ (перевод по телефону из таблицы).»\nSHEET_UPDATE: current_stage=WAIT_PURCHASE_PROOF, compensation_requested_to_admin=[comp_amount]\nNEXT_STAGE = WAIT_PURCHASE_PROOF\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -32,
+        1744
+      ],
+      "id": "f079bee7-a413-47a3-b149-a3bbcef79037",
+      "name": "Agent WAIT_CARD"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        1904
+      ],
+      "id": "7a0d255f-14a6-4b2f-a880-5024813111b3",
+      "name": "OpenAI WAIT_CARD",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        1904
+      ],
+      "id": "62b18c0d-83a5-4159-ba1a-50f2a58c2506",
+      "name": "Memory WAIT_CARD"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = WAIT_PURCHASE_PROOF):\nТриггер: пользователь прислал скрин покупки.\nОтправь ссылку на отчёт по task_bank:\n- VTB → link_vtb_report\n- GPB → link_gpb_report\n- OTP → link_otp_report\n- ALFA → link_alfa_report\nUSER_MESSAGE: «Супер, вижу 👍 Теперь заполни, пожалуйста, отчёт по проверке:\\n[ССЫЛКА_НА_ОТЧЁТ]\\nЕсли что-то непонятно в форме — напиши.»\nADMIN_MESSAGE: «[{cuid}] Получен скрин покупки ({task_bank}). Отправлена ссылка на отчёт.»\nSHEET_UPDATE: purchase_screenshot_received=yes, report_link_sent=yes, current_stage=WAIT_REPORT_DONE\nNEXT_STAGE = WAIT_REPORT_DONE\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -16,
+        2064
+      ],
+      "id": "08cb4983-a10d-4a5c-abed-8e25ffed250e",
+      "name": "Agent WAIT_PURCHASE_PROOF"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        2256
+      ],
+      "id": "d2de2386-a3d8-4a84-af8b-aa3f8f63f8d5",
+      "name": "OpenAI WAIT_PURCHASE_PROOF",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        2256
+      ],
+      "id": "344bcc50-adf6-4d3e-99e7-8d7eab4e6908",
+      "name": "Memory WAIT_PURCHASE_PROOF"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = WAIT_REPORT_DONE):\nТриггер: пользователь написал «заполнил(а) отчёт» или похожее.\nUSER_MESSAGE: «Отлично, спасибо! Передаю на проверку. Как только подтвердят — сделаем финальную выплату 500₽. Напиши, пожалуйста, когда придёт 🙂»\nADMIN_MESSAGE: «[{cuid}] Пользователь подтвердил отчёт заполнен ({task_bank}). Нужна финальная выплата: 500₽.»\nSHEET_UPDATE: report_done_user_confirm=yes, current_stage=WAIT_REVIEW, final_payout_requested_to_admin=500\nNEXT_STAGE = WAIT_REVIEW\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -32,
+        2480
+      ],
+      "id": "b7a968d5-d0be-46a1-a367-da84fbd11b78",
+      "name": "Agent WAIT_REPORT_DONE"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        2704
+      ],
+      "id": "87c20b21-b125-4d44-90d5-672455afa635",
+      "name": "OpenAI WAIT_REPORT_DONE",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        2688
+      ],
+      "id": "dd319912-cd2d-48b5-9470-2bc08616443b",
+      "name": "Memory WAIT_REPORT_DONE"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = WAIT_REVIEW):\nТриггер: пользователь написал «пришло» (подтверждение выплаты) → запроси отзыв.\nЕсли ещё не подтвердил выплату — напомни написать «пришло» когда придёт.\nПосле подтверждения выплаты:\nUSER_MESSAGE: «Супер! 🙌 Можешь коротко написать отзыв (1–2 предложения), что всё выплатили и проверка была несложной? Прямо сюда в чат.»\nADMIN_MESSAGE: «[{cuid}] Выплата подтверждена пользователем ({task_bank}). Запросили отзыв.»\nSHEET_UPDATE: current_stage=TASK2_OFFER\nПосле получения отзыва:\nUSER_MESSAGE: «Спасибо большое! Есть следующая проверка — 2 этап: юридический сервис Альфа банка. Тут от тебя нужно только оставить заявку и я отвечу на вопросы. Готов(а) перейти?»\nADMIN_MESSAGE: «[{cuid}] Отзыв получен. Предложили 2 проверку.»\nSHEET_UPDATE: review_received=yes, current_stage=TASK2_OFFER\nNEXT_STAGE = TASK2_OFFER\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -48,
+        2896
+      ],
+      "id": "d85658d5-34fd-4891-b894-55baba0c3df2",
+      "name": "Agent WAIT_REVIEW"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        3120
+      ],
+      "id": "26004274-274b-49a2-912c-d2ab3a83afc6",
+      "name": "OpenAI WAIT_REVIEW",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        3120
+      ],
+      "id": "01c71b27-343b-428e-a3bb-5697cd6ad14c",
+      "name": "Memory WAIT_REVIEW"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = TASK2_OFFER):\nЕсли «да»:\nUSER_MESSAGE: «Отлично. Вот ссылка для заявки:\\n{link_task2_apply}\\nПосле того как оставишь заявку — напиши «Заявка оставлена».»\nADMIN_MESSAGE: «[{cuid}] Пользователь согласен на 2 проверку. Отправлена ссылка на заявку.»\nSHEET_UPDATE: current_stage=TASK2_WAIT_APPLY\nNEXT_STAGE = TASK2_WAIT_APPLY\n\nЕсли «нет/позже»:\nUSER_MESSAGE: «Ок 🙂 Тогда как будешь готов(а) — просто напиши «Хочу 2 проверку», и продолжим.»\nSHEET_UPDATE: current_stage=HOLD\nNEXT_STAGE = HOLD\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -96,
+        3296
+      ],
+      "id": "d1b90b7b-a012-4c80-9091-8ce3f3f31fdf",
+      "name": "Agent TASK2_OFFER"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        3520
+      ],
+      "id": "ea2d9c87-32be-460e-931e-b13fe1790f1b",
+      "name": "OpenAI TASK2_OFFER",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        3536
+      ],
+      "id": "ccd036a5-e3cc-4b69-adc3-9a274c7bd2c7",
+      "name": "Memory TASK2_OFFER"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = TASK2_WAIT_APPLY):\nТриггер: «заявка оставлена» или похожее.\nUSER_MESSAGE: «Принято ✅ Если появятся вопросы — пиши сюда, помогу. Я сейчас передаю тебя администратору, он продолжит сопровождение.»\nADMIN_MESSAGE: «[{cuid}] 2 проверка: заявка оставлена. Передаю тестировщика администратору. Данные в таблице.»\nSHEET_UPDATE: handoff_to_admin=yes, current_stage=DONE\nNEXT_STAGE = DONE\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -96,
+        3728
+      ],
+      "id": "69663c68-c5e5-4862-9d15-2af7d8d9a16e",
+      "name": "Agent TASK2_WAIT_APPLY"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        3952
+      ],
+      "id": "7e95133b-ff67-411a-8ee2-aab94af1508d",
+      "name": "OpenAI TASK2_WAIT_APPLY",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        3952
+      ],
+      "id": "e6326606-82ac-4cec-9312-de0128d865c0",
+      "name": "Memory TASK2_WAIT_APPLY"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — Николай, ИИ-обработчик в проекте «проверка сервисов».\nТвоя задача: вести переписку с тестировщиком по строгой воронке (state machine), фиксировать этапы и формировать уведомления администратору.\n\n========================\nКОНТЕКСТ ПОЛЬЗОВАТЕЛЯ (данные уже получены от системы):\n- name: {{ $json.name }}\n- age: {{ $json.age }}\n- phone: {{ $json.phone }}\n- cuid: {{ $json.cuid }}\n- username: {{ $json.username }}\n- current_stage: {{ $json.current_stage }}\n- task_bank: {{ $json.task_bank }}\n- history_of_messages: {{ $json.history_of_messages }}\n\nСсылки:\n- link_vtb_apply: https://www.vtb.ru/\n- link_vtb_report: https://www.vtb.ru/proverka\n- link_gpb_apply: https://www.gazprombank.ru/\n- link_gpb_report: https://www.gazprombank.ru/proverka\n- link_otp_apply: https://www.otpbank.ru/\n- link_otp_report: https://www.otpbank.ru/proverka\n- link_alfa_apply: https://alfabank.ru/\n- link_alfa_report: https://alfabank.ru/proverka\n- link_task2_apply: {{ $json.link_task2_apply }}\n- admin_chat_id: {{ $json.admin_chat_id }}\n\nНастройки выплат:\n- comp_vtb = 500, comp_other = 100, final_payout = 500\n- min_purchase_vtb = 500, min_purchase_other = 100\n\n========================\nСТИЛЬ ОБЩЕНИЯ:\n- Пиши коротко, 1–6 строк.\n- Один вопрос за сообщение.\n- Умеренно эмодзи.\n- Всегда фиксируй следующий шаг: «Сделай X → напиши Y».\n- НЕ запрашивай телефон/возраст — данные уже есть.\n\n========================\nФОРМАТ ТВОЕГО ОТВЕТА (строго JSON, без markdown-обёртки):\n{\n  \"USER_MESSAGE\": \"текст пользователю\",\n  \"ADMIN_MESSAGE\": \"текст для администратора или пустая строка\",\n  \"SHEET_UPDATE\": {\n    \"current_stage\": \"НОВЫЙ_ЭТАП\",\n    \"любое_поле\": \"значение\"\n  },\n  \"NEXT_STAGE\": \"СЛЕДУЮЩИЙ_ЭТАП\"\n}\n\n========================\nТекущий этап: {{ $json.current_stage }}\nПоследнее сообщение пользователя: {{ $json.query }}\n\n========================\nТВОЯ ЗАДАЧА НА ЭТОМ ЭТАПЕ (STAGE = HOLD или DONE):\nОтвечай коротко по запросу пользователя.\nЕсли пишет «Хочу 2 проверку» → перейди к TASK2_OFFER:\n  USER_MESSAGE: «Отлично. Вот ссылка для заявки:\\n{link_task2_apply}\\nПосле того как оставишь заявку — напиши «Заявка оставлена».»\n  SHEET_UPDATE: current_stage=TASK2_WAIT_APPLY\n  NEXT_STAGE = TASK2_WAIT_APPLY\nИначе:\n  USER_MESSAGE: [короткий релевантный ответ]\n  ADMIN_MESSAGE: \"\"\n  SHEET_UPDATE: {}\n  NEXT_STAGE = HOLD (или DONE, если уже завершён)\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        608,
+        3792
+      ],
+      "id": "7943e39a-d6c5-4874-89b1-9047956820fd",
+      "name": "Agent HOLD/DONE"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        4032
+      ],
+      "id": "4c8fe957-abcf-4aca-affb-99b246ac9625",
+      "name": "OpenAI HOLD/DONE",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        4016
+      ],
+      "id": "68f52ca9-6a2a-4a60-b1f5-b2059a976030",
+      "name": "Memory HOLD/DONE"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2560,
+        1360
+      ],
+      "id": "2cab3342-c203-406d-bd72-f110a825ddd2",
+      "name": "Telegram Trigger",
+      "webhookId": "2ffcd741-2d9a-4181-88ef-2b8bc72e6a3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Читаем данные пользователя",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Читаем данные пользователя": {
+      "main": [
+        [
+          {
+            "node": "Подготовка контекста",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка контекста": {
+      "main": [
+        [
+          {
+            "node": "Switch по Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим ответ агента": {
+      "main": [
+        [
+          {
+            "node": "Отправить пользователю",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Есть ли ADMIN_MESSAGE?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Подготовка данных для Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть ли ADMIN_MESSAGE?": {
+      "main": [
+        [
+          {
+            "node": "Отправить администратору",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка данных для Sheets": {
+      "main": [
+        [
+          {
+            "node": "Обновить Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch по Stage": {
+      "main": [
+        [
+          {
+            "node": "Agent START",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent FORMAT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent ROUTING",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent SEND_LINK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent WAIT_DELIVERY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent WAIT_CARD",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent WAIT_PURCHASE_PROOF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent WAIT_REPORT_DONE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent WAIT_REVIEW",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent TASK2_OFFER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent TASK2_WAIT_APPLY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent HOLD/DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent START": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI START": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent START",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory START": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent START",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent FORMAT": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI FORMAT": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent FORMAT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory FORMAT": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent FORMAT",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent ROUTING": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI ROUTING": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent ROUTING",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory ROUTING": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent ROUTING",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent SEND_LINK": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI SEND_LINK": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent SEND_LINK",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory SEND_LINK": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent SEND_LINK",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent WAIT_DELIVERY": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_DELIVERY": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent WAIT_DELIVERY",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory WAIT_DELIVERY": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent WAIT_DELIVERY",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent WAIT_CARD": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_CARD": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent WAIT_CARD",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory WAIT_CARD": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent WAIT_CARD",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent WAIT_PURCHASE_PROOF": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_PURCHASE_PROOF": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent WAIT_PURCHASE_PROOF",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory WAIT_PURCHASE_PROOF": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent WAIT_PURCHASE_PROOF",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent WAIT_REPORT_DONE": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_REPORT_DONE": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent WAIT_REPORT_DONE",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory WAIT_REPORT_DONE": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent WAIT_REPORT_DONE",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent WAIT_REVIEW": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_REVIEW": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent WAIT_REVIEW",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory WAIT_REVIEW": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent WAIT_REVIEW",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent TASK2_OFFER": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI TASK2_OFFER": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent TASK2_OFFER",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory TASK2_OFFER": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent TASK2_OFFER",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent TASK2_WAIT_APPLY": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI TASK2_WAIT_APPLY": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent TASK2_WAIT_APPLY",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory TASK2_WAIT_APPLY": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent TASK2_WAIT_APPLY",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent HOLD/DONE": {
+      "main": [
+        [
+          {
+            "node": "Парсим ответ агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HOLD/DONE": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent HOLD/DONE",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory HOLD/DONE": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent HOLD/DONE",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "621e722b-561c-42d4-80be-147500967ae4",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-26T21:18:30.322Z",
+      "createdAt": "2026-02-26T21:18:30.322Z",
+      "role": "workflow:owner",
+      "workflowId": "yBnEtIkvxlwidBR4",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
