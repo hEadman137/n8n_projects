@@ -1,0 +1,615 @@
+{
+  "updatedAt": "2026-02-05T20:32:33.548Z",
+  "createdAt": "2026-02-05T20:16:40.763Z",
+  "id": "I5ZOaPdr6uAFmRwR",
+  "name": "Financial Agent",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты - помощник для учёта финансов. Когда пользователь описывает трату, извлеки следующую информацию:\n- Дата (если не указана, используй текущую дату в формате DD.MM.YYYY)\n- Текущая дата {{ $now.toISO() }}\n- Категория (Одежда, Подарки, Еда, Здоровье, красота, гигиена и т.д.)\n\nВерни данные ТОЛЬКО в формате JSON:\n{\n  \"date\": \"DD.MM.YYYY\",\n  \"category\": \"Категория\",\n  \"amount\": \"XXX\"\n}\n\nПримеры:\n- \"Купил рубашку за 2500\" → {\"date\": \"06.01.2026\", \"category\": \"Одежда\", \"amount\": \"2500 ₽\"}\n- \"Потратил 450 рублей на обед сегодня\" → {\"date\": \"06.01.2026\", \"category\": \"Еда\", \"amount\": \"450\"}",
+          "returnIntermediateSteps": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        192
+      ],
+      "id": "3243740e-2a30-4abd-9c7f-4ccc44c8b377",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -688,
+        400
+      ],
+      "id": "dbf6a773-1259-447a-a2cc-9b5dd11c3389",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Извлекаем ответ от AI\nconst aiResponse = $input.first().json.output;\n\ntry {\n  // Парсим JSON из ответа\n  const parsed = JSON.parse(aiResponse);\n  \n  return [{\n    json: {\n      date: parsed.date,\n      category: parsed.category,\n      amount: parsed.amount\n    }\n  }];\n} catch (error) {\n  // Если AI вернул текст вместо JSON\n  throw new Error('AI не вернул данные в нужном формате');\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        112
+      ],
+      "id": "80e59fc7-82a9-4efd-b77d-0106f8142ea8",
+      "name": "Code in JavaScript",
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE",
+          "mode": "list",
+          "cachedResultName": "n8n. Отслеживание бюджета",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Траты и бюджет",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата": "={{ $json.date }}",
+            "Категория": "={{ $json.category }}",
+            "Сумма": "={{ $json.amount }}"
+          },
+          "matchingColumns": [
+            "Дата"
+          ],
+          "schema": [
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Категория",
+              "displayName": "Категория",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Сумма",
+              "displayName": "Сумма",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5d2ac4f0-8ab8-4b5c-bb8b-329e3c17eb8b",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -848,
+        192
+      ],
+      "id": "2da66a88-3db8-4aa7-a99f-0c69b432e700",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "chatId": "=Unable to perform task. Please try again. Agent answer: {{ $json.output }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "be2f68e0-d35d-41e5-b2c3-1dd6e06e4eac",
+      "name": "Send Telegram Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        272
+      ],
+      "webhookId": "4973d88f-1367-477d-ad44-05e2db523a38",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=Unable to perform task. Please try again. Agent answer.",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a7ba07cd-0d2b-499b-b3c4-30d083e5d82d",
+      "name": "Send Telegram Response1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        192
+      ],
+      "webhookId": "4973d88f-1367-477d-ad44-05e2db523a38",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Telegram Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "aea8946a-b333-49b1-b4db-00343ab5822d",
+  "activeVersionId": "aea8946a-b333-49b1-b4db-00343ab5822d",
+  "versionCounter": 11,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-05T20:16:40.763Z",
+      "createdAt": "2026-02-05T20:16:40.763Z",
+      "role": "workflow:owner",
+      "workflowId": "I5ZOaPdr6uAFmRwR",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-02-05T20:32:35.593Z",
+    "createdAt": "2026-02-05T20:32:33.550Z",
+    "versionId": "aea8946a-b333-49b1-b4db-00343ab5822d",
+    "workflowId": "I5ZOaPdr6uAFmRwR",
+    "nodes": [
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.query }}",
+          "options": {
+            "systemMessage": "=Ты - помощник для учёта финансов. Когда пользователь описывает трату, извлеки следующую информацию:\n- Дата (если не указана, используй текущую дату в формате DD.MM.YYYY)\n- Текущая дата {{ $now.toISO() }}\n- Категория (Одежда, Подарки, Еда, Здоровье, красота, гигиена и т.д.)\n\nВерни данные ТОЛЬКО в формате JSON:\n{\n  \"date\": \"DD.MM.YYYY\",\n  \"category\": \"Категория\",\n  \"amount\": \"XXX\"\n}\n\nПримеры:\n- \"Купил рубашку за 2500\" → {\"date\": \"06.01.2026\", \"category\": \"Одежда\", \"amount\": \"2500 ₽\"}\n- \"Потратил 450 рублей на обед сегодня\" → {\"date\": \"06.01.2026\", \"category\": \"Еда\", \"amount\": \"450\"}",
+            "returnIntermediateSteps": true
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -640,
+          192
+        ],
+        "id": "3243740e-2a30-4abd-9c7f-4ccc44c8b377",
+        "name": "AI Agent",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          -688,
+          400
+        ],
+        "id": "dbf6a773-1259-447a-a2cc-9b5dd11c3389",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "I2fPS5AxAPCe68Qu",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Извлекаем ответ от AI\nconst aiResponse = $input.first().json.output;\n\ntry {\n  // Парсим JSON из ответа\n  const parsed = JSON.parse(aiResponse);\n  \n  return [{\n    json: {\n      date: parsed.date,\n      category: parsed.category,\n      amount: parsed.amount\n    }\n  }];\n} catch (error) {\n  // Если AI вернул текст вместо JSON\n  throw new Error('AI не вернул данные в нужном формате');\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          112
+        ],
+        "id": "80e59fc7-82a9-4efd-b77d-0106f8142ea8",
+        "name": "Code in JavaScript",
+        "executeOnce": false,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE",
+            "mode": "list",
+            "cachedResultName": "n8n. Отслеживание бюджета",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Траты и бюджет",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WTLL60NL8WWGJZrAmmy2xLKj79nndnay5hJtAETZAJE/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Дата": "={{ $json.date }}",
+              "Категория": "={{ $json.category }}",
+              "Сумма": "={{ $json.amount }}"
+            },
+            "matchingColumns": [
+              "Дата"
+            ],
+            "schema": [
+              {
+                "id": "Дата",
+                "displayName": "Дата",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Категория",
+                "displayName": "Категория",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Сумма",
+                "displayName": "Сумма",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          0,
+          0
+        ],
+        "id": "5d2ac4f0-8ab8-4b5c-bb8b-329e3c17eb8b",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "xOKUe7K3pMyrMWca",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -848,
+          192
+        ],
+        "id": "2da66a88-3db8-4aa7-a99f-0c69b432e700",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "chatId": "=Unable to perform task. Please try again. Agent answer: {{ $json.output }}",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "be2f68e0-d35d-41e5-b2c3-1dd6e06e4eac",
+        "name": "Send Telegram Response",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -256,
+          272
+        ],
+        "webhookId": "4973d88f-1367-477d-ad44-05e2db523a38",
+        "credentials": {
+          "telegramApi": {
+            "id": "Ed4xpYSKlIOqggT7",
+            "name": "Telegram account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "=Unable to perform task. Please try again. Agent answer.",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "id": "a7ba07cd-0d2b-499b-b3c4-30d083e5d82d",
+        "name": "Send Telegram Response1",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -16,
+          192
+        ],
+        "webhookId": "4973d88f-1367-477d-ad44-05e2db523a38",
+        "credentials": {
+          "telegramApi": {
+            "id": "Ed4xpYSKlIOqggT7",
+            "name": "Telegram account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send Telegram Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send Telegram Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Admin Admin",
+    "name": "Version aea8946a",
+    "description": "",
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-02-05T20:32:35.585Z",
+        "id": 13,
+        "workflowId": "I5ZOaPdr6uAFmRwR",
+        "versionId": "aea8946a-b333-49b1-b4db-00343ab5822d",
+        "event": "activated",
+        "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d"
+      }
+    ]
+  }
+}
