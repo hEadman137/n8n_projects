@@ -1,0 +1,533 @@
+{
+  "updatedAt": "2026-02-15T19:07:09.602Z",
+  "createdAt": "2026-02-15T18:12:02.214Z",
+  "id": "qfbHV5GbmHQ9kgk9",
+  "name": "My workflow 4",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "ca0f5a29-07ea-4c27-a361-47a14c29341d",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        704,
+        224
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "={{ DateTime.fromISO($json.timestamp).minus({ days: 7 }) }}"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.topics.replaceAll(\",\", \" OR \") }}"
+            },
+            {
+              "name": "sortBy",
+              "value": "relevancy"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "ae48d119-898b-428a-a7b0-5f6b75e75553",
+      "name": "Call NewsAPI",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1216,
+        224
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "0Iqfx1vYgbiGOS56",
+          "name": "Query Auth account 2"
+        },
+        "httpHeaderAuth": {
+          "id": "Aacz4T6W5r4RQOt8",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "454918257",
+        "text": "={{ \n  $json.output.map(article => {\n    const title = JSON.stringify(article.title).slice(1, -1);\n    const content = JSON.stringify(article.content).slice(1, -1);\n    const source = JSON.stringify(article.source).slice(1, -1);\n    const url = JSON.stringify(article.url).slice(1, -1);\n\n    return `*${title}*\\n${content}\\nSource: [${source}](${url})`;\n  }).join('\\n\\n')\n}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "940b204a-7b7c-42bb-ae75-54bc490a499b",
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2672,
+        224
+      ],
+      "webhookId": "a8a903fe-d94b-4316-92c1-0806bd260745",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content.articles",
+        "options": {}
+      },
+      "id": "37df545a-e2cf-4249-8e43-7ecfb3c1ce8d",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        1824,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"title\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"content\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"source\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"url\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "1acf33d1-ea61-401c-89f6-6c108ded6738",
+      "name": "Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        2240,
+        448
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "d8fa9b5f-85dc-45cc-8f4e-a5e6010cf2ea",
+      "name": "Tavily",
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "position": [
+        2112,
+        448
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "tavilyApi": {
+          "id": "EaGG39Cxt0lKCEDr",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0bd92ef7-a91f-4c4b-86c7-a75cd322abea",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        2448,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e1993fe-ae4d-46e0-be9f-6b02a18cc610",
+              "name": "topics",
+              "type": "string",
+              "value": "Technology, artificial intelligence, the internet, and messaging apps in Russia"
+            },
+            {
+              "id": "2c6e2dad-d54a-4387-9bf5-4751037f99d9",
+              "name": "language",
+              "type": "string",
+              "value": "Russian"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "bad663e0-6857-4fac-a9a3-991bd57cdc80",
+      "name": "Set topics and language",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        928,
+        224
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a research writer that updates short news summaries into concise, factual articles.\n\n**Input:**\nTitle: {{ $json[\"title\"] }}\nSummary: {{ $json[\"summary\"] }}\nSource: {{ $json[\"source\"] }}\nOriginal URL: {{ $json[\"url\"] }}\nLanguage: {{ $('Set topics and language').item.json.language }}\n\n**Instructions:**\n\n1. Use **Tavily Search** to gather 2–3 reliable, recent, and relevant sources on this topic.\n2. Update the **title** if a more accurate or engaging one exists.\n3. Write **1–3 sentences** summarizing the topic, combining the original summary and information from the new sources.\n4. Return the original source name and url as well.\n\n**Output (JSON):**\n\n```json\n{\n  \"title\": \"final article title\",\n  \"content\": \"concise 1–3 sentence article content\",\n  \"source\": \"the name of the original source\",\n  \"url\": \"the url of the original source\"\n}\n```\n\n**Rules:**\n\n* Ensure the topic is relevant, informative, and timely.\n* Translate the article if necessary to comply with the desired language {{ $('Set topics and language').item.json.language }}.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "4f7756d3-4fc9-4f6b-9141-ee16ef1a123c",
+      "name": "Newsletter AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2048,
+        224
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.1",
+          "cachedResultName": "GPT-5.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an assistant that selects the most relevant news articles for a user.\n\nInstructions:  \n1. Choose the **5 most relevant non-overlapping articles** based on the user topics.  \n2. For each article, provide:  \n   - title  \n   - short summary (1–2 sentences)  \n   - source name  \n   - url\n3. Output the results in the language specified by the user.\n\nOutput as a \"articles\" JSON array of objects, each with \"title\", \"summary\", \"source\" and \"url\".\n\nUser topics of interest: {{ $('Set topics and language').item.json.topics }}\nOutput language: {{ $('Set topics and language').item.json.language }}\n\nNewsAPI articles:\n\n{{ \n  $json.articles.map(\n    article => \n      `Title: ${article.title}\nDescription: ${article.description}\nContent: ${article.content}\nSource: ${article.source.name}\nURL: ${article.url}`\n  ).join('\\n---\\n')\n}}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "709804e1-5eaa-4f4e-a18b-332ce7fb2340",
+      "name": "AI Topic Selector",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1472,
+        224
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "GEpqYUgdv5PuIbRT",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# AI Newsletter Workflow\n\n## How it works\nThis workflow runs weekly, fetches fresh news for your chosen topics, lets an AI pick the five most relevant articles, enriches each with additional research, and then sends a compact Markdown newsletter to Telegram. It combines NewsAPI for discovery, GPT‑5 for reasoning and writing, and Tavily for fact-checked enrichment.\n\n## Setup steps\n1. Configure the schedule (weekly, Sunday 09:00 or your preferred time).  \n2. Set `topics` (comma-separated) and `language` in `Set topics and language`.  \n3. Add credentials: NewsAPI (query auth), OpenAI, Tavily, and Telegram bot/chat ID.  \n\n## Customization\n- Tweak `topics` and `language` for different audiences or languages.  \n- Adjust the schedule (day/time) to control when newsletters go out.  \n- Change the number of selected articles or the AI prompts if you want shorter or more in‑depth summaries.",
+        "height": 608,
+        "width": 640
+      },
+      "id": "c8d56a66-de66-4647-9b8d-810f32d21d53",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Schedule & Configuration\n\n• **Schedule Trigger**: Runs at 9am every Sunday per default.\n• **Set topics and language**: Configure your topics (comma-separated) and output language.",
+        "height": 608,
+        "width": 432,
+        "color": 7
+      },
+      "id": "49e73124-9f63-482f-bb8d-de14822f2beb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Fetch & Select articles\n\n- **Call NewsAPI**: Queries the last 7 days of news for your topics.  \n- **AI Topic Selector**: Uses GPT‑5.1 to select 5 non-overlapping, relevant articles.  \n- **Split Out**: Turns the selected list into one item per article.",
+        "height": 608,
+        "width": 848,
+        "color": 7
+      },
+      "id": "c3a7ba98-3b65-49f0-93c1-7c0b9a35de9f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Enrich Articles using AI\n\n- **Newsletter AI Agent**: Orchestrates GPT‑5, Tavily and the parser per article.  \n- **GPT-5.1**: Writes short, clear newsletter-style summaries.  \n- **Tavily**: Adds fresh sources for grounding and factual checks.  \n- **Parser**: Enforces JSON with `title`, `content`, `source`, `url`.",
+        "height": 608,
+        "width": 416,
+        "color": 7
+      },
+      "id": "233cb09e-c806-41af-bb9d-5faa30a38c4a",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1968,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.1",
+          "cachedResultName": "gpt-5.1"
+        },
+        "options": {}
+      },
+      "id": "45ce9f88-c198-4cc1-ba98-a693e4993d16",
+      "name": "GPT-5.1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1984,
+        448
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "GEpqYUgdv5PuIbRT",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Aggregate & Send\n\n- **Aggregate**: Combines all enriched article objects into one list.  \n- **Send a text message**: Formats the newsletter in Markdown and posts it to Telegram.",
+        "height": 608,
+        "width": 496,
+        "color": 7
+      },
+      "id": "cca8c9d3-ca20-46b4-a252-54cfd00e0f04",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2400,
+        0
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Newsletter AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Newsletter AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call NewsAPI": {
+      "main": [
+        [
+          {
+            "node": "AI Topic Selector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set topics and language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Topic Selector": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsletter AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set topics and language": {
+      "main": [
+        [
+          {
+            "node": "Call NewsAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Newsletter AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-5.1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Newsletter AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "052c8f72-de1c-4075-8466-f9adc9d153cd",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-15T18:12:02.214Z",
+      "createdAt": "2026-02-15T18:12:02.214Z",
+      "role": "workflow:owner",
+      "workflowId": "qfbHV5GbmHQ9kgk9",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
