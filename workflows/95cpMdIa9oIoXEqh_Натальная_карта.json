@@ -1,0 +1,987 @@
+{
+  "updatedAt": "2026-02-19T20:46:12.076Z",
+  "createdAt": "2026-02-19T19:18:23.159Z",
+  "id": "95cpMdIa9oIoXEqh",
+  "name": "Натальная карта",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        448
+      ],
+      "id": "f29c5b64-99e0-4f4a-8209-040dba50b89f",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — опытный астролог с глубокими знаниями западной и ведической астрологии. Твоя задача — составлять персонализированные астрологические прогнозы, которые звучат убедительно, вдохновляюще и содержательно.\n\nКак ты общаешься:\nГовори тёплым, но авторитетным тоном. Используй астрологическую терминологию (транзиты, аспекты, дома, ретроградность), но объясняй её доступно. Избегай категоричных негативных предсказаний — вместо этого предлагай, как использовать энергию момента.\nСтруктура прогноза:\nЕсли пользователь называет знак зодиака или дату рождения, составь прогноз по следующим сферам: общая энергия периода, любовь и отношения, карьера и финансы, здоровье и энергетика, совет на период.\nВажные правила:\n\nВсегда уточняй временной период прогноза (день, неделя, месяц), если пользователь не указал\nЕсли пользователь хочет более точный прогноз — предложи указать дату, время и место рождения\nНе делай медицинских, юридических или финансовых рекомендаций в буквальном смысле\nВ конце каждого прогноза добавляй короткую аффирмацию или мантру для периода\n\nНачало диалога:\nПоприветствуй пользователя, спроси его знак зодиака или дату рождения и желаемый период прогноза."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1344,
+        224
+      ],
+      "id": "b08de7fe-0fe0-4a58-b962-c78c364199b2",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        448
+      ],
+      "id": "95dff9ac-e5ea-441f-8d52-3576cc3e9c5d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M1MGzcjJvWiM8d2dZSB0LSZ1uYyF9S1xIke2MEbE6yg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+            "first_time_ask": "={{ $json.first_message_at }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "history_of_messages": "={{ $json.history_of_messages }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2640,
+        96
+      ],
+      "id": "f6b8b5b7-ad41-4259-ae74-168bbc724f5f",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M1MGzcjJvWiM8d2dZSB0LSZ1uYyF9S1xIke2MEbE6yg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+            "first_time_ask": "={{ $now.toISO() }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "history_of_messages": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "t-bank": "NO",
+            "vtb": "NO",
+            "alfa": "NO",
+            "ozon bank": "NO",
+            "mts bank": "NO"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "t-bank",
+              "displayName": "t-bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vtb",
+              "displayName": "vtb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alfa",
+              "displayName": "alfa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ozon bank",
+              "displayName": "ozon bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mts bank",
+              "displayName": "mts bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2640,
+        304
+      ],
+      "id": "02c61a5a-7589-4f79-9825-653a374cd08c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        208
+      ],
+      "id": "94d2c7c8-d7e3-4159-9470-d97f89dfbc56",
+      "name": "Text from bot",
+      "webhookId": "e48323a9-861e-4d49-831f-850603b04636",
+      "credentials": {
+        "telegramApi": {
+          "id": "puWFBaP6cvSY4W9C",
+          "name": "Helper Doc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3fa04be6-ce4f-4ca2-8b4b-e7ca3204259e",
+              "name": "telegram_id",
+              "value": "={{ $json.ID }}",
+              "type": "string"
+            },
+            {
+              "id": "ab13c832-c025-4955-a934-5c9eabb971eb",
+              "name": "history_of_messages",
+              "value": "={{ $json.history_of_messages }} + {{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "387202d1-9123-4bc9-9c97-56f94a624465",
+              "name": "first_message_at",
+              "value": "={{ $json.first_time_ask }}",
+              "type": "string"
+            },
+            {
+              "id": "ca0f38ea-76e0-413b-a0b1-49d4ab37b0ab",
+              "name": "last_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        96
+      ],
+      "id": "7d9cfabc-cf0a-4282-8eac-ae833807ea42",
+      "name": "Edit fields if old customers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3fa04be6-ce4f-4ca2-8b4b-e7ca3204259e",
+              "name": "telegram_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "ecf56a56-dbec-4c7c-b253-ab9e88cdd2a2",
+              "name": "first_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "ca0f38ea-76e0-413b-a0b1-49d4ab37b0ab",
+              "name": "last_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "70a6ab32-a3b4-486e-ba68-f650db11d859",
+              "name": "history_of_messages",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        304
+      ],
+      "id": "d885704b-9519-4e3d-b5d7-55b6501c65c1",
+      "name": "Edit fields if new customers"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97fcfc1a-1e99-4a0c-bac0-008b63dcd39c",
+              "leftValue": "={{ $json.ID }}",
+              "rightValue": {},
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2176,
+        208
+      ],
+      "id": "e54f0562-bebc-4af5-b62e-8f767f0bc920",
+      "name": "Check new / old customer"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M1MGzcjJvWiM8d2dZSB0LSZ1uYyF9S1xIke2MEbE6yg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID",
+              "lookupValue": "={{ $json.result.chat.username }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        208
+      ],
+      "id": "30213480-2f62-4a67-9ff7-a383a655f4a7",
+      "name": "Read Google Sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b498bbcb-54a3-411b-ab0f-2715d19d78cd",
+              "name": "query",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8d2f65a5-63d0-4b99-ad25-d31ec84e4079",
+              "name": "max_results",
+              "value": 5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        224
+      ],
+      "id": "1c252a99-46f1-48bd-a487-c3a70babf474",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -304,
+        240
+      ],
+      "id": "d0624524-bb97-4e18-9262-60d14660f90e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        256,
+        352
+      ],
+      "id": "0d284b19-3f1b-4a7e-826d-e724725355e2",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        352
+      ],
+      "id": "8d52d252-0dee-48ba-b0b2-07944331dcd4",
+      "name": "Get a file",
+      "webhookId": "0e4cb516-7116-43cc-9632-c80c02c72bf1",
+      "credentials": {
+        "telegramApi": {
+          "id": "puWFBaP6cvSY4W9C",
+          "name": "Helper Doc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45b5b690-0356-452e-a4a7-98042823f89d",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        224
+      ],
+      "id": "234ff69a-514c-41cd-8beb-4ea3a64ba83b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        240
+      ],
+      "id": "befc4510-4214-405a-8e54-18fba4275f8b",
+      "name": "Telegram Trigger",
+      "webhookId": "5baadddf-0ac8-46cb-84ce-eba1306b716d",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        224
+      ],
+      "id": "706a3af7-7fb8-4c8c-9634-2e226bed77d0",
+      "name": "Узнаем обращался ли клиент ранее?",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8018948513:AAGhjytjRj_XzU_I1wBbtJZ4HswMNOdYY9Q/sendChatAction",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $('Telegram Trigger').item.json.message.chat.id }},\n  \"action\": \"typing\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "b6ace7d2-ce0a-499a-997d-c4505b196712",
+      "name": "Статус \"Typing\""
+    }
+  ],
+  "connections": {
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Text from bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit fields if old customers": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit fields if new customers": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check new / old customer": {
+      "main": [
+        [
+          {
+            "node": "Edit fields if old customers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit fields if new customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Check new / old customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Узнаем обращался ли клиент ранее?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Статус \"Typing\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Узнаем обращался ли клиент ранее?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b6159afa-2c58-4a5c-8894-211e40a19a96",
+  "activeVersionId": null,
+  "versionCounter": 9,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T19:18:23.159Z",
+      "createdAt": "2026-02-19T19:18:23.159Z",
+      "role": "workflow:owner",
+      "workflowId": "95cpMdIa9oIoXEqh",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
