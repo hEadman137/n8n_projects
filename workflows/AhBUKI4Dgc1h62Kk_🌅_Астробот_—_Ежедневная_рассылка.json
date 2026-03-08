@@ -1,0 +1,310 @@
+{
+  "updatedAt": "2026-02-19T20:46:08.281Z",
+  "createdAt": "2026-02-19T19:48:30.179Z",
+  "id": "AhBUKI4Dgc1h62Kk",
+  "name": "🌅 Астробот — Ежедневная рассылка",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "5c2747f3-e148-4a8f-86dc-0f005bf583ba",
+      "name": "Каждый день в 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT telegram_id, first_name, last_name, birthdate::text, zodiac_sign FROM users WHERE is_active = true",
+        "options": {}
+      },
+      "id": "0dadc7f5-50ea-4082-bd97-920b4151490d",
+      "name": "Получить всех активных пользователей",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b00661b2-7255-4556-a716-ed01c9dd04af",
+      "name": "Разбить на элементы",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-4o-mini"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"Ты профессиональный астролог с многолетним опытом. Составляй персональные, уникальные и разнообразные астрологические прогнозы. Никогда не повторяй одинаковые тексты. Учитывай текущие астрологические события — фазы луны, ретроградные планеты, сезоны.\"}, {\"role\": \"user\", \"content\": \"Составь астрологический прогноз на сегодня для {{ $json.first_name }} {{ $json.last_name }}.\\n\\nЗнак зодиака: {{ $json.zodiac_sign }}\\nДата рождения: {{ $json.birthdate }}\\nСегодняшняя дата: {{ $now.toFormat('dd MMMM yyyy') }}\\n\\nФормат прогноза:\\n🔮 *Прогноз на {{ $now.toFormat('dd MMMM') }} для {{ $json.first_name }}*\\n\\n🌟 *Общий прогноз*\\n[2-3 предложения]\\n\\n💼 *Карьера и финансы*\\n[2 предложения]\\n\\n❤️ *Любовь и отношения*\\n[2 предложения]\\n\\n🏃 *Здоровье*\\n[1-2 предложения]\\n\\n✨ *Совет дня*\\n[1 вдохновляющее предложение]\\n\\nОбщий объём — 200-250 слов. Стиль — тёплый, личный, позитивный.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": 900
+            },
+            {
+              "name": "temperature",
+              "value": 0.9
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1b3c8234-a379-42db-8c22-60429e6b7d89",
+      "name": "Генерировать персональный прогноз",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        672,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const forecastText = $('Генерировать персональный прогноз').item.json.choices[0].message.content;\nconst telegramId = $('Разбить на элементы').item.json.telegram_id;\n\nreturn [{ json: { telegram_id: telegramId, forecast: forecastText } }];"
+      },
+      "id": "d9f64930-358a-479d-970d-45353e84acd2",
+      "name": "Подготовить сообщение",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_id }}",
+        "text": "={{ $json.forecast }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "fa2b9091-18b6-4301-92f6-5d1471ff0718",
+      "name": "Отправить прогноз пользователю",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        0
+      ],
+      "webhookId": "22fc84ec-c6d1-4325-96bd-df3d71dc3d28"
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "73b31dc2-3419-4fe9-844c-25830aceb7e0",
+      "name": "Пауза 1 сек (защита от бана)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        0
+      ],
+      "webhookId": "wait-webhook-id"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO forecast_logs (telegram_id, sent_at, forecast_date)\nVALUES ({{ $('Разбить на элементы').item.json.telegram_id }}, NOW(), CURRENT_DATE)\nON CONFLICT DO NOTHING",
+        "options": {}
+      },
+      "id": "bc95fe0f-4f78-4076-8db3-60f6f33e25ff",
+      "name": "Записать в лог",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Каждый день в 09:00": {
+      "main": [
+        [
+          {
+            "node": "Получить всех активных пользователей",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить всех активных пользователей": {
+      "main": [
+        [
+          {
+            "node": "Разбить на элементы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разбить на элементы": {
+      "main": [
+        [
+          {
+            "node": "Генерировать персональный прогноз",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Генерировать персональный прогноз": {
+      "main": [
+        [
+          {
+            "node": "Подготовить сообщение",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить сообщение": {
+      "main": [
+        [
+          {
+            "node": "Отправить прогноз пользователю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отправить прогноз пользователю": {
+      "main": [
+        [
+          {
+            "node": "Пауза 1 сек (защита от бана)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Пауза 1 сек (защита от бана)": {
+      "main": [
+        [
+          {
+            "node": "Записать в лог",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "32c17239-0e5b-4648-adaf-683ea2e4feef",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T19:48:30.179Z",
+      "createdAt": "2026-02-19T19:48:30.179Z",
+      "role": "workflow:owner",
+      "workflowId": "AhBUKI4Dgc1h62Kk",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
