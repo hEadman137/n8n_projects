@@ -1,0 +1,449 @@
+{
+  "updatedAt": "2026-02-27T17:56:29.031Z",
+  "createdAt": "2026-02-27T17:56:29.031Z",
+  "id": "FM2PxVcw6o3ngoaE",
+  "name": "check_subscribers_max_channel",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        320
+      ],
+      "id": "16d13bab-f298-4871-97af-9b7881cddff5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://platform-api.max.ru/chats",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        544
+      ],
+      "id": "c2248ad8-f52d-458e-b131-48665b8692cb",
+      "name": "Get all chats for bot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "members",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        944,
+        256
+      ],
+      "id": "6bfe221c-4468-436f-8194-36e160689ef3",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HOxFdBlkd60ySEuQ",
+          "mode": "list",
+          "cachedResultName": "Members_channel",
+          "cachedResultUrl": "/projects/0Ib0uCxwfuMKI6HN/datatables/HOxFdBlkd60ySEuQ"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "user_id": "={{ $json.user_id }}",
+            "name": "={{ $json.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        256
+      ],
+      "id": "377e5fae-2fc6-4891-96f9-d0c4810e3c62",
+      "name": "Upsert row(s)"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        160
+      ],
+      "id": "68864228-4bbc-4084-860e-144adecb2d0f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"channel_id\": \"ваш ID канала\",\n  \"marker\": null,\n  \"has_more_pages\": true,\n  \"total_loaded\": 0,\n  \"page_number\": 1\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        320
+      ],
+      "id": "661e5551-4caa-42c8-b0d8-49ccf5bacb06",
+      "name": "Initialize Variables"
+    },
+    {
+      "parameters": {
+        "url": "=https://platform-api.max.ru/chats/{{ $json.channel_id }}/members",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "marker",
+              "value": "={{ $json.marker || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        496,
+        320
+      ],
+      "id": "56a5a69f-ed56-4727-997d-f95bc7b737b7",
+      "name": "Get Channel Members",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Получаем данные из HTTP Request\nconst response = $input.first().json;\n\n// Получаем текущие переменные из Set ноды\nconst currentVars = $('Initialize Variables').first().json;\n\n// Проверяем структуру ответа\nif (!response || response.length === 0) {\n  console.log(\"edff\" + Array.isArray(response));\n  // Нет данных - останавливаем цикл\n  return [{\n    json: {\n      channel_id: currentVars.channel_id,\n      marker: null,\n      has_more_pages: false,\n      members: [],\n      total_loaded: currentVars.total_loaded,\n      page_number: currentVars.page_number\n    }\n  }];\n}\n\n// Извлекаем данные\nconst data = response;\nconst members = data.members || [];\nconst newMarker = data.marker;\n\n// Проверяем, есть ли еще страницы\n// Если marker === null или undefined, значит это последняя страница\nconst hasMorePages = newMarker !== null && newMarker !== undefined;\n\n// Подсчитываем общее количество загруженных\nconst totalLoaded = currentVars.total_loaded + members.length;\n\nconsole.log(`Page ${currentVars.page_number}: Loaded ${members.length} members, Total: ${totalLoaded}`);\nconsole.log(`Next marker: ${newMarker}, Has more: ${hasMorePages}`);\n\n// Возвращаем результат\nreturn [{\n  json: {\n    channel_id: currentVars.channel_id,\n    marker: newMarker,\n    has_more_pages: hasMorePages,\n    members: members,\n    total_loaded: totalLoaded,\n    page_number: currentVars.page_number\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        256
+      ],
+      "id": "1ba8d73e-9a60-4075-ba40-f829b2ca35d1",
+      "name": "Process Members Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5868fb83-ae98-43d0-b20d-eeda74a57cab",
+              "leftValue": "={{ $('Process Members Response').first().json.has_more_pages }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1392,
+        256
+      ],
+      "id": "457fb0cb-c743-40e0-975f-634835b76833",
+      "name": "Check Has More Pages"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"channel_id\": \"{{ $('Process Members Response').item.json.channel_id }}\",\n  \"marker\": \"{{ $('Process Members Response').item.json.marker }}\",\n  \"has_more_pages\": {{ $('Process Members Response').item.json.has_more_pages }},\n  \"total_loaded\": \"{{ $('Process Members Response').item.json.total_loaded }}\",\n  \"page_number\": \"{{ $('Process Members Response').item.json.page_number + 1}}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "2e25a2cc-ade8-44b7-8927-fc22bf491203",
+      "name": "Update Marker for Next Page"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nreturn [{\n  json: {\n    status: 'completed',\n    total_members: data.total_loaded,\n    total_pages: data.page_number,\n    channel_id: data.channel_id,\n    completed_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        352
+      ],
+      "id": "e6bdb4c5-7f2c-4879-8c43-5a8538d69094",
+      "name": "Final Summary"
+    },
+    {
+      "parameters": {
+        "content": "## Загрузка базы подписчиков на канал в MAX в Data Tables \n\n**Отредактируйте ноду Initialize Variables**\n- В переменную \"channel_id\" впишите свой ID канала\n- Для получения \"channel_id\" вызовите ноду - \"Get all chats for bot\"\n\n\n**Создайте новую таблицу в Data Tables с названием \"Members_channel\"**\n- Структуру таблицы можете бесплатно скачать с моего канала - [MAX канал AI на твоей службе](https://max.ru/id5403044169_biz/AZwoITAsWnw)\n",
+        "height": 528,
+        "width": 2064,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5d06d961-2c69-4203-b734-dc9dbbd2e1e0",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Initialize Variables",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get all chats for bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert row(s)": {
+      "main": [
+        [
+          {
+            "node": "Check Has More Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Update Marker for Next Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Variables": {
+      "main": [
+        [
+          {
+            "node": "Get Channel Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channel Members": {
+      "main": [
+        [
+          {
+            "node": "Process Members Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Members Response": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Has More Pages": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Marker for Next Page": {
+      "main": [
+        [
+          {
+            "node": "Get Channel Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f276ac68-ca49-4457-9616-eca745406d18",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-27T17:56:29.031Z",
+      "createdAt": "2026-02-27T17:56:29.031Z",
+      "role": "workflow:owner",
+      "workflowId": "FM2PxVcw6o3ngoaE",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:34:17.849Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2026-02-27T17:53:06.590Z",
+      "createdAt": "2026-02-27T17:53:06.590Z",
+      "id": "N3jCactT7ZGBrVab",
+      "name": "AIvDelo"
+    }
+  ],
+  "activeVersion": null
+}
