@@ -1,0 +1,3446 @@
+{
+  "updatedAt": "2026-03-01T12:14:50.590Z",
+  "createdAt": "2026-03-01T09:58:09.564Z",
+  "id": "LOT1Weoq3Xa1s0Sf",
+  "name": "My workflow 31",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3696,
+        1008
+      ],
+      "id": "89ab48a2-9d4e-4965-8d7e-26da02b04d9e",
+      "name": "Telegram Trigger",
+      "webhookId": "2ffcd741-2d9a-4181-88ef-2b8bc72e6a3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -3376,
+        1008
+      ],
+      "id": "206715b6-2943-4480-b459-43565b2b03b6",
+      "name": "Switch тип"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2960,
+        1216
+      ],
+      "id": "61fc8898-126f-4ec0-a39a-b9f924e8b1aa",
+      "name": "Get a file",
+      "webhookId": "2d19065f-61e6-41d9-9af1-cae1770705a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -2560,
+        1216
+      ],
+      "id": "3fbb8931-485a-4a19-b641-f3caf1b8b01a",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edit-text",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2080,
+        992
+      ],
+      "id": "3b73efdf-7383-43dd-b0e3-1fc06842df5a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "cuid",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1456,
+        992
+      ],
+      "id": "11cbc804-72b9-4da7-994c-a811b3b15b0b",
+      "name": "Читаем данные пользователя",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "prep-query",
+              "name": "query",
+              "value": "={{ $('Edit Fields').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-cuid",
+              "name": "cuid",
+              "value": "={{ $json.cuid }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-name",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-age",
+              "name": "age",
+              "value": "={{ $json.age }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-phone",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-username",
+              "name": "username",
+              "value": "={{ $json.username }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-stage",
+              "name": "current_stage",
+              "value": "={{ $json.current_stage || 'START' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-task",
+              "name": "task_bank",
+              "value": "={{ $json.task_bank || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-history",
+              "name": "history_of_messages",
+              "value": "={{ $json.history_of_messages || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-vtb-apply",
+              "name": "link_vtb_apply",
+              "value": "={{ $json.link_vtb_apply || '{link_vtb_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-vtb-report",
+              "name": "link_vtb_report",
+              "value": "={{ $json.link_vtb_report || '{link_vtb_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-gpb-apply",
+              "name": "link_gpb_apply",
+              "value": "={{ $json.link_gpb_apply || '{link_gpb_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-gpb-report",
+              "name": "link_gpb_report",
+              "value": "={{ $json.link_gpb_report || '{link_gpb_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-otp-apply",
+              "name": "link_otp_apply",
+              "value": "={{ $json.link_otp_apply || '{link_otp_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-otp-report",
+              "name": "link_otp_report",
+              "value": "={{ $json.link_otp_report || '{link_otp_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-alfa-apply",
+              "name": "link_alfa_apply",
+              "value": "={{ $json.link_alfa_apply || '{link_alfa_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-alfa-report",
+              "name": "link_alfa_report",
+              "value": "={{ $json.link_alfa_report || '{link_alfa_report}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-link-task2",
+              "name": "link_task2_apply",
+              "value": "={{ $json.link_task2_apply || '{link_task2_apply}' }}",
+              "type": "string"
+            },
+            {
+              "id": "prep-admin-chat",
+              "name": "admin_chat_id",
+              "value": "=454918257",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        992
+      ],
+      "id": "abb09357-8402-4a80-9ee4-9bdfb9e9952a",
+      "name": "Подготовка контекста"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d586d7ca-e063-4382-83f2-094ca422b41e",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "START",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "START"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5328d3fe-b7ee-4527-a6d4-50a0f92bb048",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "FORMAT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FORMAT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "633ce96c-5edb-4ca1-9a0b-7f86ecbdab4b",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "ROUTING",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ROUTING"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c94921f9-1b6d-4034-b1c2-66a6738a1591",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "SEND_LINK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SEND_LINK"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "901dbf7e-57fa-4d0a-9681-5fda72af5c1e",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_DELIVERY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_DELIVERY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b1de4dce-08e9-4cfa-8bf6-8edea94955db",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_CARD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_CARD"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eeedc5dc-90f2-44d8-b42f-ffdeb4e64f75",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_PURCHASE_PROOF",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_PURCHASE_PROOF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c6ed9ec4-da0e-463d-aee4-7a6abaa980a9",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_REPORT_DONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_REPORT_DONE"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "234af2e0-7f11-42cf-90d0-eb46fa64160b",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "WAIT_REVIEW",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WAIT_REVIEW"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cf55994d-3bfb-4baa-8fa4-7dbcdb968bf6",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "TASK2_OFFER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TASK2_OFFER"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4b36cad6-5447-4d64-824b-d0eafedddd6b",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "TASK2_WAIT_APPLY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TASK2_WAIT_APPLY"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1905d15-8b98-45c2-bcf0-5c3bbed3b747",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "HOLD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "HOLD"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cf20b58e-2a41-42fd-8390-85a2f8448ba2",
+                    "leftValue": "={{ $json.current_stage }}",
+                    "rightValue": "DONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DONE"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -736,
+        800
+      ],
+      "id": "fc361377-a84e-469a-a413-88d8bed45560",
+      "name": "Switch по этапу"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx   = $('Подготовка контекста').item.json;\nconst tgMsg = $('Telegram Trigger').item.json;\nconst user  = $('Edit Fields').item.json.text || '';\nconst d     = $json;\n\nconst history = ctx.history_of_messages\n  ? `${ctx.history_of_messages}\\n---\\nПользователь: ${user}\\nНиколай: ${d.reply}`\n  : `Пользователь: ${user}\\nНиколай: ${d.reply}`;\n\nreturn [{ json: {\n  text_for_user:       d.reply,\n  admin_message:       d.admin_msg    || '',\n  telegram_chat_id:    String(tgMsg.message.chat.id),\n  admin_chat_id:       String(ctx.admin_chat_id || ''),\n  cuid:                String(ctx.cuid),\n  current_stage:       d.next_stage,\n  history_of_messages: history,\n  last_time_ask:       new Date().toISOString(),\n  // доп. поля — пишем только если переданы\n  ...(d.task_bank                       ? {task_bank: d.task_bank}                                             : {}),\n  ...(d.delivery_datetime               ? {delivery_datetime: d.delivery_datetime}                             : {}),\n  ...(d.compensation_requested_to_admin ? {compensation_requested_to_admin: d.compensation_requested_to_admin} : {}),\n  ...(d.purchase_screenshot_received    ? {purchase_screenshot_received: d.purchase_screenshot_received}       : {}),\n  ...(d.report_link_sent                ? {report_link_sent: d.report_link_sent}                               : {}),\n  ...(d.report_done_user_confirm        ? {report_done_user_confirm: d.report_done_user_confirm}               : {}),\n  ...(d.final_payout_requested_to_admin ? {final_payout_requested_to_admin: d.final_payout_requested_to_admin} : {}),\n  ...(d.payout_confirmed                ? {payout_confirmed: d.payout_confirmed}                               : {}),\n  ...(d.review_received                 ? {review_received: d.review_received}                                 : {}),\n  ...(d.review_text                     ? {review_text: d.review_text}                                         : {}),\n  ...(d.handoff_to_admin                ? {handoff_to_admin: d.handoff_to_admin}                               : {}),\n  ...(d.task2_accepted                  ? {task2_accepted: d.task2_accepted}                                   : {}),\n  ...(d.task2_applied                   ? {task2_applied: d.task2_applied}                                     : {}),\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        1040
+      ],
+      "id": "8c20bf56-6d8e-4b6e-a99f-e953dabed669",
+      "name": "Сохранить историю"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id }}",
+        "text": "={{ $json.text_for_user }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        880
+      ],
+      "id": "4881f26f-48ac-488b-872b-32be19feaafa",
+      "name": "Отправить пользователю",
+      "webhookId": "49a0b273-6e6f-48e6-a0a9-ee550d8619e8",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cc3ca5d5-f4aa-44dc-8b2d-a99d66ab01ad",
+              "leftValue": "={{ $json.admin_message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        1072
+      ],
+      "id": "6baaf6cf-058e-4249-a985-b9f8b1bef3d8",
+      "name": "Есть ADMIN?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.admin_chat_id }}",
+        "text": "={{ $json.admin_message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        1072
+      ],
+      "id": "d7f5ed56-f080-43ef-b533-212f8b6bc22f",
+      "name": "Отправить администратору",
+      "webhookId": "e38ae78f-a729-4540-8186-ad3b0b300129",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 0,
+            "cuid": "={{ $json.cuid }}",
+            "current_stage": "={{ $json.current_stage }}",
+            "history_of_messages": "={{ $json.history_of_messages }}",
+            "last_time_ask": "={{ $json.last_time_ask }}",
+            "task_bank": "={{ $json.task_bank ?? $('Подготовка контекста').item.json.task_bank }}",
+            "delivery_datetime": "={ $json.delivery_datetime ?? '' }",
+            "compensation_requested_to_admin": "={ $json.compensation_requested_to_admin ?? '' }",
+            "purchase_screenshot_received": "={ $json.purchase_screenshot_received ?? '' }",
+            "report_link_sent": "={ $json.report_link_sent ?? '' }",
+            "report_done_user_confirm": "={ $json.report_done_user_confirm ?? '' }",
+            "final_payout_requested_to_admin": "={ $json.final_payout_requested_to_admin ?? '' }",
+            "review_received": "={ $json.review_received ?? '' }",
+            "review_text": "={ $json.review_text ?? '' }",
+            "payout_confirmed": "={ $json.payout_confirmed ?? '' }",
+            "handoff_to_admin": "={ $json.handoff_to_admin ?? '' }",
+            "task2_accepted": "={ $json.task2_accepted ?? '' }",
+            "task2_applied": "={ $json.task2_applied ?? '' }"
+          },
+          "matchingColumns": [
+            "cuid"
+          ],
+          "schema": [
+            {
+              "id": "cuid",
+              "displayName": "cuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "current_stage",
+              "displayName": "current_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "task_bank",
+              "displayName": "task_bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "delivery_datetime",
+              "displayName": "delivery_datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "compensation_requested_to_admin",
+              "displayName": "compensation_requested_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "purchase_screenshot_received",
+              "displayName": "purchase_screenshot_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "report_link_sent",
+              "displayName": "report_link_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "report_done_user_confirm",
+              "displayName": "report_done_user_confirm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_payout_requested_to_admin",
+              "displayName": "final_payout_requested_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_received",
+              "displayName": "review_received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_text",
+              "displayName": "review_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payout_confirmed",
+              "displayName": "payout_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "handoff_to_admin",
+              "displayName": "handoff_to_admin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "task2_accepted",
+              "displayName": "task2_accepted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "task2_applied",
+              "displayName": "task2_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        784,
+        1280
+      ],
+      "id": "80de5240-a476-4b3d-9562-c2e0d2618e28",
+      "name": "Обновить Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7506e380-de72-4843-ada4-78fc2c798085",
+              "name": "reply",
+              "value": "=Привет, {{ $json.name }}! 👋 Я Николай, главный менеджер по работе с тестировщиками.\nЕсть вопросы после прохождения бота — или можем сразу начать? 🙂",
+              "type": "string"
+            },
+            {
+              "id": "90444f8c-ee61-46f8-9534-202a5e40f748",
+              "name": "next_stage",
+              "value": "FORMAT",
+              "type": "string"
+            },
+            {
+              "id": "b5f99364-533e-4553-991b-c58a55bbe663",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        208
+      ],
+      "id": "3d800456-4dfa-48f7-b770-4ddde2ec4fe0",
+      "name": "Ответ START"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — классификатор намерений. Пользователь отвечает менеджеру по поводу условий работы (сдельная оплата, 20-60 мин, без переводов от пользователя).\n\nОпредели намерение пользователя и верни ТОЛЬКО JSON без markdown:\n{\n  \"intent\": \"agree\" | \"doubt\" | \"decline\",\n  \"doubt_topic\": \"краткая тема сомнения если intent=doubt, иначе пустая строка\"\n}\n\nСообщение пользователя: {{ $json.query }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -128,
+        400
+      ],
+      "id": "f8e26f15-33a6-428a-b74f-97bc81b5216e",
+      "name": "Классификатор FORMAT"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        560
+      ],
+      "id": "c3e15184-b7cb-41df-badc-1fe745789795",
+      "name": "OpenAI FORMAT",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = ($input.first().json.output || '').trim()\n  .replace(/```json\\n?/g,'').replace(/```/g,'');\nlet d;\ntry { d = JSON.parse(raw); } catch(e) { d = {intent:'doubt', doubt_topic:''}; }\nreturn [{ json: { intent: d.intent || 'doubt', doubt_topic: d.doubt_topic || '' } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        400
+      ],
+      "id": "b5337d00-e87b-48c6-9e31-cc3f3d03a139",
+      "name": "Парсим FORMAT"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1533e1e0-ca60-4586-ab50-7e4415a7ab83",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "agree",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agree"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9e4ec1cb-9e15-4200-9a04-62127d221b48",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "decline",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "decline"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        352,
+        384
+      ],
+      "id": "7d327910-b1eb-45dd-bc7a-49231e8689e2",
+      "name": "Switch FORMAT"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b6047a38-f035-497e-9989-d8ca3a1c000f",
+              "name": "reply",
+              "value": "=Отлично! Тогда начинаем 🙂\nПодскажи — ты сейчас являешься клиентом ВТБ (есть действующая карта или счёт)?",
+              "type": "string"
+            },
+            {
+              "id": "073694ec-33f3-4a11-ab9e-77fc7a9da795",
+              "name": "next_stage",
+              "value": "ROUTING",
+              "type": "string"
+            },
+            {
+              "id": "7255dc82-605f-4b40-bac1-64f9dc1a5ed5",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        192
+      ],
+      "id": "a2ed2d83-eb22-4464-ba3a-fcdf6d3c4b19",
+      "name": "Ответ FORMAT agree"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fac8f218-0a59-4e99-87ad-659f3efabafd",
+              "name": "reply",
+              "value": "=Понял, без проблем. Если передумаешь — напиши, всегда рады 🙂",
+              "type": "string"
+            },
+            {
+              "id": "61e13df9-e1e6-4934-af3e-615853cc3a90",
+              "name": "next_stage",
+              "value": "HOLD",
+              "type": "string"
+            },
+            {
+              "id": "751c2713-0179-4d69-8686-f03bcd594dd1",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        288
+      ],
+      "id": "6ee84fe8-73a6-4053-8f6d-2f7538d50ccf",
+      "name": "Ответ FORMAT decline"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "502611b4-dd8d-420d-9df4-e63ba6c6a6de",
+              "name": "reply",
+              "value": "=Никаких переводов от тебя не требуется — мы сами переводим вознаграждение после выполнения задания. Твои данные в безопасности, задание законное.\nПодходит такой формат? 🙂",
+              "type": "string"
+            },
+            {
+              "id": "a19f4b4b-7e5d-4e62-88ea-607f5165dac0",
+              "name": "next_stage",
+              "value": "FORMAT",
+              "type": "string"
+            },
+            {
+              "id": "fc6143bf-771a-4713-8b70-27a9692717bf",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        384
+      ],
+      "id": "dd0cc513-a0c3-4edd-822f-20dd21bcb05c",
+      "name": "Ответ FORMAT doubt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — классификатор ответов про банк.\n\nКонтекст:\n- Пользователю задают вопросы о том, клиентом каких банков он является\n- История диалога: {{ $json.history_of_messages }}\n- Возраст: {{ $json.age }}\n\nОпредели намерение и верни ТОЛЬКО JSON без markdown:\n{\n  \"intent\": \"not_vtb_client\" | \"yes_vtb_wants_tbank\" | \"yes_vtb_no_tbank\" | \"still_asking\",\n  \"selected_bank\": \"VTB\" | \"TBANK\" | \"ALFA\" | \"GPB\" | \"\"\n}\n\nПравила выбора банка:\n- not_vtb_client → selected_bank = \"VTB\"\n- yes_vtb_wants_tbank → selected_bank = \"TBANK\"  \n- yes_vtb_no_tbank, возраст < 18 → selected_bank = \"ALFA\"\n- yes_vtb_no_tbank, возраст >= 18 → selected_bank = \"GPB\"\n- still_asking (первое сообщение или непонятно) → selected_bank = \"\"\n\nСообщение пользователя: {{ $json.query }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -160,
+        688
+      ],
+      "id": "ab1f347f-b5a5-4ebd-adcd-78d692972a1d",
+      "name": "Классификатор ROUTING"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        848
+      ],
+      "id": "f28b56f1-8c5b-4ca1-83e9-2399f5693035",
+      "name": "OpenAI ROUTING",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nconst raw = ($input.first().json.output || '').trim()\n  .replace(/```json\\n?/g,'').replace(/```/g,'');\nlet d;\ntry { d = JSON.parse(raw); } catch(e) { d = {intent:'still_asking', selected_bank:''}; }\n\nconst LINKS = {\n  VTB:   ctx.link_vtb_apply   || 'https://www.vtb.ru/',\n  GPB:   ctx.link_gpb_apply   || 'https://www.gazprombank.ru/',\n  OTP:   ctx.link_otp_apply   || 'https://www.otpbank.ru/',\n  ALFA:  ctx.link_alfa_apply  || 'https://alfabank.ru/',\n  TBANK: 'https://www.tbank.ru/'\n};\nconst NAMES = {VTB:'ВТБ', GPB:'Газпромбанк', OTP:'ОТП', ALFA:'Альфа Банк', TBANK:'Т-Банк'};\n\nreturn [{ json: {\n  intent:        d.intent || 'still_asking',\n  selected_bank: d.selected_bank || '',\n  bank_link:     d.selected_bank ? (LINKS[d.selected_bank] || '') : '',\n  bank_name:     d.selected_bank ? (NAMES[d.selected_bank] || '') : '',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        688
+      ],
+      "id": "38475c00-dc61-46bc-b43e-986c53087104",
+      "name": "Парсим ROUTING"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "592e8f70-d2a0-4c81-b990-6187f9ad0fdb",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "still_asking",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "still_asking"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5cf611f3-05bd-4d55-84ac-3e97cbee06a5",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "yes_vtb_wants_tbank",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "yes_vtb_wants_tbank"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        672
+      ],
+      "id": "bb3ac308-7a27-4cd8-8b04-6a41ebde7847",
+      "name": "Switch ROUTING"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d35750b4-1c3c-4746-82a4-15e4aaeaccea",
+              "name": "reply",
+              "value": "=Подскажи — ты сейчас являешься клиентом ВТБ (есть действующая карта или счёт)?",
+              "type": "string"
+            },
+            {
+              "id": "3c2ca689-b259-4236-8c76-aa712d5f77e7",
+              "name": "next_stage",
+              "value": "ROUTING",
+              "type": "string"
+            },
+            {
+              "id": "bd2e9751-65ff-47a0-8a0f-1f30b8d62c01",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        464
+      ],
+      "id": "4839b0e7-e660-423f-8b41-0ca8ff91c61b",
+      "name": "Ответ ROUTING спросить ВТБ"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8259b79-7e7a-4c8a-99bb-091f463e8f64",
+              "name": "reply",
+              "value": "=Понял, ВТБ не подойдёт. Есть аналогичное задание для Т-Банка на тех же условиях — тебе было бы интересно?",
+              "type": "string"
+            },
+            {
+              "id": "ef93bfe2-b0c2-483d-ab3e-80697341d595",
+              "name": "next_stage",
+              "value": "ROUTING",
+              "type": "string"
+            },
+            {
+              "id": "90242ffc-592a-46e0-8502-cf918e97c850",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        560
+      ],
+      "id": "fa6fce62-eb75-4c3d-b6d1-8226d377167c",
+      "name": "Ответ ROUTING спросить Тбанк"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c20f994-e812-4d5d-8943-73d739fc84a8",
+              "name": "reply",
+              "value": "=Тогда выбираем {{ $json.bank_name }}. Ссылка для оформления заявки 👇\n{{ $json.bank_link }}",
+              "type": "string"
+            },
+            {
+              "id": "851824e7-a4ff-43b6-a5a4-eac786599154",
+              "name": "next_stage",
+              "value": "WAIT_DELIVERY",
+              "type": "string"
+            },
+            {
+              "id": "18425409-b0ac-4197-bf6f-158b352f7684",
+              "name": "admin_msg",
+              "value": "=[{{ $('Подготовка контекста').item.json.cuid }}] {{ $('Подготовка контекста').item.json.name }} @{{ $('Подготовка контекста').item.json.username }} → банк: {{ $json.selected_bank }}. Ссылка отправлена.",
+              "type": "string"
+            },
+            {
+              "id": "01dac99b-8642-43ce-ae9f-07208636fad4",
+              "name": "task_bank",
+              "value": "={{ $json.selected_bank }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        672
+      ],
+      "id": "4268f989-e5a3-4e82-8c48-ad69d3bf276c",
+      "name": "Ответ ROUTING банк выбран"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nconst LINKS = {\n  VTB:'https://www.vtb.ru/', GPB:'https://www.gazprombank.ru/',\n  OTP:'https://www.otpbank.ru/', ALFA:'https://alfabank.ru/', TBANK:'https://www.tbank.ru/'\n};\nconst NAMES = {VTB:'ВТБ',GPB:'Газпромбанк',OTP:'ОТП',ALFA:'Альфа Банк',TBANK:'Т-Банк'};\nconst bank = ctx.task_bank || 'VTB';\nconst link = LINKS[bank] || LINKS.VTB;\nconst name = NAMES[bank] || bank;\nreturn [{ json: {\n  reply:      `Тогда выбираем ${name}. Ссылка для оформления заявки 👇\\n${link}`,\n  next_stage: 'WAIT_DELIVERY',\n  admin_msg:  `[${ctx.cuid}] Ссылка на оформление отправлена (${bank}). Ждём дату доставки.`,\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        992
+      ],
+      "id": "57c3a664-9485-4421-bc89-3413aad2f512",
+      "name": "Ответ SEND_LINK"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5776b244-ae3b-43bc-a116-7aba722d8ed8",
+              "leftValue": "={{ $('Edit Fields').item.json.text }}",
+              "rightValue": "(\\d{1,2}[./\\-]\\d{1,2}|\\d{1,2}\\s*(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)|завтра|послезавтра|понедельник|вторник|среда|четверг|пятниц|суббот|воскресен|\\d{1,2}:\\d{2})",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1200
+      ],
+      "id": "4ea0c234-4314-448f-9faf-0fe1af384aa0",
+      "name": "Дата указана?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04784035-85ef-486d-8998-ad7d5789de4e",
+              "name": "reply",
+              "value": "=Принято ✅ Как карта окажется у тебя — напиши: \"Карта на руках\" 🙂",
+              "type": "string"
+            },
+            {
+              "id": "2e004982-d73e-4163-b01c-3be292de9e74",
+              "name": "next_stage",
+              "value": "WAIT_CARD",
+              "type": "string"
+            },
+            {
+              "id": "8c3f9692-d23f-4dbe-a59c-7179673006ba",
+              "name": "admin_msg",
+              "value": "=[{{ $('Подготовка контекста').item.json.cuid }}] Дата доставки: {{ $('Edit Fields').item.json.text }} ({{ $('Подготовка контекста').item.json.task_bank }}).",
+              "type": "string"
+            },
+            {
+              "id": "81ce5b4e-0d07-4df6-848f-62752484d4f2",
+              "name": "delivery_datetime",
+              "value": "={{ $('Edit Fields').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        1136
+      ],
+      "id": "fe902c63-61d1-49ff-9540-ae5f243d9da7",
+      "name": "Ответ WAIT_DELIVERY принято"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d811fc18-5dcc-41d9-9725-df4666b3d2d7",
+              "name": "reply",
+              "value": "=Как оформишь заявку и выберешь дату/время доставки — пришли мне 📅\nЕсли не звонят — это нормально, звонок может прийти в течение нескольких часов.",
+              "type": "string"
+            },
+            {
+              "id": "ec33dfe4-bee0-4beb-b7f7-5942ce855da5",
+              "name": "next_stage",
+              "value": "WAIT_DELIVERY",
+              "type": "string"
+            },
+            {
+              "id": "dcd2ff64-512b-4a51-a263-13d61708cd6b",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        1248
+      ],
+      "id": "a7934da6-7c6d-4a82-b114-f1d10cef3772",
+      "name": "Ответ WAIT_DELIVERY ждём"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "20c03a54-349d-4d6f-92ce-3e215c666998",
+              "leftValue": "={{ $('Edit Fields').item.json.text }}",
+              "rightValue": "(карта на руках|карту получил|карту привезли|карта пришла|карта у меня|получил карту|получила карту|карт.{0,10}(получ|привезл|руках))",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1408
+      ],
+      "id": "b374df1b-8805-4094-9bdf-7e57d75ede85",
+      "name": "Карта получена?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nconst sum  = ctx.task_bank === 'VTB' ? '500' : '100';\nreturn [{ json: {\n  reply:      `Отлично! 🎉 Теперь нужно совершить одну покупку на сумму от ${sum}₽ (что угодно для себя).\nПосле покупки пришли скриншот операции из приложения банка. Данные можно замазать — нужны сумма, дата и статус ✅`,\n  next_stage: 'WAIT_PURCHASE_PROOF',\n  admin_msg:  `[${ctx.cuid}] Карта получена (${ctx.task_bank}). Компенсация: ${sum}₽ на ${ctx.phone}.`,\n  compensation_requested_to_admin: sum,\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        1360
+      ],
+      "id": "fd6e40b5-8d25-477c-aee0-b5353a69f035",
+      "name": "Ответ WAIT_CARD получена"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db0af9f-3d0f-4b25-b5dc-697b254eb6b8",
+              "name": "reply",
+              "value": "=Ожидаю 🙂 Как только получишь карту — напиши \"Карта на руках\" и перейдём дальше.",
+              "type": "string"
+            },
+            {
+              "id": "3b3b8435-2452-4786-8af2-ce6b706b4b72",
+              "name": "next_stage",
+              "value": "WAIT_CARD",
+              "type": "string"
+            },
+            {
+              "id": "e53a3d28-0846-4bcf-a1a2-92b687842f62",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        1472
+      ],
+      "id": "60a6c66c-47d9-44d9-8b06-e3b214e8d7f0",
+      "name": "Ответ WAIT_CARD ждём"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "984614ad-3e55-4620-add3-9d4ae1c7a099",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.photo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1632
+      ],
+      "id": "65fde9d4-2d81-4561-8f50-2eeba1f70f65",
+      "name": "Фото получено?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nconst LINKS = {\n  VTB:'https://www.vtb.ru/proverka', GPB:'https://www.gazprombank.ru/proverka',\n  OTP:'https://www.otpbank.ru/proverka', ALFA:'https://alfabank.ru/proverka',\n  TBANK:'https://www.tbank.ru/proverka'\n};\nconst link = LINKS[ctx.task_bank] || LINKS.VTB;\nreturn [{ json: {\n  reply:      `Вижу, спасибо! 👍 Теперь последний шаг — заполни короткий отчёт о проверке:\\n${link}\\nЗаймёт 2–3 минуты 🙂`,\n  next_stage: 'WAIT_REPORT_DONE',\n  admin_msg:  `[${ctx.cuid}] Скриншот покупки получен (${ctx.task_bank}). Отправлена ссылка на отчёт.`,\n  purchase_screenshot_received: 'yes',\n  report_link_sent: 'yes',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        1568
+      ],
+      "id": "9849b796-b132-4d5f-89f8-fc44c071dbef",
+      "name": "Ответ WAIT_PURCHASE_PROOF скрин"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ae503ea-cffb-4ec4-86a6-6f3674a6dd41",
+              "name": "reply",
+              "value": "=Как совершишь покупку — пришли скриншот операции из приложения банка.\nДанные можно замазать — нужны только сумма, дата и статус ✅",
+              "type": "string"
+            },
+            {
+              "id": "b1773dfc-03e0-47aa-b808-b92f90675ac7",
+              "name": "next_stage",
+              "value": "WAIT_PURCHASE_PROOF",
+              "type": "string"
+            },
+            {
+              "id": "b5c7e0a3-d3b1-4ce4-a32b-f7181ae50c60",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        1696
+      ],
+      "id": "fda35824-2297-427d-b798-828a795f8be0",
+      "name": "Ответ WAIT_PURCHASE_PROOF ждём"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "03df1368-2006-49ae-8a3b-db07ec94ae0a",
+              "leftValue": "={{ $('Edit Fields').item.json.text }}",
+              "rightValue": "(заполнил|заполнила|готово|отправил форму|сделал|форму заполн|отчёт заполн)",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1856
+      ],
+      "id": "06e43da6-8006-4fec-aee9-6140293b7cff",
+      "name": "Отчёт заполнен?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nreturn [{ json: {\n  reply:      'Отлично, спасибо! 🙌 Передаю на проверку. Как только подтвердят — переведём финальную выплату 500₽.\nКогда придут деньги — напиши мне 🙂',\n  next_stage: 'WAIT_REVIEW',\n  admin_msg:  `[${ctx.cuid}] Отчёт заполнен (${ctx.task_bank}). Финальная выплата: 500₽ на ${ctx.phone}.`,\n  report_done_user_confirm:        'yes',\n  final_payout_requested_to_admin: '500',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        1792
+      ],
+      "id": "a8b0c590-1f81-46d0-ad83-f5ac5c2b163a",
+      "name": "Ответ WAIT_REPORT_DONE готово"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4537820e-215d-4271-b21e-c30b6231a785",
+              "name": "reply",
+              "value": "=Как заполнишь форму отчёта — напиши мне ✅\nЕсли что-то непонятно в форме — спрашивай, объясню!",
+              "type": "string"
+            },
+            {
+              "id": "611e0feb-f3fc-4ce6-ae3a-19352ca17a48",
+              "name": "next_stage",
+              "value": "WAIT_REPORT_DONE",
+              "type": "string"
+            },
+            {
+              "id": "5de2b40c-30f9-42b4-802a-5ccac18ed13f",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        1920
+      ],
+      "id": "968fb383-88fd-4768-a239-23bca0d8244b",
+      "name": "Ответ WAIT_REPORT_DONE ждём"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — классификатор намерений для этапа получения выплаты и отзыва.\n\nИстория диалога: {{ $json.history_of_messages }}\n\nОпредели что написал пользователь и верни ТОЛЬКО JSON без markdown:\n{\n  \"intent\": \"payout_confirmed\" | \"review_given\" | \"waiting\"\n}\n\n- payout_confirmed: пользователь сообщает что деньги пришли (пришло, получил, перевод пришёл, +500 и т.п.)\n- review_given: пользователь написал отзыв о проверке (если в истории уже был запрос отзыва)\n- waiting: деньги ещё не пришли или вопрос о сроках\n\nСообщение пользователя: {{ $json.query }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -128,
+        2080
+      ],
+      "id": "e8c63cb0-15e4-463b-9071-1de82e3b626d",
+      "name": "Классификатор WAIT_REVIEW"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        2224
+      ],
+      "id": "6589c062-c192-4fbd-b4f6-e3b8da1b67b4",
+      "name": "OpenAI WAIT_REVIEW",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = ($input.first().json.output || '').trim()\n  .replace(/```json\\n?/g,'').replace(/```/g,'');\nlet d;\ntry { d = JSON.parse(raw); } catch(e) { d = {intent:'waiting'}; }\nreturn [{ json: { intent: d.intent || 'waiting' } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        2080
+      ],
+      "id": "911a3e72-75e0-4b23-944e-63176b0e530b",
+      "name": "Парсим WAIT_REVIEW"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9fb55776-0685-4c41-a111-6f492ff4e792",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "payout_confirmed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "payout_confirmed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6c32f6fb-dba2-4cd7-9597-09ecfc764b40",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "review_given",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "review_given"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        2080
+      ],
+      "id": "32dfbe3a-6331-4542-a7b8-7318bedeb2eb",
+      "name": "Switch WAIT_REVIEW"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nreturn [{ json: {\n  reply:          'Супер! 🙌 Можешь написать короткий отзыв (1–2 предложения) — что выплатили и проверка была несложной? Прямо сюда в чат 🙏',\n  next_stage:     'WAIT_REVIEW',\n  admin_msg:      `[${ctx.cuid}] Выплата подтверждена (${ctx.task_bank}). Запросили отзыв.`,\n  payout_confirmed: 'yes',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        2080
+      ],
+      "id": "77ca356b-2cc4-4be5-9023-7c928ce1dab1",
+      "name": "Ответ WAIT_REVIEW выплата подтверждена"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx  = $('Подготовка контекста').item.json;\nconst user = $('Edit Fields').item.json.text || '';\nreturn [{ json: {\n  reply:         'Спасибо большое! 😊 У нас есть ещё одно задание — 2-й этап: проверка юридического сервиса Альфа банка. Нужно только оставить заявку, всё остальное объясню. Готов(а)?',\n  next_stage:    'TASK2_OFFER',\n  admin_msg:     `[${ctx.cuid}] Отзыв получен. Предложено задание 2.`,\n  review_received: 'yes',\n  review_text:   user,\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        1856
+      ],
+      "id": "729a1672-5009-4423-9356-27267a8b4d72",
+      "name": "Ответ WAIT_REVIEW отзыв получен"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3776a15e-1208-47e0-9e0d-5ec1164584fd",
+              "name": "reply",
+              "value": "=Как придёт выплата — напиши мне 🙂 Обычно переводят в течение 24 часов.",
+              "type": "string"
+            },
+            {
+              "id": "3755e302-04e6-40ca-a03d-4970c85d8845",
+              "name": "next_stage",
+              "value": "WAIT_REVIEW",
+              "type": "string"
+            },
+            {
+              "id": "b3838b68-922e-47df-ab05-d9eeb2779851",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        2352
+      ],
+      "id": "65eb5c60-c876-4842-bd98-f7eeedc094c5",
+      "name": "Ответ WAIT_REVIEW ждём"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=Ты — классификатор намерений. Пользователю предложили 2-е задание (юридический сервис Альфа банка, онлайн-заявка, 5–10 минут, сдельная оплата).\n\nОпредели намерение и верни ТОЛЬКО JSON без markdown:\n{\n  \"intent\": \"agree\" | \"decline\" | \"question\"\n}\n\nСообщение пользователя: {{ $json.query }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -128,
+        2352
+      ],
+      "id": "074ec194-4eb2-40f7-8bb0-1f4059028448",
+      "name": "Классификатор TASK2_OFFER"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        2480
+      ],
+      "id": "510f13c7-5bce-4f0d-85f9-8477adc71806",
+      "name": "OpenAI TASK2_OFFER",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst raw = ($input.first().json.output || '').trim()\n  .replace(/```json\\n?/g,'').replace(/```/g,'');\nlet d;\ntry { d = JSON.parse(raw); } catch(e) { d = {intent:'question'}; }\nreturn [{ json: { intent: d.intent || 'question' } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        2352
+      ],
+      "id": "b6e3d105-89d3-4689-8f5b-90fef95b6abd",
+      "name": "Парсим TASK2_OFFER"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fb8a5231-6dcc-46b5-a359-abc361fdc0e1",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "agree",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agree"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d3428d17-be46-49af-9a4e-ebb4fc0122f0",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "decline",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "decline"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        2352
+      ],
+      "id": "f91b912b-c85f-4798-869b-4f0cd589492c",
+      "name": "Switch TASK2_OFFER"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bbff241b-5ec2-4c59-8c3b-9be36b0cd9e5",
+              "name": "reply",
+              "value": "=Отлично! Вот ссылка для подачи заявки:\n{{ $('Подготовка контекста').item.json.link_task2_apply }}\nКак оставишь — напиши \"Заявка оставлена\" ✅",
+              "type": "string"
+            },
+            {
+              "id": "c4d38f4c-dd67-4508-869c-77273d86d0ef",
+              "name": "next_stage",
+              "value": "TASK2_WAIT_APPLY",
+              "type": "string"
+            },
+            {
+              "id": "6fb9878e-bf36-496c-99e4-879df41a05d9",
+              "name": "admin_msg",
+              "value": "=[{{ $('Подготовка контекста').item.json.cuid }}] Пользователь согласен на задание 2. Ссылка отправлена.",
+              "type": "string"
+            },
+            {
+              "id": "eeafa6cd-207e-41b4-8cb8-43639efdb9e7",
+              "name": "task2_accepted",
+              "value": "yes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        2576
+      ],
+      "id": "42f4c28c-163d-4b0a-bb28-fbb1162f86e7",
+      "name": "Ответ TASK2_OFFER согласен"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba5652fd-1f47-47c5-997c-dc0b100cf665",
+              "name": "reply",
+              "value": "=Ок, без проблем 🙂 Как будешь готов(а) — просто напиши \"Хочу 2 задание\" и продолжим.",
+              "type": "string"
+            },
+            {
+              "id": "ba88b59f-ca84-4412-bf5a-7838cd9619ff",
+              "name": "next_stage",
+              "value": "HOLD",
+              "type": "string"
+            },
+            {
+              "id": "22df30df-497d-49a2-8c27-5588c6785eb3",
+              "name": "admin_msg",
+              "value": "=[{{ $('Подготовка контекста').item.json.cuid }}] Пользователь отложил задание 2.",
+              "type": "string"
+            },
+            {
+              "id": "159224c4-5838-4ba5-9607-20797f4aebda",
+              "name": "task2_accepted",
+              "value": "no",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        2768
+      ],
+      "id": "2614ee8a-9e80-4f11-b83a-08763d7a3328",
+      "name": "Ответ TASK2_OFFER отказ"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c57749ce-20ce-4576-bfd4-f7f44b2c86dc",
+              "name": "reply",
+              "value": "=Юридический сервис Альфа банка — нужно только оставить онлайн-заявку, это займёт 5–10 минут. Условия те же — сдельная оплата после выполнения. Готов(а) попробовать?",
+              "type": "string"
+            },
+            {
+              "id": "c839c8ca-7233-47b7-b5f8-e25d059c9d72",
+              "name": "next_stage",
+              "value": "TASK2_OFFER",
+              "type": "string"
+            },
+            {
+              "id": "b5a4daa3-339b-4ac0-b258-7eddb119e5a7",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        2992
+      ],
+      "id": "b4ccc573-5e5e-4faa-b073-27cba8baa076",
+      "name": "Ответ TASK2_OFFER вопрос"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f4ebe80c-238a-455d-baf3-48839f955933",
+              "leftValue": "={{ $('Edit Fields').item.json.text }}",
+              "rightValue": "(заявка оставлена|оставил заявку|оставила заявку|заявку оставил|подал заявку|заявку подал)",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        2608
+      ],
+      "id": "be5ccc7c-9f4e-4af4-bd09-c68f8aef98f1",
+      "name": "Заявка оставлена?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx = $('Подготовка контекста').item.json;\nreturn [{ json: {\n  reply:         'Принято ✅ Спасибо! Если появятся вопросы — пиши сюда, помогу.\nСейчас передаю тебя нашему администратору — он продолжит сопровождение.',\n  next_stage:    'DONE',\n  admin_msg:     `[${ctx.cuid}] Задание 2: заявка оставлена. Передаю администратору.`,\n  task2_applied: 'yes',\n  handoff_to_admin: 'yes',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        2512
+      ],
+      "id": "40313eb9-e859-4d49-9293-59076a4ba3d9",
+      "name": "Ответ TASK2_WAIT_APPLY принято"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "163df3b9-6c7a-43e6-a612-cfe9bd9c5370",
+              "name": "reply",
+              "value": "=Как оставишь заявку — напиши мне \"Заявка оставлена\" ✅\nЕсли ссылка не открывается — попробуй с другого браузера.",
+              "type": "string"
+            },
+            {
+              "id": "fbf1aa68-4838-4fe7-b3c2-189f114af738",
+              "name": "next_stage",
+              "value": "TASK2_WAIT_APPLY",
+              "type": "string"
+            },
+            {
+              "id": "df73b63c-3e63-42b7-a7ad-d4a04cddf2b6",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        2672
+      ],
+      "id": "caec3320-0926-4e31-905e-4add7f08e174",
+      "name": "Ответ TASK2_WAIT_APPLY ждём"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "55237ac9-0f91-4d5b-a53c-e0093af128b5",
+              "leftValue": "={{ $('Edit Fields').item.json.text }}",
+              "rightValue": "(хочу 2|хочу второе|хочу задание 2|готов ко второму|хочу продолжить)",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        2880
+      ],
+      "id": "93a9f0e5-a8f2-4dd1-96bc-66f077e3b8b8",
+      "name": "Хочет 2 задание?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4369c39-98c3-4d21-9a9e-21840ad0a478",
+              "name": "reply",
+              "value": "=Отлично, рад что вернулся! 🙂 Вот ссылка для подачи заявки:\n{{ $('Подготовка контекста').item.json.link_task2_apply }}\nКак оставишь — напиши \"Заявка оставлена\" ✅",
+              "type": "string"
+            },
+            {
+              "id": "55eb8859-511f-4ef8-9fa7-60bad5b0eafc",
+              "name": "next_stage",
+              "value": "TASK2_WAIT_APPLY",
+              "type": "string"
+            },
+            {
+              "id": "ed745735-52ba-4bf7-9f84-f7dddd2757e5",
+              "name": "admin_msg",
+              "value": "=[{{ $('Подготовка контекста').item.json.cuid }}] Пользователь вернулся и принял задание 2.",
+              "type": "string"
+            },
+            {
+              "id": "fe3b8df2-de8c-463e-8d46-4f905b41ae85",
+              "name": "task2_accepted",
+              "value": "yes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        2832
+      ],
+      "id": "8bd246dd-8fe4-4c51-a54a-7ada62f33aea",
+      "name": "Ответ HOLD возврат"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "845783c8-6312-4430-ac0a-d0051ad53b09",
+              "name": "reply",
+              "value": "=Хорошо, буду ждать 🙂 Когда будешь готов(а) продолжить — напиши \"Хочу 2 задание\".",
+              "type": "string"
+            },
+            {
+              "id": "6113688d-0af6-4885-864d-f6abcb9ba7ba",
+              "name": "next_stage",
+              "value": "HOLD",
+              "type": "string"
+            },
+            {
+              "id": "6f0124dc-b623-4798-8dab-db94ae0a06dc",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        2992
+      ],
+      "id": "ddc475d5-b82d-48b9-9caf-5bbc2cad107e",
+      "name": "Ответ HOLD ожидание"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "174056ac-cd77-466d-8e54-e801e2ac78ec",
+              "name": "reply",
+              "value": "=Привет! Твоё задание завершено и тебя сопровождает администратор. По всем вопросам он поможет 🙂",
+              "type": "string"
+            },
+            {
+              "id": "6afeae10-cd19-470a-89b2-f38813b790df",
+              "name": "next_stage",
+              "value": "DONE",
+              "type": "string"
+            },
+            {
+              "id": "7aa76427-77b3-47bf-8bda-2b9fa824049b",
+              "name": "admin_msg",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        3456
+      ],
+      "id": "168e7db3-a118-4976-b00b-1f2bd5e1a1d5",
+      "name": "Ответ DONE"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch тип",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch тип": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Читаем данные пользователя",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Читаем данные пользователя": {
+      "main": [
+        [
+          {
+            "node": "Подготовка контекста",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка контекста": {
+      "main": [
+        [
+          {
+            "node": "Switch по этапу",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить историю": {
+      "main": [
+        [
+          {
+            "node": "Отправить пользователю",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Есть ADMIN?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Обновить Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть ADMIN?": {
+      "main": [
+        [
+          {
+            "node": "Отправить администратору",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ START": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch по этапу": {
+      "main": [
+        [
+          {
+            "node": "Ответ START",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Классификатор FORMAT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Классификатор ROUTING",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ SEND_LINK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Дата указана?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Карта получена?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Фото получено?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отчёт заполнен?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Классификатор WAIT_REVIEW",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Классификатор TASK2_OFFER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Заявка оставлена?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Хочет 2 задание?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI FORMAT": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Классификатор FORMAT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Классификатор FORMAT": {
+      "main": [
+        [
+          {
+            "node": "Парсим FORMAT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим FORMAT": {
+      "main": [
+        [
+          {
+            "node": "Switch FORMAT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ FORMAT agree": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch FORMAT": {
+      "main": [
+        [
+          {
+            "node": "Ответ FORMAT agree",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ FORMAT decline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ FORMAT doubt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ FORMAT decline": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ FORMAT doubt": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI ROUTING": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Классификатор ROUTING",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Классификатор ROUTING": {
+      "main": [
+        [
+          {
+            "node": "Парсим ROUTING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим ROUTING": {
+      "main": [
+        [
+          {
+            "node": "Switch ROUTING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ ROUTING спросить ВТБ": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch ROUTING": {
+      "main": [
+        [
+          {
+            "node": "Ответ ROUTING спросить ВТБ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ ROUTING спросить Тбанк",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ ROUTING банк выбран",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ ROUTING спросить Тбанк": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ ROUTING банк выбран": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ SEND_LINK": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_DELIVERY принято": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Дата указана?": {
+      "main": [
+        [
+          {
+            "node": "Ответ WAIT_DELIVERY принято",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_DELIVERY ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_DELIVERY ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Карта получена?": {
+      "main": [
+        [
+          {
+            "node": "Ответ WAIT_CARD получена",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_CARD ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_CARD получена": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_CARD ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фото получено?": {
+      "main": [
+        [
+          {
+            "node": "Ответ WAIT_PURCHASE_PROOF скрин",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_PURCHASE_PROOF ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_PURCHASE_PROOF скрин": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_PURCHASE_PROOF ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отчёт заполнен?": {
+      "main": [
+        [
+          {
+            "node": "Ответ WAIT_REPORT_DONE готово",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_REPORT_DONE ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_REPORT_DONE готово": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_REPORT_DONE ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI WAIT_REVIEW": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Классификатор WAIT_REVIEW",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Классификатор WAIT_REVIEW": {
+      "main": [
+        [
+          {
+            "node": "Парсим WAIT_REVIEW",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим WAIT_REVIEW": {
+      "main": [
+        [
+          {
+            "node": "Switch WAIT_REVIEW",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch WAIT_REVIEW": {
+      "main": [
+        [
+          {
+            "node": "Ответ WAIT_REVIEW выплата подтверждена",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_REVIEW отзыв получен",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ WAIT_REVIEW ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_REVIEW выплата подтверждена": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_REVIEW отзыв получен": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ WAIT_REVIEW ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI TASK2_OFFER": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Классификатор TASK2_OFFER",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Классификатор TASK2_OFFER": {
+      "main": [
+        [
+          {
+            "node": "Парсим TASK2_OFFER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсим TASK2_OFFER": {
+      "main": [
+        [
+          {
+            "node": "Switch TASK2_OFFER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch TASK2_OFFER": {
+      "main": [
+        [
+          {
+            "node": "Ответ TASK2_OFFER согласен",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ TASK2_OFFER отказ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ TASK2_OFFER вопрос",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ TASK2_OFFER согласен": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ TASK2_OFFER отказ": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ TASK2_OFFER вопрос": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Заявка оставлена?": {
+      "main": [
+        [
+          {
+            "node": "Ответ TASK2_WAIT_APPLY принято",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ TASK2_WAIT_APPLY ждём",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ TASK2_WAIT_APPLY принято": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ TASK2_WAIT_APPLY ждём": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Хочет 2 задание?": {
+      "main": [
+        [
+          {
+            "node": "Ответ HOLD возврат",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ HOLD ожидание",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ HOLD возврат": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ HOLD ожидание": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ DONE": {
+      "main": [
+        [
+          {
+            "node": "Сохранить историю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d311e743-c316-4456-b74e-f95b3ccd7134",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-01T09:58:09.564Z",
+      "createdAt": "2026-03-01T09:58:09.564Z",
+      "role": "workflow:owner",
+      "workflowId": "LOT1Weoq3Xa1s0Sf",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
