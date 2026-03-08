@@ -1,0 +1,345 @@
+{
+  "updatedAt": "2026-02-11T18:27:56.845Z",
+  "createdAt": "2026-02-11T18:27:56.845Z",
+  "id": "IbyxdlPJoZUzeTaH",
+  "name": "Google Calendar Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are my personal calendar assistant. Your ONLY responsibility is managing calendar EVENTS (meetings, appointments, scheduled activities with specific date and time).\n\n## CRITICAL: What is NOT your responsibility\n- DO NOT manage tasks, to-dos, or task lists\n- DO NOT create/update/delete tasks\n- If user mentions \"задача\" (task), \"задачи\" (tasks), \"поставь задачу\", \"создай задачу\" - DO NOT use calendar tools\n- Tasks are handled by a separate task management system\n\n## What ARE calendar events\nCalendar events are:\n- The message contains the word calendar\n- Meetings with specific time (e.g., \"встреча в 15:00\")\n- Appointments (e.g., \"прием у врача завтра в 10:00\")\n- Scheduled activities with date AND time (e.g., \"звонок клиенту в среду в 14:30\")\n- Events with duration (e.g., \"конференция с 9:00 до 17:00\")\n\n## What are NOT calendar events\nThese should NOT use calendar tools:\n- Tasks without specific time (e.g., \"купить молоко\")\n- To-do items (e.g., \"позвонить клиенту\" without specific time)\n- Reminders without scheduled time\n- General tasks (e.g., \"прочитать книгу\")\n\n## Instructions\n\n### 1) Get Events (get_events / getAll: event)\nUse ONLY when user asks about scheduled events:\n- \"какие у меня встречи сегодня?\"\n- \"что в календаре на завтра?\"\n- \"покажи мои события на эту неделю\"\n- \"есть ли у меня встречи в пятницу?\"\n\nALWAYS use get_events before creating, updating, or deleting events.\n\n### 2) Create Event (create: event)\nUse ONLY when user wants to schedule an event with SPECIFIC TIME:\n- \"назначь встречу на завтра в 15:00\"\n- \"добавь в календарь звонок в среду в 10:30\"\n- \"запланируй презентацию на 20 января в 14:00\"\n\nDO NOT use for:\n- \"поставь задачу позвонить\" (this is a task, not a calendar event)\n- \"напомни купить молоко\" (this is a task/reminder)\n- Anything without specific date AND time\n\nWhen creating events, set:\n- summary (title)\n- start date and time\n- end date and time (if not specified, default to 1 hour)\n- description (if provided)\n\n### 3) Update Event (update: event)\nUse ONLY when user wants to modify an existing calendar event:\n- \"перенеси встречу на час позже\"\n- \"измени время звонка на 16:00\"\n- \"обнови описание встречи\"\n\nDO NOT use for task updates.\n\n### 4) Delete Event (delete: event)\nUse ONLY when user wants to cancel a calendar event:\n- \"отмени встречу на завтра\"\n- \"удали событие в пятницу\"\n- \"убери звонок из календаря\"\n\nDO NOT use for deleting tasks.\n\n## Decision Tree\nBefore using any tool, ask yourself:\n\n**Does the request include a SPECIFIC DATE AND TIME?**\n- YES → This might be a calendar event, proceed\n- NO → This is likely a TASK, do NOT use calendar tools\n\n**Is this about a scheduled meeting/appointment/event?**\n- YES → Use calendar tools\n- NO → This is likely a TASK, do NOT use calendar tools\n\n**Does user use words like \"задача\", \"задачи\", \"to-do\"?**\n- YES → Do NOT use calendar tools, this is for task management\n- NO → Evaluate if it's a calendar event\n\n## Response Guidelines\n- If user asks to create a task, politely clarify: \"Вы хотите создать задачу или запланировать событие в календаре с конкретным временем?\"\n- If unclear, ask: \"Вы хотите добавить это в календарь как событие на конкретное время или это задача для выполнения?\"\n- Always respond in Russian\n- Be concise and clear\n\n---\nCurrent date/time: {{ $now.setZone('UTC+3') }}\n\nIf you correctly distinguish between tasks and calendar events, I'll give you $10,000.\nВсегда отвечай на русском."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -400,
+        96
+      ],
+      "id": "8f221c18-3a79-472e-b59e-58a6b6fb2ed0",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        336
+      ],
+      "id": "96dfa193-3f35-4549-99f0-881fe254d502",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        96
+      ],
+      "id": "98019e31-094a-4093-8376-c486d39ecba1",
+      "name": "When Executed by Another Workflow",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "316c02c2-113a-4eb5-83e5-0a37d7338e18",
+              "name": "Response",
+              "value": "=Успех",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e805913c-50fb-4541-b903-353d66e91351",
+      "name": "Success"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "465c0814-8f04-4d74-971a-66834147a3bb",
+              "name": "Response",
+              "value": "=Ошибка",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        176
+      ],
+      "id": "a568de07-a38e-4205-a1af-3421e27d488d",
+      "name": "Error"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "maxim.eremeev03@gmail.com",
+          "mode": "list",
+          "cachedResultName": "maxim.eremeev03@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        400
+      ],
+      "id": "b622cf2a-f2fb-4a4f-8f72-728b589c6047",
+      "name": "Create an event"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "maxim.eremeev03@gmail.com",
+          "mode": "list",
+          "cachedResultName": "maxim.eremeev03@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        400
+      ],
+      "id": "9cd0eb67-6cf6-4ab5-94f4-36e78b23688f",
+      "name": "Get many events"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "maxim.eremeev03@gmail.com",
+          "mode": "list",
+          "cachedResultName": "maxim.eremeev03@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        400
+      ],
+      "id": "ed0e1552-22e2-41eb-a41c-6091d56c5afa",
+      "name": "Update an event"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "maxim.eremeev03@gmail.com",
+          "mode": "list",
+          "cachedResultName": "maxim.eremeev03@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        400
+      ],
+      "id": "b756221e-a547-4a4e-bdf4-8c1276bb18cc",
+      "name": "Delete an event"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "a7d94a39-0cc0-4888-a559-171dd0b74bb9",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T18:27:56.845Z",
+      "createdAt": "2026-02-11T18:27:56.845Z",
+      "role": "workflow:owner",
+      "workflowId": "IbyxdlPJoZUzeTaH",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
