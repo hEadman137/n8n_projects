@@ -1,0 +1,171 @@
+{
+  "updatedAt": "2026-03-07T17:36:57.506Z",
+  "createdAt": "2026-03-07T17:36:57.506Z",
+  "id": "hLxAG8zz0ipt0hNW",
+  "name": "Рассылка — Астрочат приветствие",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs",
+          "mode": "list",
+          "cachedResultName": "Нотальная идея",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WWQPKhYxYoZnlzG-juoEDh0wYOP-9XxzhUS1NCH-mWs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "517f7616-ee30-44a6-a1f4-87c24b03b892",
+      "name": "Читаем пользователей из Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Фильтруем только строки, где есть telegram_id, chat_id и first_name\nconst items = $input.all();\nconst filtered = items.filter(item => {\n  const row = item.json;\n  return row.telegram_id && String(row.telegram_id).trim() !== ''\n      && row.chat_id    && String(row.chat_id).trim()    !== ''\n      && row.first_name && String(row.first_name).trim() !== '';\n});\nreturn filtered;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "15c80b1a-4974-45b0-a842-7ae226c08425",
+      "name": "Фильтруем — только с telegram_id, chat_id, first_name"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ 'Привет, ' + $json.first_name + '! Я так рад, что мы теперь вместе💕\\nХочу узнать тебя поближе! Заходи в наш астрочат и расскажи, какой знак зодиака мешает тебе жить больше всего😡\\n\\nБуду рад твоим историям✨\\n\\nССЫЛКА_НА_ПОСТ' }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "03d236a4-ff7d-4594-b09d-f42131a697e4",
+      "name": "Отправляем сообщение в Telegram",
+      "webhookId": "9fb1f35d-bffd-4dd6-8e2a-636a239a1b2f",
+      "credentials": {
+        "telegramApi": {
+          "id": "puWFBaP6cvSY4W9C",
+          "name": "Helper Doc"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Читаем пользователей из Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Фильтруем — только с telegram_id, chat_id, first_name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фильтруем — только с telegram_id, chat_id, first_name": {
+      "main": [
+        [
+          {
+            "node": "Отправляем сообщение в Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "beacb0f5-0370-4aaa-8c08-4a55e348423e",
+  "activeVersionId": null,
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-07T17:36:57.506Z",
+      "createdAt": "2026-03-07T17:36:57.506Z",
+      "role": "workflow:owner",
+      "workflowId": "hLxAG8zz0ipt0hNW",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
