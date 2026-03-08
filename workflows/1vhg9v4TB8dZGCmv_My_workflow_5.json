@@ -1,0 +1,459 @@
+{
+  "updatedAt": "2026-02-15T18:42:41.450Z",
+  "createdAt": "2026-02-15T18:42:41.450Z",
+  "id": "1vhg9v4TB8dZGCmv",
+  "name": "My workflow 5",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4b6111cd-d1ad-49d3-b236-b8a7441c9929",
+      "name": "Merge Feeds",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        560,
+        736
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "promptType": "=auto",
+        "text": "=",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "=You are a creative social media manager. Create a short telegram channel post summarizing today's top AI news from these articles: {{JSON.stringify($json)}}\nRequirements:\n- Professional but friendly tone\n- Include 2-3 relevant hashtags, such as #AInews #TechTrends #Innovation\n- Add a call to action: “Read more below 👇”\nOutput should be a tweet suitable for posting, with clear highlights from the articles.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "2ad3e033-bd73-4630-9924-5581312eeca8",
+      "name": "Generate post summary",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1232,
+        736
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "url": "https://venturebeat.com/category/ai/feed/",
+        "options": {}
+      },
+      "id": "048f735a-a94b-4799-b303-f7a64d5a9dfa",
+      "name": "Fetch VentureBeat AI feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        336,
+        640
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/TheAIBlog",
+        "options": {}
+      },
+      "id": "bd6e4bf4-d8ae-47e7-952e-b30833cd860f",
+      "name": "Fetch AI Blog feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        336,
+        832
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "123456789",
+        "message": "={{ $json.text }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "id": "b76a278a-10da-488d-8b4d-b1c07ec79230",
+      "name": "Request approval via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1600,
+        736
+      ],
+      "webhookId": "db8bc27a-add5-4d78-964e-c85908fc92d5",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Post AI news to Telegram with Google Gemini and human approval\n\nThis workflow automates fetching and summarizing AI news from RSS feeds, then posts to Telegram after human approval. It balances automation with control.\n\n## How it works\n- Schedule triggers RSS feeds to fetch recent AI articles.\n- Merges and selects the top article.\n- Uses Google Gemini to generate a concise Telegram post draft.\n- Sends draft for approval via Telegram; posts only if approved.\n\n## Setup steps\n1. Configure RSS feed URLs.\n2. Add Google Gemini API credentials.\n3. Set up Telegram bot and target channel/chat ID.\n4. Adjust schedule as needed.\n5. Activate the workflow.",
+        "height": 448,
+        "width": 712
+      },
+      "id": "5bf308a1-06ba-41c6-9f71-595cd61a9dcb",
+      "name": "Workflow Explanation",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n json: {\n chatInput: `Summarize this article for a LinkedIn post:\\nTitle: ${item.json.title}\\nSummary: ${item.json.contentSnippet}\\nLink: ${item.json.link}`\n }\n}));\n"
+      },
+      "id": "69630d0f-4f99-4572-93d4-090613d5ea09",
+      "name": "Prepare Gemini Prompt",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1008,
+        736
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "Data Collection\n\nFetches and merges recent AI articles from RSS feeds, then selects the top one.",
+        "height": 544,
+        "width": 656,
+        "color": 3
+      },
+      "id": "db1fcb93-77b9-4ebb-b392-90b34633bf7a",
+      "name": "Group: Data Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        528
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "AI Summarization\n\nPrepares prompt and uses Google Gemini to generate a Telegram-friendly post draft.",
+        "height": 528,
+        "width": 560,
+        "color": 6
+      },
+      "id": "6f68c882-144f-4dd0-a51d-3d56875c6f04",
+      "name": "Group: AI Summarization",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// Keep top 1 most recent\nconst sorted = items.sort((a, b) => new Date(b.json.isoDate) - new Date(a.json.isoDate));\nreturn sorted.slice(0, 1);\n"
+      },
+      "id": "4a7fde21-e287-41c5-88a7-0f2a73e455a1",
+      "name": "Keep Top 1 Article",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        784,
+        736
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "8ef3580a-a5ce-43e5-962e-7a5e3c7e79f9",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "=true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "19b6329d-6a12-4885-bcf1-ed42d7589329",
+      "name": "Check approval result",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1792,
+        736
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "Approval & Publishing\n\nRequests human approval in Telegram, checks result, and posts if approved.",
+        "height": 512,
+        "width": 672,
+        "color": 7
+      },
+      "id": "8d5a208c-5ddd-4ed8-886e-a979591ab55a",
+      "name": "Group: Approval & Publishing",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e2408f1e-0d18-4b54-bb7d-10552f4d0bf2",
+      "name": "Generate Telegram post (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1232,
+        928
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chatId": "123456789",
+        "text": "={{ $('Generate post summary').item.json.text }}",
+        "additionalFields": {}
+      },
+      "id": "acf33df5-48f0-4a0e-9a84-ce86efec018f",
+      "name": "Publish approved post to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2032,
+        720
+      ],
+      "webhookId": "259006f6-fb56-4359-b275-38d7f4f3d937",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15,
+              "triggerAtMinute": 56
+            }
+          ]
+        }
+      },
+      "id": "0ae0d3e9-7903-4434-82f1-4b657e98c2da",
+      "name": "Schedule trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        112,
+        736
+      ],
+      "typeVersion": 1.2
+    }
+  ],
+  "connections": {
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Keep Top 1 Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch VentureBeat AI feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch AI Blog feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch AI Blog feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Keep Top 1 Article": {
+      "main": [
+        [
+          {
+            "node": "Prepare Gemini Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check approval result": {
+      "main": [
+        [
+          {
+            "node": "Publish approved post to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate post summary": {
+      "main": [
+        [
+          {
+            "node": "Request approval via Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Gemini Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate post summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch VentureBeat AI feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request approval via Telegram": {
+      "main": [
+        [
+          {
+            "node": "Check approval result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Telegram post (Gemini)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate post summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "7ad4e42b-5a95-46e6-9afa-ab45b6109463",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-15T18:42:41.450Z",
+      "createdAt": "2026-02-15T18:42:41.450Z",
+      "role": "workflow:owner",
+      "workflowId": "1vhg9v4TB8dZGCmv",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T11:51:25.359Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
