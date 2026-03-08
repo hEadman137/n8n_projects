@@ -1,0 +1,1094 @@
+{
+  "updatedAt": "2026-02-25T18:40:21.203Z",
+  "createdAt": "2026-02-09T17:29:59.253Z",
+  "id": "satfimvihE90MLrS",
+  "name": "Лид для оформления карт",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        432
+      ],
+      "id": "214b91ff-83e1-493f-b228-b1259e064fc5",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields1').item.json.query }}",
+        "options": {
+          "systemMessage": "=Пошаговая инструкция для ведения диалога (воронка):\n\n1. Этап 1: Вовлечение и выявление готовности (первые 2-3 сообщения)\n\nПоприветствуй и сразу обозначь выгоду: \"Привет! Рад, что ты с нами. Готов выбрать карту, на которой заработаешь? 💰\"\n\nЗадай уточняющий вопрос, чтобы сегментировать клиента:\n\n\"Ты больше для себя карту ищешь или просто чтобы бонус получить и, возможно, не пользоваться?\"\n\n\"Есть предпочтения по банкам? Или главное — максимальный реферальный бонус?\"\n\nЦель: Получить \"да\" или понять мотивацию.\n\n2. Этап 2: Предложение выбора и работа с возражениями (основная часть)\n\nПредложи 2-3 варианта банков. По каждому назови: 1) Реферальный бонус (НАША ВЫГОДА ДЛЯ НЕГО), 2) Плюсы карты (кешбэк, проценты), 3) Простота оформления (\"заявка за 5 минут онлайн\").\n\nРабота с типичными возражениями:\n\n\"Подумаю / Сделаю потом\" -> Ответ: \"Понимаю! Но банки часто меняют условия реферальных программ. Сейчас бонус максимальный. Давай пока процесс запустим, это тебя ни к чему не обязывает. Чем раньше оформишь — раньше получишь деньги. Просто выбери банк, который больше нравится?\"\n\n\"Боюсь, что не одобрят / плохая кредитная история\" -> Ответ: \"С дебетовой картой одобрение 99%. Её выдают всем. С кредитной — да, банк проверяет. Но попытка не пытка! Подача заявки ничего не стоит, не влияет на кредитную историю критично, а если одобрят — ты и карту получишь, и наш бонус. Выгоднее пробовать, чем гадать. Попробуем?\"\n\n\"Слишком сложно / много документов\" -> Ответ: \"Сейчас всё онлайн. Нужен только паспорт и иногда фото с ним. Я дам тебе прямую ссылку, где всё интуитивно понятно. А если будут вопросы — я тут, помогу.\"\n\n\"А это безопасно? / Вы кто?\" -> Ответ: \"Мы помогаем людям получать бонусы за карты, которые они и так могут оформить. Мы не банк, мы партнёры. Ты подаёшь заявку НАПРЯМУЮ на официальном сайте банка. Мы просто даём тебе ссылку, которая добавляет тебе бонус. Безопасность — как при обычном оформлении.\"\n\nЦель: Снять основные барьеры и подвести к выбору конкретного банка.\n\n3. Этап 3: Направление на действие (Key Moment)\n\nКак только пользователь соглашается (даже пассивно: \"ладно, ок\"): НЕМЕДЛЕННО переходи к действию.\n\nСообщение: \"Отлично! Держи прямую ссылку на заявку в [Название банка]. ⚡️ Важно: чтобы бонус зачислился, нужно пройти по этой ссылке и оформить карту до конца. Весь процесс займет 5-10 минут. Если возникнут сложности с заполнением — пиши, помогу разобраться.\"\n\nОтправь уникальную реферальную ссылку.\n\nДобавь социальное доказательство: \"Только вчера 47 человек через нас получили бонус. Ты следующий!\"\n\nПредложи помощь: \"После оформления напиши мне 'Готово', и я расскажу, как и когда получишь свой бонус от нас.\"\n\nРеферальные ссылки для банков:\nТ-Банк: https://www.tbank.ru/\nВТБ: https://www.vtb.ru/\nАльфа: https://alfabank.ru/\nМТС-Банк: https://www.mtsbank.ru/\nОзон Банк: https://finance.ozon.ru/\n\n4. Этап 4: Доводка и поддержка (если пользователь пропал)\n\nЕсли после отправки ссылки тишина 5-10 минут: Напиши: \"Так как, успеваешь оформить? Если что-то не грузит или есть вопросы — лови меня здесь 👍\"\n\nЧерез 1-2 часа: \"Привет! Напомню про самую выгодную ссылку на карту [Банк]. Бонус всё ещё актуален. Успевай забрать!\"\n\nЦель: Вернуть в воронку, показать свою доступность.\n\n5. Финальное сообщение (после \"Готово\"):\n\n\"Супер! Поздравляю с оформлением! 🎉 Обычно банк проверяет заявку от пары часов до 2 дней. Как только карта будет активирована/получена, мы автоматически увидим это и начислим тебе бонус [сумма/способ]. Следи за сообщениями здесь! А теперь можешь посмотреть другие карты — можешь заработать ещё.\"\n\n---\n\nВСЕГДА, перед тем как ответить клиенту обращайся к Check Info, чтобы посмотреть историю общения - history_of_messages. Ответ формируй на основе контекст, чтобы было в history_of_messages.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        304,
+        192
+      ],
+      "id": "e3a22167-4cf8-4f94-adcd-8d845ba2b70d",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        432
+      ],
+      "id": "1b77d187-9e7d-4516-96ad-67479779edb9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M1MGzcjJvWiM8d2dZSB0LSZ1uYyF9S1xIke2MEbE6yg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cuid": "={{ $('Read Google Sheet').item.json.cuid }}",
+            "first_time_ask": "={{ $('Read Google Sheet').item.json.first_time_ask }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "history_of_messages": "={{ $json.history_of_messages }}"
+          },
+          "matchingColumns": [
+            "cuid"
+          ],
+          "schema": [
+            {
+              "id": "cuid",
+              "displayName": "cuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1600,
+        80
+      ],
+      "id": "1ae5dc39-6c07-4b48-aae1-94e99fe6d0ca",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M1MGzcjJvWiM8d2dZSB0LSZ1uYyF9S1xIke2MEbE6yg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_time_ask": "={{ $now.toISO() }}",
+            "last_time_ask": "={{ $now.toISO() }}",
+            "history_of_messages": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "cuid": "={{ $('Check new / old customer').item.json.cuid }}",
+            "username": "={{ $('Check new / old customer').item.json.username }}",
+            "name": "={{ $('Check new / old customer').item.json.name }}",
+            "age": "={{ $('Check new / old customer').item.json.age }}",
+            "phone": "={{ $('Check new / old customer').item.json.phone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cuid",
+              "displayName": "cuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "stage",
+              "displayName": "stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_time_ask",
+              "displayName": "first_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_time_ask",
+              "displayName": "last_time_ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "history_of_messages",
+              "displayName": "history_of_messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1600,
+        288
+      ],
+      "id": "94977051-e351-49b2-a796-62222e1520a8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        176
+      ],
+      "id": "b0114c0a-0df2-4d13-8be7-97d5552faa79",
+      "name": "Text from bot",
+      "webhookId": "e48323a9-861e-4d49-831f-850603b04636",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3fa04be6-ce4f-4ca2-8b4b-e7ca3204259e",
+              "name": "telegram_id",
+              "value": "={{ $json.ID }}",
+              "type": "string"
+            },
+            {
+              "id": "ab13c832-c025-4955-a934-5c9eabb971eb",
+              "name": "history_of_messages",
+              "value": "={{ $json.history_of_messages }} + {{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "387202d1-9123-4bc9-9c97-56f94a624465",
+              "name": "first_message_at",
+              "value": "={{ $json.first_time_ask }}",
+              "type": "string"
+            },
+            {
+              "id": "ca0f38ea-76e0-413b-a0b1-49d4ab37b0ab",
+              "name": "last_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        80
+      ],
+      "id": "befabd55-9f4e-449a-b998-5b6e4a0f0411",
+      "name": "Edit fields if old customers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3fa04be6-ce4f-4ca2-8b4b-e7ca3204259e",
+              "name": "telegram_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "ecf56a56-dbec-4c7c-b253-ab9e88cdd2a2",
+              "name": "first_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "ca0f38ea-76e0-413b-a0b1-49d4ab37b0ab",
+              "name": "last_message_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "70a6ab32-a3b4-486e-ba68-f650db11d859",
+              "name": "history_of_messages",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        288
+      ],
+      "id": "2fc50717-3dcd-4ff0-bb52-ce0adbeeeccc",
+      "name": "Edit fields if new customers"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97fcfc1a-1e99-4a0c-bac0-008b63dcd39c",
+              "leftValue": "={{ $json.cuid }}",
+              "rightValue": {},
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        176
+      ],
+      "id": "ae5e0f44-361e-478c-bf0f-dc467bcf5fbe",
+      "name": "Check new / old customer"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "cuid",
+              "lookupValue": "={{ $json.result.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        176
+      ],
+      "id": "64e86190-49f1-4238-9668-e3f0ba8a47cb",
+      "name": "Read Google Sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b498bbcb-54a3-411b-ab0f-2715d19d78cd",
+              "name": "query",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8d2f65a5-63d0-4b99-ad25-d31ec84e4079",
+              "name": "max_results",
+              "value": 5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -608,
+        208
+      ],
+      "id": "62f05777-8518-4dd8-bb93-5e764bc23c26",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "34181888-7b0d-4936-a829-53f76907077d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ea21faa-21c3-4f37-b2f3-8ba8add11ce2",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голос"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1392,
+        224
+      ],
+      "id": "453f8955-cae8-4977-8737-2248c59619fd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "RU",
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -944,
+        368
+      ],
+      "id": "651057c7-f275-49cb-b600-d8cbd16d7691",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1168,
+        368
+      ],
+      "id": "315e4c44-7f58-47ed-9549-b78e089e2dce",
+      "name": "Get a file",
+      "webhookId": "0e4cb516-7116-43cc-9632-c80c02c72bf1",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45b5b690-0356-452e-a4a7-98042823f89d",
+              "name": "text",
+              "value": "={{ $json.text || $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        208
+      ],
+      "id": "65c600c8-5386-4c87-84de-9e71e353b1dc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1680,
+        224
+      ],
+      "id": "1e4b35ab-cc76-4ba3-8d0f-31e5933c5df4",
+      "name": "Telegram Trigger",
+      "webhookId": "5baadddf-0ac8-46cb-84ce-eba1306b716d",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        208
+      ],
+      "id": "04537870-8d2b-46e0-bd12-0f5a6d276169",
+      "name": "Узнаем возраст и имя клиента",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04",
+          "mode": "list",
+          "cachedResultName": "Табличка для рефок",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eduSIGRdgCYB5EiSsnaBBGyVK3vzYwziHtQB9EtsB04/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "cuid",
+              "lookupValue": "={{ $json.cuid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        192
+      ],
+      "id": "c371748d-d68f-41bd-879b-3ef7e8dfce20",
+      "name": "Узнаем обращался ли клиент ранее?",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.age }}",
+                    "rightValue": 18,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "id": "46cc1443-9a19-4a70-8686-2f15ce6b66ad"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Есть 18"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "773f9931-5d5a-4344-a213-2bdcbe7b9258",
+                    "leftValue": "={{ $json.age }}",
+                    "rightValue": 18,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Меньше 18"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        208
+      ],
+      "id": "c467f962-aeda-4722-9753-00a9777a0ba1",
+      "name": "Switch1"
+    }
+  ],
+  "connections": {
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Text from bot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text from bot": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit fields if old customers": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit fields if new customers": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check new / old customer": {
+      "main": [
+        [
+          {
+            "node": "Edit fields if old customers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit fields if new customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Check new / old customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Узнаем возраст и имя клиента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Узнаем возраст и имя клиента": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Узнаем обращался ли клиент ранее?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Узнаем обращался ли клиент ранее?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "59d757a9-7484-429d-8bc9-dcfe33b3907d",
+  "activeVersionId": null,
+  "versionCounter": 69,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-09T17:29:59.253Z",
+      "createdAt": "2026-02-09T17:29:59.253Z",
+      "role": "workflow:owner",
+      "workflowId": "satfimvihE90MLrS",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
