@@ -1,0 +1,783 @@
+{
+  "updatedAt": "2026-02-19T20:46:06.028Z",
+  "createdAt": "2026-02-19T19:42:47.681Z",
+  "id": "RajxIBdVWZRLQNAN",
+  "name": "🔮 Астробот — Онбординг пользователей (AI Agent)",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "be43a5db-53b6-45df-8538-6967fef9bfe1",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        480
+      ],
+      "webhookId": "320b7e05-da66-4d81-a153-5351b86cb1b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT state, temp_data FROM user_states WHERE telegram_id = {{ $json.message.from.id }}",
+        "options": {}
+      },
+      "id": "f204e181-74a6-4b50-8a0f-1bf073c3d93c",
+      "name": "Получить состояние пользователя",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\nconst state = (rows[0] && rows[0].json && rows[0].json.state) ? rows[0].json.state : 'new';\nconst tempData = (rows[0] && rows[0].json && rows[0].json.temp_data) ? rows[0].json.temp_data : {};\nconst telegramId = $('Telegram Trigger').item.json.message.from.id;\nconst messageText = $('Telegram Trigger').item.json.message.text || '';\n\nreturn [{ json: { state, temp_data: tempData, telegram_id: telegramId, message_text: messageText } }];"
+      },
+      "id": "15b3e58e-5939-40f9-86e9-e975f7919451",
+      "name": "Извлечь состояние",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "new",
+              "outputKey": "new"
+            },
+            {
+              "value2": "awaiting_name",
+              "outputKey": "awaiting_name"
+            },
+            {
+              "value2": "awaiting_birthdate",
+              "outputKey": "awaiting_birthdate"
+            },
+            {
+              "value2": "completed",
+              "outputKey": "completed"
+            }
+          ]
+        },
+        "fallbackOutput": "new"
+      },
+      "id": "d07a2b28-1ff0-4a40-a131-019feb40443a",
+      "name": "Маршрутизация по состоянию",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        16,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO user_states (telegram_id, state) VALUES ({{ $('extract-state').item.json.telegram_id }}, 'awaiting_name') ON CONFLICT (telegram_id) DO UPDATE SET state = 'awaiting_name', updated_at = NOW()",
+        "options": {}
+      },
+      "id": "7c3453f5-cbd9-455b-bcf4-a2bc14a5f57f",
+      "name": "Установить: ожидаем имя",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        304,
+        112
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "🔮 *Добро пожаловать в Астрологический Бот!*\n\nКаждое утро я буду отправлять тебе персональный гороскоп ✨\n\nДля начала мне нужно несколько данных.\n\nКак тебя зовут? Введи своё *имя и фамилию*\n_Например: Иван Иванов_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "00cd0d6e-055e-4f4a-8916-44b0f5ab0d30",
+      "name": "Запросить имя",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        544,
+        112
+      ],
+      "webhookId": "722f1b5f-4c76-496e-8c73-36aef88961c7",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('extract-state').item.json.message_text.trim();\nconst parts = text.split(' ');\nconst firstName = parts[0] || '';\nconst lastName = parts.slice(1).join(' ') || '';\nreturn [{ json: { first_name: firstName, last_name: lastName } }];"
+      },
+      "id": "29ebba6c-5626-4be0-8393-723aa6922272",
+      "name": "Распарсить имя",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        304,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE user_states SET state = 'awaiting_birthdate', temp_data = jsonb_build_object('first_name', '{{ $json.first_name }}', 'last_name', '{{ $json.last_name }}'), updated_at = NOW() WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }}",
+        "options": {}
+      },
+      "id": "074ebac3-750b-4bde-ba57-359a7ec8a55e",
+      "name": "Сохранить имя в temp_data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        544,
+        304
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "Приятно познакомиться, *{{ $('parse-name').item.json.first_name }}*! 🌟\n\nТеперь введи дату своего рождения в формате *ДД.ММ.ГГГГ*\n_Например: 15.03.1990_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "25948a2f-174a-49b0-9d53-3d0a53a325d5",
+      "name": "Запросить дату рождения",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        784,
+        304
+      ],
+      "webhookId": "08000ebb-58cd-4af5-b354-e644809df6c8",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('extract-state').item.json.message_text.trim();\nconst parts = text.split('.');\nif (parts.length !== 3) return [{ json: { valid: false } }];\n\nconst day = parseInt(parts[0]);\nconst month = parseInt(parts[1]);\nconst year = parseInt(parts[2]);\n\nif (isNaN(day) || isNaN(month) || isNaN(year) || day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2010) {\n  return [{ json: { valid: false } }];\n}\n\nlet zodiac = '';\nif ((month === 3 && day >= 21) || (month === 4 && day <= 19)) zodiac = 'Овен ♈';\nelse if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) zodiac = 'Телец ♉';\nelse if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) zodiac = 'Близнецы ♊';\nelse if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) zodiac = 'Рак ♋';\nelse if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) zodiac = 'Лев ♌';\nelse if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) zodiac = 'Дева ♍';\nelse if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) zodiac = 'Весы ♎';\nelse if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) zodiac = 'Скорпион ♏';\nelse if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) zodiac = 'Стрелец ♐';\nelse if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) zodiac = 'Козерог ♑';\nelse if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) zodiac = 'Водолей ♒';\nelse zodiac = 'Рыбы ♓';\n\nconst birthdate = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;\nreturn [{ json: { valid: true, birthdate, zodiac } }];"
+      },
+      "id": "4b22f4fd-d60b-4e4d-8dc3-29efa85c33a6",
+      "name": "Распарсить дату и знак зодиака",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        304,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.valid }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "e91202a8-cb04-4b49-aa0f-d51a5288c891",
+      "name": "Дата корректна?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        544,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "⚠️ Неверный формат даты.\n\nПожалуйста, введи дату в формате *ДД.ММ.ГГГГ*\n_Например: 15.03.1990_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "3cf77324-49c9-45f7-b237-5886d3446fdc",
+      "name": "Ошибка формата даты",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        800,
+        656
+      ],
+      "webhookId": "27af6db1-8719-4896-b639-addb68cd3930",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH state_data AS (\n  SELECT temp_data FROM user_states WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }}\n)\nINSERT INTO users (telegram_id, first_name, last_name, birthdate, zodiac_sign, is_active)\nSELECT\n  {{ $('extract-state').item.json.telegram_id }},\n  state_data.temp_data->>'first_name',\n  state_data.temp_data->>'last_name',\n  '{{ $('parse-birthdate').item.json.birthdate }}'::DATE,\n  '{{ $('parse-birthdate').item.json.zodiac }}',\n  true\nFROM state_data\nON CONFLICT (telegram_id) DO UPDATE SET\n  first_name = EXCLUDED.first_name,\n  last_name = EXCLUDED.last_name,\n  birthdate = EXCLUDED.birthdate,\n  zodiac_sign = EXCLUDED.zodiac_sign,\n  is_active = true;\n\nUPDATE user_states SET state = 'completed', updated_at = NOW() WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }};",
+        "options": {}
+      },
+      "id": "f68d0b27-e8f2-4159-8ba0-b7d755b7583b",
+      "name": "Сохранить пользователя в БД",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        784,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "✅ *Регистрация завершена!*\n\nТвой знак зодиака: *{{ $('parse-birthdate').item.json.zodiac }}*\n\n🌅 Каждое утро в 09:00 ты будешь получать персональный прогноз!\n\nДоступные команды:\n/today — получить прогноз прямо сейчас\n/stop — отписаться от рассылки\n/start — возобновить рассылку",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "17c68f76-c3d7-4830-b8cf-72f70e56d93c",
+      "name": "Сообщение об успешной регистрации",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        480
+      ],
+      "webhookId": "455149d4-0423-4e01-96cd-5b5adec270e3",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2vA3zYFe8z83aTv",
+          "name": "Natal Chart"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "/stop",
+              "outputKey": "stop"
+            },
+            {
+              "value2": "/start",
+              "outputKey": "start"
+            },
+            {
+              "value2": "/today",
+              "outputKey": "today"
+            }
+          ]
+        },
+        "fallbackOutput": "other"
+      },
+      "id": "1d5da82e-b2eb-4db1-94a9-87003ca5e9f4",
+      "name": "Маршрутизация команд",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE users SET is_active = false WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }}",
+        "options": {}
+      },
+      "id": "e61cfdbe-7d00-4695-ac3c-30c02bb15758",
+      "name": "Отписать пользователя",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        576,
+        912
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "😔 Ты отписался от ежедневного гороскопа.\n\nЧтобы возобновить рассылку, отправь /start",
+        "additionalFields": {}
+      },
+      "id": "e0f3b2a9-13bb-4c8b-a074-f5deb3a5614b",
+      "name": "Сообщение об отписке",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        832,
+        800
+      ],
+      "webhookId": "265fd634-4917-4972-9187-98ff3b18c078",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE users SET is_active = true WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }}",
+        "options": {}
+      },
+      "id": "d4ce0704-3ca8-42ad-a051-de7c6e684ace",
+      "name": "Активировать подписку",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        576,
+        1072
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "🎉 Рассылка возобновлена! Жди прогноз завтра утром в 09:00 ✨",
+        "additionalFields": {}
+      },
+      "id": "6fe4e40b-b43f-4e77-afda-3d5b67766ae4",
+      "name": "Сообщение о подписке",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        832,
+        960
+      ],
+      "webhookId": "74afffbb-e62f-4e86-b15b-0e5bd3a9e1a5",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT first_name, last_name, birthdate::text, zodiac_sign FROM users WHERE telegram_id = {{ $('extract-state').item.json.telegram_id }} AND is_active = true",
+        "options": {}
+      },
+      "id": "44e2e3e9-d124-4bd5-920f-6232a19574f6",
+      "name": "Получить данные для прогноза",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        592,
+        1264
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Du86twvR93MpSTki",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Составь персональный астрологический прогноз на сегодня.\n\nДанные пользователя:\n- Имя: {{ $json[0].first_name }} {{ $json[0].last_name }}\n- Знак зодиака: {{ $json[0].zodiac_sign }}\n- Дата рождения: {{ $json[0].birthdate }}\n- Сегодняшняя дата: {{ $now.toFormat('dd MMMM yyyy') }}\n\nФормат ответа:\n🔮 *Прогноз на {{ $now.toFormat('dd MMMM') }} для {{ $json[0].first_name }}*\n\n🌟 *Общий прогноз*\n[2-3 предложения]\n\n💼 *Карьера и финансы*\n[2 предложения]\n\n❤️ *Любовь и отношения*\n[2 предложения]\n\n🏃 *Здоровье*\n[1-2 предложения]\n\n✨ *Совет дня*\n[1 вдохновляющее предложение]\n\nОбращайся по имени, тон тёплый и позитивный, объём 200-250 слов.",
+        "options": {
+          "systemMessage": "Ты опытный астролог с глубокими знаниями западной астрологии. Составляй персональные, уникальные гороскопы. Учитывай фазы Луны, сезоны, транзиты планет. Отвечай только текстом прогноза без вводных фраз."
+        }
+      },
+      "id": "7fd4dcc6-4901-4007-a758-2a13263dcbc5",
+      "name": "AI Agent — Прогноз Today",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        832,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxTokens": 900,
+          "temperature": 0.9
+        }
+      },
+      "id": "538b2218-8aa8-4249-8b77-2ab874eedb8f",
+      "name": "OpenAI Chat Model (Today)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        800,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('extract-state').item.json.telegram_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "e36d9d99-dc05-4bc9-93b4-1b842642422d",
+      "name": "Отправить прогноз Today",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        1136
+      ],
+      "webhookId": "fb1ed9a4-bc61-4322-a842-c5060894a30a",
+      "credentials": {
+        "telegramApi": {
+          "id": "emuQi6NCsEIMhU0W",
+          "name": "Traffic Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Получить состояние пользователя",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить состояние пользователя": {
+      "main": [
+        [
+          {
+            "node": "Извлечь состояние",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Извлечь состояние": {
+      "main": [
+        [
+          {
+            "node": "Маршрутизация по состоянию",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Маршрутизация по состоянию": {
+      "main": [
+        [
+          {
+            "node": "Установить: ожидаем имя",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Распарсить имя",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Распарсить дату и знак зодиака",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Маршрутизация команд",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Установить: ожидаем имя": {
+      "main": [
+        [
+          {
+            "node": "Запросить имя",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Распарсить имя": {
+      "main": [
+        [
+          {
+            "node": "Сохранить имя в temp_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить имя в temp_data": {
+      "main": [
+        [
+          {
+            "node": "Запросить дату рождения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Распарсить дату и знак зодиака": {
+      "main": [
+        [
+          {
+            "node": "Дата корректна?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Дата корректна?": {
+      "main": [
+        [
+          {
+            "node": "Сохранить пользователя в БД",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка формата даты",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить пользователя в БД": {
+      "main": [
+        [
+          {
+            "node": "Сообщение об успешной регистрации",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Маршрутизация команд": {
+      "main": [
+        [
+          {
+            "node": "Отписать пользователя",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Активировать подписку",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Получить данные для прогноза",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отписать пользователя": {
+      "main": [
+        [
+          {
+            "node": "Сообщение об отписке",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Активировать подписку": {
+      "main": [
+        [
+          {
+            "node": "Сообщение о подписке",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить данные для прогноза": {
+      "main": [
+        [
+          {
+            "node": "AI Agent — Прогноз Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent — Прогноз Today": {
+      "main": [
+        [
+          {
+            "node": "Отправить прогноз Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model (Today)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent — Прогноз Today",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0d46c98e-094a-4b94-85d6-5be18ae0521a",
+  "activeVersionId": null,
+  "versionCounter": 5,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T19:42:47.681Z",
+      "createdAt": "2026-02-19T19:42:47.681Z",
+      "role": "workflow:owner",
+      "workflowId": "RajxIBdVWZRLQNAN",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
