@@ -1,0 +1,1149 @@
+{
+  "updatedAt": "2026-02-03T19:10:55.825Z",
+  "createdAt": "2026-02-03T17:31:10.716Z",
+  "id": "MHzIEPsjuYfcz7t7",
+  "name": "Сценарий по отправке писем ИП",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4",
+          "mode": "list",
+          "cachedResultName": "Cтоматология",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -672,
+        0
+      ],
+      "id": "ffc9e553-5a12-4d20-b23c-04df37938b31",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Сгенерируй персонализированное письмо с предложением автоматизации бизнеса для следующего получателя:\n\nФИО: {{ $json.fio }}\nEmail: {{ $json.mail }}\nТип бизнеса: {{ $json.type }}\n\nПисьмо должно быть профессиональным, конкретным и показывать понимание специфики бизнеса получателя.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — эксперт по автоматизации бизнес-процессов и копирайтер, специализирующийся на B2B-коммуникациях.\n\nТвоя задача: создавать персонализированные коммерческие письма для владельцев бизнеса с предложением услуг по автоматизации на базе n8n.\n\nСтруктура письма:\n1. Приветствие — обращение по имени\n2. Вступление — показать понимание специфики их бизнеса (2-3 предложения)\n3. Проблематика — описать типичные проблемы этого типа бизнеса, которые решает автоматизация (3-4 пункта)\n4. Решение — конкретные примеры автоматизации для их отрасли (3-4 примера с цифрами)\n5. Выгоды — измеримые результаты (экономия времени, снижение ошибок, рост прибыли)\n6. Призыв к действию — предложение встречи/звонка для обсуждения\n7. Подпись (Максим Еремеев, телефон: +79995591513, telegram: @eremeev_me)\n\nРЕАЛЬНЫЕ ПРИМЕРЫ АВТОМАТИЗАЦИИ С ЦИФРАМИ (используй релевантные для типа бизнеса):\n\nДля медицины/стоматологии:\n- Автоматическая запись на прием через Telegram/WhatsApp — экономия 15-20 часов администратора в неделю\n- Автоматические напоминания пациентам за 24 часа — снижение пропусков на 40-50%\n- Автоматический учет материалов и оборудования — сокращение потерь на 25-30%\n- Интеграция CRM с мессенджерами — ускорение обработки заявок в 3 раза\n\nДля e-commerce/интернет-магазинов:\n- Автоматическая синхронизация товаров между площадками (Ozon, Wildberries, Яндекс.Маркет) — экономия 10-12 часов в неделю\n- Автоматические уведомления о статусе заказа — рост повторных покупок на 20-25%\n- Автообработка возвратов и обращений — сокращение времени обработки с 2 часов до 15 минут\n- Автоматический сбор отзывов после покупки — увеличение количества отзывов на 60%\n\nДля B2B продаж/консалтинга:\n- Автоматическая квалификация лидов из разных источников — экономия 8-10 часов менеджера в неделю\n- Автоматическое создание коммерческих предложений — ускорение отклика на заявки в 5 раз\n- Автоматические follow-up цепочки — рост конверсии холодных лидов на 30-35%\n- Интеграция CRM с email и мессенджерами — снижение потерь лидов на 40%\n\nДля производства/логистики:\n- Автоматический учет остатков и заказ материалов — снижение простоев на 35-40%\n- Автоматические уведомления о статусе производства/доставки — экономия 6-8 часов диспетчера в день\n- Интеграция складского учета с 1С — снижение ошибок инвентаризации на 90%\n- Автоматические отчеты по производительности — экономия 12-15 часов на аналитику в месяц\n\nДля образования/онлайн-школ:\n- Автоматическая регистрация на курсы и рассылка материалов — экономия 10-15 часов в неделю\n- Автоматические напоминания о занятиях — снижение пропусков на 45%\n- Автоматическая проверка домашних заданий (базовая) — экономия 5-7 часов преподавателя\n- Автоматический сбор обратной связи — рост вовлеченности студентов на 30%\n\nДля агентств/маркетинга:\n- Автоматический сбор данных из рекламных кабинетов в общий дашборд — экономия 8-10 часов аналитика в неделю\n- Автоматические отчеты для клиентов — сокращение времени подготовки с 4 часов до 15 минут\n- Автоматический мониторинг упоминаний бренда — ускорение реакции на негатив в 10 раз\n- Интеграция всех каналов коммуникации с клиентами — снижение времени ответа на 70%\n\nДля ресторанов/кафе:\n- Автоматическая система бронирования столов через Instagram/WhatsApp — экономия 6-8 часов хостес в неделю\n- Автоматический учет продуктов и заказ у поставщиков — снижение порчи продуктов на 30%\n- Автоматическая программа лояльности — рост повторных визитов на 25-30%\n- Автоматические опросы о качестве обслуживания — увеличение рейтинга на картах на 0.5-1 звезду\n\nДля фитнес-клубов/салонов красоты:\n- Автоматическая запись клиентов 24/7 — рост количества записей на 35-40%\n- Автоматические напоминания о записи — снижение no-show на 50%\n- Автоматический учет абонементов и продлений — экономия 10-12 часов администратора в неделю\n- Персонализированные предложения на основе истории посещений — рост допродаж на 20-25%\n\nТребования:\n- Тон: профессиональный, дружелюбный, не навязчивый\n- Длина: 200-300 слов\n- Избегай общих фраз, используй конкретику для каждого типа бизнеса\n- Не используй агрессивных продаж\n- Фокус на ценности для клиента, а не на твоих услугах\n- Адаптируй примеры под тип бизнеса из переменной {{ $json.type }}\n- ОБЯЗАТЕЛЬНО используй конкретные цифры из примеров выше\n\nВАЖНО - ФОРМАТИРОВАНИЕ ТЕКСТА:\n- Разделяй текст на абзацы с помощью двойного переноса строки (\\n\\n)\n- Каждый смысловой блок (приветствие, проблематика, решение, призыв к действию) должен быть отдельным абзацем\n- Для списков используй дефисы с переносами строк\n- НЕ используй markdown форматирование (**, ##, и т.д.)\n- Текст должен быть готов для вставки в email как plain text\n\nФормат вывода ОБЯЗАТЕЛЬНО в JSON:\n{\n  \"fio\": \"ФИО из входных данных\",\n  \"mail\": \"Email из входных данных\",\n  \"type\": \"Тип бизнеса из входных данных\",\n  \"subject\": \"Сгенерированная тема письма\",\n  \"body\": \"Полный текст письма с абзацами (используй \\\\n\\\\n для разделения абзацев)\"\n}\n\nВыводи ТОЛЬКО валидный JSON без дополнительного текста, markdown или пояснений."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "66fd6067-6f2d-4511-8402-78bc5c650cfa",
+      "name": "AI Agent",
+      "notesInFlow": false,
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2462402a-3110-40d9-8c7c-b1254933bd39",
+              "name": "fio",
+              "value": "={{ $json['фио'] }}",
+              "type": "string"
+            },
+            {
+              "id": "6284e9a4-35b5-4b83-ba17-9210f9e6dcdc",
+              "name": "mail",
+              "value": "={{ $json['имейл личный'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3b176d94-dc2a-4981-a50b-c414452b2e2b",
+              "name": "type",
+              "value": "={{ $json['Тип предприятия'] }}",
+              "type": "string"
+            },
+            {
+              "id": "417be8da-ccac-4990-acad-48bf6df776ee",
+              "name": "is_sent",
+              "value": "={{ $json['Отправлено'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        0
+      ],
+      "id": "dec26129-1dea-4ab8-af99-71e4270812f8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        208
+      ],
+      "id": "aa5d6637-57a7-43b0-b463-2aa5823d5eae",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "I2fPS5AxAPCe68Qu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "5aeeee22-ca6f-47b0-a3a1-44f79682ae39",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.output.mail }}",
+        "subject": "={{ $json.output.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        80
+      ],
+      "id": "e1dad8dd-a5f5-4baf-88fa-5c1b31a67d5c",
+      "name": "Send a message",
+      "webhookId": "86864527-6629-4417-b7a6-29c1721f7d03",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LejHXawv22MiL3fI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"fio\": {\n      \"type\": \"string\",\n      \"description\": \"ФИО получателя\"\n    },\n    \"mail\": {\n      \"type\": \"string\",\n      \"description\": \"Email получателя\"\n    },\n    \"type\": {\n      \"type\": \"string\",\n      \"description\": \"Тип бизнеса\"\n    },\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"Тема письма\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"Текст письма\"\n    }\n  },\n  \"required\": [\"fio\", \"mail\", \"type\", \"subject\", \"body\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        192
+      ],
+      "id": "f4a55978-8b52-436c-9bc0-3093b1d0bfb7",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.randomDelay }}",
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        80
+      ],
+      "id": "48bc36dc-2f95-4269-aa6e-48e2abbaa6ca",
+      "name": "Wait",
+      "webhookId": "9e0124e6-94c8-4ec5-bb00-0948a6789163"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            },
+            {
+              "triggerAtHour": 13
+            },
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        0
+      ],
+      "id": "d991e90a-3686-4e24-b761-418c1bcea689",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4",
+          "mode": "list",
+          "cachedResultName": "Cтоматология",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "имейл личный": "={{ $('Loop Over Items').item.json.output.mail }}",
+            "Отправлено": "={{ $json.labelIds[0] }}",
+            "фио": "={{ $('Get row(s) in sheet').item.json['фио'] }}",
+            "инн": "={{ $('Get row(s) in sheet').item.json['инн'] }}"
+          },
+          "matchingColumns": [
+            "инн"
+          ],
+          "schema": [
+            {
+              "id": "инн",
+              "displayName": "инн",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "фио",
+              "displayName": "фио",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "статус",
+              "displayName": "статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "действующий?",
+              "displayName": "действующий?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "руководитель компаний",
+              "displayName": "руководитель компаний",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "огрнип",
+              "displayName": "огрнип",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "учредитель компаний",
+              "displayName": "учредитель компаний",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "дата регистрации",
+              "displayName": "дата регистрации",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Регион",
+              "displayName": "Регион",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Доп сведения",
+              "displayName": "Доп сведения",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ОКВЭД",
+              "displayName": "ОКВЭД",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "орг форма",
+              "displayName": "орг форма",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "личн моб",
+              "displayName": "личн моб",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "имейл личный",
+              "displayName": "имейл личный",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Тип предприятия",
+              "displayName": "Тип предприятия",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Отправлено",
+              "displayName": "Отправлено",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        80
+      ],
+      "id": "e95d0912-9564-4be6-b825-cfe2416f9552",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fd17ced7-29b8-43ed-bdd1-709900727d1f",
+              "leftValue": "={{ $json.is_sent }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "9c627242-d223-49f1-a775-a13a4bd69469",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "chatId": "454918257",
+        "text": "=Пачка писем была отправлена:\nТип предприятий: {{ $('Get row(s) in sheet').item.json['Тип предприятия'] }}\nВремя: {{ $now.toISO() }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -112
+      ],
+      "id": "4c62aa28-3cd3-4bcc-90c8-dbe56f1b2115",
+      "name": "Send a text message",
+      "webhookId": "d57b135a-3ad4-4a21-b99c-d481864b3550",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "4194350f-80fb-4529-a6f9-039783648ced",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Генерируем рандомное число от 0 до 10 для каждого item\nfor (const item of $input.all()) {\n  item.json.randomDelay = Math.floor(Math.random() * 11);\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        80
+      ],
+      "id": "ed8141f3-e421-48e2-a793-f7deb7e6d6f0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        640
+      ],
+      "id": "7bcfa9f5-46f1-4aaa-b502-458ff6a3dc74",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LejHXawv22MiL3fI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4",
+          "mode": "list",
+          "cachedResultName": "Cтоматология",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wHsBTvK_WAnkIPUgS39R5QijaNGx6DC9hbw-Bo5s_V4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "имейл личный": "={{ $json.mail }}",
+            "Получен ответ": "Да",
+            "Время ответа": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "имейл личный"
+          ],
+          "schema": [
+            {
+              "id": "инн",
+              "displayName": "инн",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "фио",
+              "displayName": "фио",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "статус",
+              "displayName": "статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "действующий?",
+              "displayName": "действующий?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "руководитель компаний",
+              "displayName": "руководитель компаний",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "огрнип",
+              "displayName": "огрнип",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "учредитель компаний",
+              "displayName": "учредитель компаний",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "дата регистрации",
+              "displayName": "дата регистрации",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Регион",
+              "displayName": "Регион",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Доп сведения",
+              "displayName": "Доп сведения",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ОКВЭД",
+              "displayName": "ОКВЭД",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "орг форма",
+              "displayName": "орг форма",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "личн моб",
+              "displayName": "личн моб",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "имейл личный",
+              "displayName": "имейл личный",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Тип предприятия",
+              "displayName": "Тип предприятия",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Отправлено",
+              "displayName": "Отправлено",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Получен ответ",
+              "displayName": "Получен ответ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Время ответа",
+              "displayName": "Время ответа",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -512,
+        640
+      ],
+      "id": "bc7819c8-3906-4ab7-b6ce-831b5ca80867",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xOKUe7K3pMyrMWca",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17e74325-02af-4a3e-ae53-4424ad30cf44",
+              "name": "mail",
+              "value": "={{ $json.From.match(/<(.+?)>/)[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "c61223c0-19bd-48a8-8143-81b5418a41e5",
+              "name": "snippet",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        640
+      ],
+      "id": "df867830-b1ed-49cd-a8fd-6e216854bf44",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "chatId": "454918257",
+        "text": "=Был получен ответ! Нужно связаться с обратившимся.\n\nМейл: {{ $json['имейл личный'] }}\nВремя: {{ $now.toISO() }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        640
+      ],
+      "id": "51e08523-fe7c-4e5e-9061-40bbda6b2d1e",
+      "name": "Send a text message1",
+      "webhookId": "d57b135a-3ad4-4a21-b99c-d481864b3550",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed4xpYSKlIOqggT7",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19c24e3faa899817",
+          "threadId": "19c24dde9d29a9b7",
+          "snippet": "Еще раз Вт, 3 февр. 2026 г. в 22:02, Максим Еремеев &lt;maks0319nt@gmail.com&gt;: Привет Вт, 3 февр. 2026 г. в 21:57, &lt;maxim.eremeev03@gmail.com&gt;: Здравствуйте, Николай Борисович, Понимаю, что",
+          "payload": {
+            "mimeType": "multipart/alternative"
+          },
+          "sizeEstimate": 16570,
+          "historyId": "1848894",
+          "internalDate": "1770145434000",
+          "labels": [
+            {
+              "id": "INBOX",
+              "name": "INBOX"
+            },
+            {
+              "id": "IMPORTANT",
+              "name": "IMPORTANT"
+            },
+            {
+              "id": "CATEGORY_PERSONAL",
+              "name": "CATEGORY_PERSONAL"
+            },
+            {
+              "id": "UNREAD",
+              "name": "UNREAD"
+            }
+          ],
+          "From": "\"Максим Еремеев\" <maks0319nt@gmail.com>",
+          "Subject": "Re: Оптимизация работы вашей стоматологии через автоматизацию",
+          "To": "maxim.eremeev03@gmail.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "89e26849-a4c4-4c43-a38b-07c8db5d3510",
+  "activeVersionId": null,
+  "versionCounter": 20,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T17:31:10.716Z",
+      "createdAt": "2026-02-03T17:31:10.716Z",
+      "role": "workflow:owner",
+      "workflowId": "MHzIEPsjuYfcz7t7",
+      "projectId": "BfEgmNRV6qqyBW3u",
+      "project": {
+        "updatedAt": "2026-01-08T15:24:28.230Z",
+        "createdAt": "2026-01-08T15:24:04.032Z",
+        "id": "BfEgmNRV6qqyBW3u",
+        "name": "Admin Admin <maxim.eremeev03@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+        "projectRelations": [
+          {
+            "updatedAt": "2026-01-08T15:24:04.032Z",
+            "createdAt": "2026-01-08T15:24:04.032Z",
+            "userId": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+            "projectId": "BfEgmNRV6qqyBW3u",
+            "user": {
+              "updatedAt": "2026-03-08T15:32:45.336Z",
+              "createdAt": "2026-01-08T15:24:03.610Z",
+              "id": "14d29d00-dc19-4de2-b837-2b22b4d84b9d",
+              "email": "maxim.eremeev03@gmail.com",
+              "firstName": "Admin",
+              "lastName": "Admin",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "W1OITZJdAGvvz0SB",
+                "userActivatedAt": 1768331805354,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1770323013086
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-03-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
